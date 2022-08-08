@@ -1,0 +1,18 @@
+{
+  "name": "com.greenbamboogames.puppeteer",
+  "version": "0.0.1",
+  "displayName": "Puppeteer!",
+  "description": "Puppeteer!",
+  "unity": "2021.3",
+  "documentationUrl": "",
+  "changelogUrl": "",
+  "licensesUrl": "https://github.com/SolarianZ/Puppeteer/blob/main/LICENSE",
+  "keywords": [],
+  "author": {
+    "name": "GBG",
+    "email": "vdergow@hotmail.com",
+    "url": ""
+  },
+  "type": "module",
+  "hideInEditor": false
+}
