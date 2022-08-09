@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.Animations;
 using UnityEngine.Playables;
 
 namespace GBG.Puppeteer
@@ -18,9 +17,13 @@ namespace GBG.Puppeteer
 
         private PlayableGraph _graph;
 
-        private AnimationLayerMixerPlayable _layerMixerPlayable;
+        //private AnimationLayerMixerPlayable _layerMixerPlayable;
 
         private bool _isInitialized;
+
+
+        // for test
+        public PuppeteerPlayableBehaviour Behaviour;
 
 
         private void OnEnable()
@@ -56,10 +59,17 @@ namespace GBG.Puppeteer
             _graph = PlayableGraph.Create(nameof(Puppeteer));
             _graph.SetTimeUpdateMode(_updateMode);
 
-            _layerMixerPlayable = AnimationLayerMixerPlayable.Create(_graph);
+            //_layerMixerPlayable = AnimationLayerMixerPlayable.Create(_graph);
 
-            var animOutput = AnimationPlayableOutput.Create(_graph, "PuppeteerAnimationOutput", _animator);
-            animOutput.SetSourcePlayable(_layerMixerPlayable);
+            //var animOutput = AnimationPlayableOutput.Create(_graph, "PuppeteerAnimationOutput", _animator);
+            //animOutput.SetSourcePlayable(_layerMixerPlayable);
+
+            var playable = ScriptPlayable<PuppeteerPlayableBehaviour>.Create(_graph);
+            Behaviour = playable.GetBehaviour();
+            Behaviour.Initialize(_graph, _animator);
+
+            var scriptOutput = ScriptPlayableOutput.Create(_graph, "PuppeteerBehaviourOutput");
+            scriptOutput.SetSourcePlayable(playable);
 
             _isInitialized = true;
         }

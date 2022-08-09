@@ -1,100 +1,32 @@
 ﻿using UnityEngine;
+using UnityEngine.Animations;
+using UnityEngine.Assertions;
 using UnityEngine.Playables;
 
 namespace GBG.Puppeteer
 {
-    public class PuppeteerPlayableBehaviour : PlayableBehaviour
+    public partial class PuppeteerPlayableBehaviour : PlayableBehaviour
     {
-        private bool _isGraphDirty = true;
+        private const string _logPerfix = "[Puppeteer]";
+
+        private Animator _animator;
+
+        private PlayableGraph _graph;
+
+        private AnimationLayerMixerPlayable _layerMixerPlayable;
 
 
-        private void RebuildGraph()
+        public void Initialize(PlayableGraph graph, Animator animator)
         {
+            Assert.IsTrue(graph.IsValid());
 
+            _animator = animator;
+            _graph = graph;
+            _layerMixerPlayable = AnimationLayerMixerPlayable.Create(_graph);
+
+            var animOutput = AnimationPlayableOutput.Create(_graph, "PuppeteerAnimationOutput", _animator);
+            animOutput.SetSourcePlayable(_layerMixerPlayable);
         }
-
-
-        public void Play(string layerName, string stateName,
-            float timeOffset = 0f, TimeMode timeMode = TimeMode.NormalizedTime)
-        {
-
-        }
-
-        public void CrossFadeState(string layerName, string targetStateName, float fadeTime,
-            float timeOffset = 0f, TimeMode timeMode = TimeMode.NormalizedTime)
-        {
-
-        }
-
-
-        #region Layer
-
-        public byte LayerNameToIndex(string layerName)
-        {
-            return 0;
-        }
-
-        public bool HasLayer(string layerName)
-        {
-            return false;
-        }
-
-        public int AddLayer(string layerName, AvatarMask avatarMask = null,
-            AnimationBlendMode blendMode = AnimationBlendMode.Blend, float weight = 0f) // ik?
-        {
-            return -1;
-        }
-
-        public bool RemoveLayer(string layerName)
-        {
-            return false;
-        }
-
-        public void SetLayerWeight(string layerName, float weight) { }
-
-        public void SetLayerAvatarMask(string layerName, AvatarMask avatarMask) { }
-
-        #endregion
-
-
-        #region State
-
-        public bool HasState(string layerName, string stateName)
-        {
-            return false;
-        }
-
-        public void AddState(string layerName, string stateName, AnimationClip animClip)
-        {
-        }
-
-        //public void AddBlendTree1DState(string layerName, string stateName, BlendTree1DInfo)
-        //{
-        //    // BlendTree1DInfo: AnimationClip - blendParam threshold
-        //    throw new System.NotImplementedException();
-        //}
-
-        //public void AddBlendTree2DState(string layerName, string stateName, BlendTree2DInfo)
-        //{
-        //    throw new System.NotImplementedException();
-        //}
-
-        public bool RemoveState(string layerName, string stateName)
-        {
-            return false;
-        }
-
-        public void SetStateWeight(string layerName, string stateName, float weight)
-        {
-
-        }
-
-        public void SetStatePlaybackSpeed(string layerName, string stateName, float speed)
-        {
-
-        }
-
-        #endregion
 
 
         #region Playable Behaviour Callbacks
@@ -104,13 +36,25 @@ namespace GBG.Puppeteer
         {
             base.PrepareFrame(playable, info);
 
-            // todo build playable graph hierarchy
-        }
+            for (int i = 0; i < _activeCrossFades.Count; i++)
+            {
+                var crossFadeInfo = _activeCrossFades[i];
+                crossFadeInfo.Evaluate(info.deltaTime);
+                if (crossFadeInfo.IsDone())
+                {
+                    _activeCrossFades.RemoveAt(i--);
 
-        // may not use this method
-        public override void ProcessFrame(Playable playable, FrameData info, object playerData)
-        {
-            base.ProcessFrame(playable, info, playerData);
+                    SwapInputs(crossFadeInfo.Receiver, 1, 0);
+                    if (crossFadeInfo.From.IsValid())
+                    {
+                        crossFadeInfo.From.Destroy();
+                    }
+                }
+                else
+                {
+                    _activeCrossFades[i] = crossFadeInfo;
+                }
+            }
         }
 
         #endregion
