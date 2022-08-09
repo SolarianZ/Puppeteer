@@ -1,12 +1,29 @@
 using UnityEngine;
+using UnityEngine.Animations;
 using UnityEngine.Playables;
 
 namespace GBG.Puppeteer
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Animator))]
-    public class Puppeteer : MonoBehaviour
+    public partial class Puppeteer : MonoBehaviour
     {
+        private const string _logPerfix = "[Puppeteer]";
+
+
+        public DirectorUpdateMode UpdateMode
+        {
+            get { return _updateMode; }
+            set
+            {
+                _updateMode = value;
+                if (_isInitialized)
+                {
+                    _graph.SetTimeUpdateMode(_updateMode);
+                }
+            }
+        }
+
         [SerializeField]
         private DirectorUpdateMode _updateMode = DirectorUpdateMode.GameTime;
 
@@ -17,14 +34,18 @@ namespace GBG.Puppeteer
 
         private PlayableGraph _graph;
 
-        //private AnimationLayerMixerPlayable _layerMixerPlayable;
+        private AnimationLayerMixerPlayable _layerMixerPlayable;
 
         private bool _isInitialized;
 
 
-        // for test
-        public PuppeteerPlayableBehaviour Behaviour;
-
+        private void OnValidate()
+        {
+            if (_isInitialized)
+            {
+                _graph.SetTimeUpdateMode(_updateMode);
+            }
+        }
 
         private void OnEnable()
         {
@@ -46,6 +67,11 @@ namespace GBG.Puppeteer
             }
         }
 
+        private void Update()
+        {
+            ProcessCrossFades(Time.deltaTime);
+        }
+
 
         private void Initialize()
         {
@@ -55,21 +81,15 @@ namespace GBG.Puppeteer
             }
 
             _animator = GetComponent<Animator>();
+            _animator.runtimeAnimatorController = null;
 
             _graph = PlayableGraph.Create(nameof(Puppeteer));
             _graph.SetTimeUpdateMode(_updateMode);
 
-            //_layerMixerPlayable = AnimationLayerMixerPlayable.Create(_graph);
+            _layerMixerPlayable = AnimationLayerMixerPlayable.Create(_graph);
 
-            //var animOutput = AnimationPlayableOutput.Create(_graph, "PuppeteerAnimationOutput", _animator);
-            //animOutput.SetSourcePlayable(_layerMixerPlayable);
-
-            var playable = ScriptPlayable<PuppeteerPlayableBehaviour>.Create(_graph);
-            Behaviour = playable.GetBehaviour();
-            Behaviour.Initialize(_graph, _animator);
-
-            var scriptOutput = ScriptPlayableOutput.Create(_graph, "PuppeteerBehaviourOutput");
-            scriptOutput.SetSourcePlayable(playable);
+            var animOutput = AnimationPlayableOutput.Create(_graph, "PuppeteerAnimationOutput", _animator);
+            animOutput.SetSourcePlayable(_layerMixerPlayable);
 
             _isInitialized = true;
         }

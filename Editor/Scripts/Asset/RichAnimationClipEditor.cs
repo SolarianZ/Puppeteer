@@ -27,9 +27,6 @@ namespace GBG.Puppeteer.Editor
         }
 
 
-        internal void SetAsset(RichAnimationClip asset)
-        {
-
-        }
+        internal void SetAsset(RichAnimationClip asset) { }
     }
 }

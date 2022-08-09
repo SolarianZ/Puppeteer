@@ -1,11 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Playables;
-using UDebug = UnityEngine.Debug;
 
 namespace GBG.Puppeteer
 {
-    public partial class PuppeteerPlayableBehaviour
+    public partial class Puppeteer
     {
         private readonly List<GraphLayer> _layers = new List<GraphLayer>();
 
@@ -23,7 +22,7 @@ namespace GBG.Puppeteer
                 }
             }
 
-            index = default;
+            index = -1;
             return false;
         }
 
@@ -77,7 +76,7 @@ namespace GBG.Puppeteer
 
             if (weight < 0 || weight > 1)
             {
-                UDebug.LogWarning($"{_logPerfix} Clamp weight({weight}) into [0f,1f].");
+                Debug.LogWarning($"{_logPerfix} Clamp weight({weight}) into [0f,1f].");
                 weight = Mathf.Clamp01(weight);
             }
 
@@ -120,8 +119,6 @@ namespace GBG.Puppeteer
             }
 
             layer.AddState(stateName, animClip, playbackSpeed);
-
-            // todo need rebuild graph
         }
 
         //public void AddBlendTree1DState(string layerName, string stateName, BlendTree1DInfo)
@@ -148,7 +145,7 @@ namespace GBG.Puppeteer
                 return false;
             }
 
-            // todo need rebuild graph
+            // todo if(state is current playing state) ...
 
             return true;
         }
@@ -158,16 +155,9 @@ namespace GBG.Puppeteer
             var state = GetStateWithException(layerName, stateName);
             state.PlaybackSpeed = speed;
 
-            // todo need rebuild graph
+            // todo if(state is current playing state) ...
         }
 
-
-        private void SetStateWeight(string layerName, string stateName, float weight)
-        {
-            var state = GetStateWithException(layerName, stateName);
-
-            // todo set state weight
-        }
 
         private GraphClipState GetStateWithException(string layerName, string stateName)
         {

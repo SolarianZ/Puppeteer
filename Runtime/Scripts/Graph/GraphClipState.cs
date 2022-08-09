@@ -20,15 +20,13 @@ namespace GBG.Puppeteer
             PlaybackSpeed = playbackSpeed;
         }
 
-        public AnimationMixerPlayable CreatePlayable(PlayableGraph graph, float fixedTime)
+        public Playable CreatePlayable(PlayableGraph graph, float fixedTime)
         {
             var animClipPlayable = AnimationClipPlayable.Create(graph, Clip);
             animClipPlayable.SetTime(fixedTime);
             animClipPlayable.SetSpeed(PlaybackSpeed);
-            var animMixerPlayable = AnimationMixerPlayable.Create(graph);
-            animMixerPlayable.AddInput(animClipPlayable, 0, 1);
 
-            return animMixerPlayable;
+            return animClipPlayable;
         }
     }
 }

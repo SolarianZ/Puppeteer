@@ -2,7 +2,7 @@
 
 namespace GBG.Puppeteer
 {
-    [CreateAssetMenu(fileName = "New" + nameof(RichAnimationClip) + ".richAnim",
+    [CreateAssetMenu(fileName = "New" + nameof(RichAnimationClip),//+ ".richAnim",
         menuName = "Animation/Puppeteer/Create New Rich Animation Clip")]
     public class RichAnimationClip : ScriptableObject
     {
