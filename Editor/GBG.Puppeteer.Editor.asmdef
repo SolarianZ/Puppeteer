@@ -1,0 +1,18 @@
+{
+    "name": "GBG.Puppeteer.Editor",
+    "rootNamespace": "GBG.Puppeteer.Editor",
+    "references": [
+        "GUID:b215e5ac804ebde479456841787631a1"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
