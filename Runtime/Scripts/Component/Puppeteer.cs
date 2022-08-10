@@ -8,9 +8,6 @@ namespace GBG.Puppeteer
     [RequireComponent(typeof(Animator))]
     public partial class Puppeteer : MonoBehaviour
     {
-        private const string _logPerfix = "[Puppeteer]";
-
-
         public DirectorUpdateMode UpdateMode
         {
             get { return _updateMode; }
@@ -69,7 +66,10 @@ namespace GBG.Puppeteer
 
         private void Update()
         {
-            ProcessCrossFades(Time.deltaTime);
+            if (UpdateMode != DirectorUpdateMode.Manual)
+            {
+                ProcessCrossFades(Time.deltaTime);
+            }
         }
 
 
@@ -98,6 +98,7 @@ namespace GBG.Puppeteer
         public void ManualUpdate(float deltaTime)
         {
             _graph.Evaluate(deltaTime);
+            ProcessCrossFades(Time.deltaTime);
         }
     }
 }

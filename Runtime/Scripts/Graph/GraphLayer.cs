@@ -1,29 +1,32 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace GBG.Puppeteer
 {
-    internal class GraphLayer
+    internal class GraphLayer : IEnumerable<GraphClipState>
     {
-        public string Name { get; }
+        public string LayerName { get; }
 
-        public bool IsAdditive { get; }
+        public bool IsAdditive { get; set; }
 
-        public AvatarMask Mask { get; set; }
+        public AvatarMask AvatarMask { get; }
 
         public float Weight { get; set; }
+
+        public int StateCount => _states.Count;
 
 
         private readonly Dictionary<string, GraphClipState> _states
             = new Dictionary<string, GraphClipState>();
 
 
-        public GraphLayer(string name, bool isAdditive = false,
-            AvatarMask mask = null, float weight = 0f)
+        public GraphLayer(string layerName, bool isAdditive = false,
+            AvatarMask avatarMask = null, float weight = 0f)
         {
-            Name = name;
+            LayerName = layerName;
             IsAdditive = isAdditive;
-            Mask = mask;
+            AvatarMask = avatarMask;
             Weight = weight;
         }
 
@@ -53,6 +56,16 @@ namespace GBG.Puppeteer
         public bool TryGetState(string stateName, out GraphClipState state)
         {
             return _states.TryGetValue(stateName, out state);
+        }
+
+        public IEnumerator<GraphClipState> GetEnumerator()
+        {
+            return _states.Values.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

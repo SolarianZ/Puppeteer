@@ -6,6 +6,8 @@ namespace GBG.Puppeteer
 {
     public partial class Puppeteer
     {
+        public int LayerCount => _layers.Count;
+
         private readonly List<GraphLayer> _layers = new List<GraphLayer>();
 
 
@@ -15,7 +17,7 @@ namespace GBG.Puppeteer
         {
             for (int i = 0; i < _layers.Count; i++)
             {
-                if (_layers[i].Name.Equals(layerName))
+                if (_layers[i].LayerName.Equals(layerName))
                 {
                     index = i;
                     return true;
@@ -31,8 +33,8 @@ namespace GBG.Puppeteer
             return TryLayerNameToIndex(layerName, out _);
         }
 
-        public void PushLayer(string layerName, AvatarMask avatarMask = null,
-            bool isAdditive = false, float weight = 0f) // ik?
+        public int PushLayer(string layerName, AvatarMask avatarMask = null,
+            bool isAdditive = false, float weight = 0f)
         {
             if (string.IsNullOrWhiteSpace(layerName))
             {
@@ -49,6 +51,8 @@ namespace GBG.Puppeteer
             _layers.Add(layer);
 
             PushGraphLayer(layer);
+
+            return _layers.Count - 1;
         }
 
         public string PopLayer()
@@ -64,20 +68,21 @@ namespace GBG.Puppeteer
 
             PopGraphLayer();
 
-            return layer.Name;
+            return layer.LayerName;
         }
 
         public void SetLayerWeight(string layerName, float weight)
         {
             if (!TryLayerNameToIndex(layerName, out var layerIndex))
             {
-                throw new System.ArgumentException($"Layer {layerName} not exist.", nameof(layerName));
+                throw new System.ArgumentException($"Layer {layerName} not exist.",
+                    nameof(layerName));
             }
 
             if (weight < 0 || weight > 1)
             {
-                Debug.LogWarning($"{_logPerfix} Clamp weight({weight}) into [0f,1f].");
-                weight = Mathf.Clamp01(weight);
+                throw new System.ArgumentException("Layer weight should be in range of [0f,1f].",
+                    nameof(weight));
             }
 
             var layer = _layers[layerIndex];
@@ -85,6 +90,11 @@ namespace GBG.Puppeteer
 
             _layerMixerPlayable.SetInputWeight(layerIndex, weight);
         }
+
+        /** Why not a "PrepareLayer" method?
+         * Users should know the order of all layers,
+         * "PrepareLayer" are apt to make users ignore layer order.
+         */
 
         #endregion
 
@@ -145,7 +155,7 @@ namespace GBG.Puppeteer
                 return false;
             }
 
-            // todo if(state is current playing state) ...
+            state.Destroy();
 
             return true;
         }
@@ -154,8 +164,6 @@ namespace GBG.Puppeteer
         {
             var state = GetStateWithException(layerName, stateName);
             state.PlaybackSpeed = speed;
-
-            // todo if(state is current playing state) ...
         }
 
 
@@ -170,7 +178,7 @@ namespace GBG.Puppeteer
             var layer = _layers[layerIndex];
             if (!layer.TryGetState(stateName, out var state))
             {
-                throw new System.ArgumentException($"State {stateName} not exist.",
+                throw new System.ArgumentException($"State {stateName} not exist in layer {layerName}.",
                     nameof(stateName));
             }
 
