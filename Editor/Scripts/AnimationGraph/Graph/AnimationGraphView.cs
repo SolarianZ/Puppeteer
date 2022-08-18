@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.UIElements;
 using UGraphView = UnityEditor.Experimental.GraphView.GraphView;
 
@@ -10,11 +11,15 @@ namespace GBG.Puppeteer.Editor.AnimationGraph
 {
     public abstract class AnimationGraphView : UGraphView
     {
+        public AnimationGraphAsset Asset { get; }
+
         public abstract AnimationGraphNode RootNode { get; }
 
 
-        protected AnimationGraphView()
+        protected AnimationGraphView(AnimationGraphAsset asset)
         {
+            Asset = asset ?? ScriptableObject.CreateInstance<AnimationGraphAsset>();
+
             style.width = new Length(100, LengthUnit.Percent);
             style.height = new Length(100, LengthUnit.Percent);
 
@@ -23,8 +28,47 @@ namespace GBG.Puppeteer.Editor.AnimationGraph
             this.AddManipulator(new RectangleSelector());
             SetupZoom(ContentZoomer.DefaultMinScale, ContentZoomer.DefaultMaxScale);
 
+            RebuildGraph();
         }
 
+
+        private void RebuildGraph()
+        {
+            // nodes
+            var nodes = new Dictionary<string, AnimationGraphNode>(Asset.Nodes.Count);
+            for (int i = 0; i < Asset.Nodes.Count; i++)
+            {
+                var nodeData = Asset.Nodes[i];
+                var nodeType = Type.GetType(nodeData.TypeAssemblyQualifiedName);
+                var nodeCtor = nodeType.GetConstructor(new Type[] { nodeData.GetType() });
+                var node = (AnimationGraphNode)nodeCtor.Invoke(new object[] { nodeData });
+                AddElement(node);
+
+                node.RebuildPorts();
+
+                nodes.Add(nodeData.Guid, node);
+            }
+
+            // edges
+            for (int i = 0; i < Asset.Edges.Count; i++)
+            {
+                var edgeData = Asset.Edges[i];
+                nodes.TryGetValue(edgeData.FromNodeGuid, out var fromNode);
+                Assert.IsTrue(fromNode != null);
+                nodes.TryGetValue(edgeData.ToNodeGuid, out var toNode);
+                Assert.IsTrue(toNode != null);
+                fromNode.TryFindPort(edgeData.FromPortGuid, out var fromPort);
+                Assert.IsTrue(fromPort != null);
+                toNode.TryFindPort(edgeData.ToPortGuid, out var toPort);
+                Assert.IsTrue(toPort != null);
+
+                var edge = fromPort.ConnectTo(toPort);
+                AddElement(edge);
+            }
+        }
+
+
+        #region Menu
 
         private IEnumerable<Type> _nodeTypesCache;
 
@@ -48,7 +92,7 @@ namespace GBG.Puppeteer.Editor.AnimationGraph
                             return;
                         }
                         var node = (AnimationGraphNode)ctor.Invoke(null);
-                        node.SetPosition(new Rect(action.eventInfo.localMousePosition, Vector2.zero));
+                        node.SetPosition(new Rect(action.eventInfo.mousePosition, Vector2.zero));
                         AddElement(node);
                     });
                 }
@@ -60,6 +104,10 @@ namespace GBG.Puppeteer.Editor.AnimationGraph
             }
         }
 
+        #endregion
+
+
+        #region Port
 
         private readonly List<Port> _compatiblePortsCache = new List<Port>();
 
@@ -76,5 +124,7 @@ namespace GBG.Puppeteer.Editor.AnimationGraph
 
             return _compatiblePortsCache;
         }
+
+        #endregion
     }
 }

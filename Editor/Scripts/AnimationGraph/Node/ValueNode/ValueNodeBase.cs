@@ -12,11 +12,11 @@ namespace GBG.Puppeteer.Editor.AnimationGraph
         Parameter
     }
 
-    public abstract class ValueNodeBase<TValueType> : AnimationGraphNode
+    public abstract class ValueNodeBase<TValue, TOutput> : AnimationGraphNode
     {
         public ValueSource Source { get; protected set; } = ValueSource.Literal;
 
-        public abstract TValueType LiteralValue { get; }
+        public abstract TValue LiteralValue { get; }
 
         public string ParameterName => _parameterNameField?.value;
         private TextField _parameterNameField;
@@ -26,13 +26,13 @@ namespace GBG.Puppeteer.Editor.AnimationGraph
         protected Port OutputPort { get; }
 
 
-        protected ValueNodeBase() : base(false)
+        protected ValueNodeBase() : base(null) // todo node data
         {
             var sourcePopup = new EnumField(Source);
             sourcePopup.RegisterCallback<ChangeEvent<Enum>>(OnSourceChanged);
             inputContainer.Add(sourcePopup);
 
-            OutputPort = InstantiatePort(Direction.Output, typeof(TValueType));
+            OutputPort = InstantiatePort(Direction.Output, typeof(TOutput));
             outputContainer.Add(OutputPort);
 
             RefreshExpandedState();

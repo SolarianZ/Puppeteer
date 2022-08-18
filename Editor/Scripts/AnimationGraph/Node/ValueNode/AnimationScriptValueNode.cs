@@ -1,13 +1,12 @@
 ﻿using UnityEditor.UIElements;
-using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.UIElements;
 
 namespace GBG.Puppeteer.Editor.AnimationGraph
 {
-    public class AnimationClipValueNode : ValueNodeBase<AnimationClip, Playable>
+    public class AnimationScriptValueNode : ValueNodeBase<AnimationScriptPlayableAsset, Playable>
     {
-        public override AnimationClip LiteralValue => _literalValueField?.value as AnimationClip;
+        public override AnimationScriptPlayableAsset LiteralValue => _literalValueField?.value as AnimationScriptPlayableAsset;
 
         protected override VisualElement LiteralValueField
         {
@@ -17,7 +16,7 @@ namespace GBG.Puppeteer.Editor.AnimationGraph
                 {
                     _literalValueField = new ObjectField
                     {
-                        objectType = typeof(AnimationClip)
+                        objectType = typeof(AnimationScriptPlayableAsset)
                     };
                 }
 
@@ -27,9 +26,9 @@ namespace GBG.Puppeteer.Editor.AnimationGraph
         private ObjectField _literalValueField;
 
 
-        public AnimationClipValueNode()
+        public AnimationScriptValueNode()
         {
-            title = "Animation Clip Value";
+            title = "Animation Script Value";
 
             OutputPort.portColor = Colors.AnimationPlayableColor;
 

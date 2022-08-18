@@ -4,7 +4,7 @@ using UnityEngine.UIElements;
 
 namespace GBG.Puppeteer.Editor.AnimationGraph
 {
-    public class FloatValueNode : ValueNodeBase<float>
+    public class FloatValueNode : ValueNodeBase<float, float>
     {
         public override float LiteralValue => _literalValueField?.value ?? default;
 
@@ -28,6 +28,11 @@ namespace GBG.Puppeteer.Editor.AnimationGraph
             title = "Float Value";
 
             RefreshInputView();
+        }
+
+        public override void RebuildPorts()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

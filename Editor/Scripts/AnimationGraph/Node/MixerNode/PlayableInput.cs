@@ -1,15 +1,15 @@
 ﻿using System;
 using UnityEditor.Experimental.GraphView;
-using UnityEngine;
+using UnityEngine.Playables;
 using UnityEngine.UIElements;
 
 namespace GBG.Puppeteer.Editor.AnimationGraph
 {
-    public class InputPair : VisualElement
+    public class PlayableInput : VisualElement
     {
-        public int Index { get; private set; } = -1;
+        public int Index { get; private set; }
 
-        public bool Deletable { get; set; } = true;
+        public bool Deletable { get; set; }
 
         public Port PlayablePort { get; }
 
@@ -18,24 +18,23 @@ namespace GBG.Puppeteer.Editor.AnimationGraph
 
         private Button _deleteButton;
 
-        private readonly Action<InputPair> _onDelete;
+        private readonly Action<PlayableInput> _onDelete;
 
 
-        public InputPair(AnimationGraphNode owner, int index,
-            Color playablePortColor, Type playablePortType, Action<InputPair> onDelete)
+        public PlayableInput(Port playablePort, Port weightPort,
+            int index, Action<PlayableInput> onDelete)
         {
             #region Ports
 
-            PlayablePort = owner.InstantiatePort(Orientation.Horizontal,
-                Direction.Input, Port.Capacity.Single, playablePortType);
+            // playable
+            PlayablePort = playablePort;
             PlayablePort.portName = $"Input {index}";
-            PlayablePort.portColor = playablePortColor;
-
-            WeightPort = owner.InstantiatePort(Orientation.Horizontal,
-                Direction.Input, Port.Capacity.Single, typeof(float));
-            WeightPort.portName = $"{PlayablePort.portName} weight";
-
+            PlayablePort.portColor = Colors.AnimationPlayableColor;
             Add(PlayablePort);
+
+            // weight
+            WeightPort = weightPort;
+            WeightPort.portName = $"{PlayablePort.portName} weight";
             Add(WeightPort);
 
             #endregion
@@ -47,6 +46,12 @@ namespace GBG.Puppeteer.Editor.AnimationGraph
             RegisterCallback<MouseLeaveEvent>(OnMouseOut);
 
             #endregion
+        }
+
+        public void DisconnectAll()
+        {
+            PlayablePort.DisconnectAll();
+            WeightPort.DisconnectAll();
         }
 
         public void SetIndex(int index)

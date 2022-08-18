@@ -3,7 +3,7 @@ using UnityEngine.UIElements;
 
 namespace GBG.Puppeteer.Editor.AnimationGraph
 {
-    public class IntValueNode : ValueNodeBase<int>
+    public class IntValueNode : ValueNodeBase<int, int>
     {
         public override int LiteralValue => _literalValueField?.value ?? default;
 
@@ -27,6 +27,11 @@ namespace GBG.Puppeteer.Editor.AnimationGraph
             title = "Int Value";
 
             RefreshInputView();
+        }
+
+        public override void RebuildPorts()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

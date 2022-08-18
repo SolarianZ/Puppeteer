@@ -2,7 +2,7 @@
 
 namespace GBG.Puppeteer.Editor.AnimationGraph
 {
-    public class StringValueNode : ValueNodeBase<string>
+    public class StringValueNode : ValueNodeBase<string, string>
     {
         public override string LiteralValue => _literalValueField?.value;
 
@@ -26,6 +26,11 @@ namespace GBG.Puppeteer.Editor.AnimationGraph
             title = "String Value";
 
             RefreshInputView();
+        }
+
+        public override void RebuildPorts()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

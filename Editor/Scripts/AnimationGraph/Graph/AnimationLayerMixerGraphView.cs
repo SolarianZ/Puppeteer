@@ -2,7 +2,8 @@
 {
     public class AnimationLayerMixerGraphView : AnimationGraphView
     {
-        public AnimationLayerMixerGraphView()
+        public AnimationLayerMixerGraphView(AnimationGraphAsset asset)
+            : base(asset)
         {
             CreateRootNode();
         }
