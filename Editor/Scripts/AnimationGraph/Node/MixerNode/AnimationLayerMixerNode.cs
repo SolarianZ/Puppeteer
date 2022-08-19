@@ -15,21 +15,18 @@ namespace GBG.Puppeteer.Editor.AnimationGraph
 
         public AnimationLayerMixerNode(bool isRootNode) : base(new NodeData
         {
+            Title = "Animation Layer Mixer",
             Guid = NewGuid(),
             IsRootNode = isRootNode,
             TypeAssemblyQualifiedName = typeof(AnimationLayerMixerNode).AssemblyQualifiedName,
         }, false)
         {
-            title = "Animation Layer Mixer";
-            NodeData.Title = title;
         }
 
         // for rebuild node
         // ReSharper disable once UnusedMember.Global
         public AnimationLayerMixerNode(NodeData nodeData) : base(nodeData, true)
         {
-            title = "Animation Layer Mixer";
-            NodeData.Title = title;
         }
     }
 }

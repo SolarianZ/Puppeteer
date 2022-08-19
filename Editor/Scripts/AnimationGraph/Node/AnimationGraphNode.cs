@@ -16,6 +16,8 @@ namespace GBG.Puppeteer.Editor.AnimationGraph
         protected AnimationGraphNode(NodeData nodeData)
         {
             NodeData = nodeData;
+            title = NodeData.Title;
+
             SetPosition(new Rect(nodeData.Position, Vector2.zero));
         }
 

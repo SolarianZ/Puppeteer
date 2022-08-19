@@ -74,6 +74,7 @@ namespace GBG.Puppeteer.Editor.AnimationGraph
 
         public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
         {
+            var localMousePos = contentViewContainer.WorldToLocal(evt.mousePosition);
             if (selection.Count == 0)
             {
                 _nodeTypesCache ??= from assembly in AppDomain.CurrentDomain.GetAssemblies()
@@ -92,7 +93,7 @@ namespace GBG.Puppeteer.Editor.AnimationGraph
                             return;
                         }
                         var node = (AnimationGraphNode)ctor.Invoke(null);
-                        node.SetPosition(new Rect(action.eventInfo.mousePosition, Vector2.zero));
+                        node.SetPosition(new Rect(localMousePos, Vector2.zero));
                         AddElement(node);
                     });
                 }

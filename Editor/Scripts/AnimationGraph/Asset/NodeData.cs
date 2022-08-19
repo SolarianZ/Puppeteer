@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UObject = UnityEngine.Object;
 
 namespace GBG.Puppeteer.Editor.AnimationGraph
 {
@@ -36,26 +36,25 @@ namespace GBG.Puppeteer.Editor.AnimationGraph
     }
 
     [Serializable]
-    public class PortData
+    public class ValueNodeData : NodeData
     {
-        public string Guid;
+        public ValueSource Source;
 
-        public int Index;
+        public string ParameterName;
 
-        public Direction Direction;
+        public float FloatValue;
 
-        public string TypeAssemblyQualifiedName;
+        public int IntValue;
+
+        public string StringValue;
+
+        public UObject ObjectValue;
     }
 
     [Serializable]
-    public class EdgeData
+    public class ObjectNodeData : NodeData
     {
-        public string FromNodeGuid;
-
-        public string FromPortGuid;
-
-        public string ToNodeGuid;
-
-        public string ToPortGuid;
+        [SerializeReference]
+        public UObject Object;
     }
 }

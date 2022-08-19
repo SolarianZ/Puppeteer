@@ -6,7 +6,6 @@ namespace GBG.Puppeteer.Editor.AnimationGraph
     {
         private void SaveAsset()
         {
-            // todo save
             // nodes
             _asset.Nodes.Clear();
             foreach (var node in _graphView.nodes)
@@ -15,13 +14,6 @@ namespace GBG.Puppeteer.Editor.AnimationGraph
                 nodeData.Position = node.GetPosition().position;
                 nodeData.SortPorts();
                 _asset.Nodes.Add(nodeData);
-            }
-
-            // ports
-            _asset.Ports.Clear();
-            foreach (var port in _graphView.ports)
-            {
-                //port.ConnectTo
             }
 
             // edges
