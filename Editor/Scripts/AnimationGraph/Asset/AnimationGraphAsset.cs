@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace GBG.Puppeteer.Editor.AnimationGraph
 {
-    public abstract class AnimationGraphAsset : RuntimeAnimationGraphAsset
+    public abstract class AnimationGraphAsset : RuntimeAnimationGraph
     {
         public abstract Type RootNodeType { get; }
 
