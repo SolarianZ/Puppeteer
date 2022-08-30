@@ -6,7 +6,7 @@ using UnityEngine.Assertions;
 namespace GBG.Puppeteer.Parameter
 {
     [Serializable]
-    public class ParamNameOrValue
+    public class ParamNameOrValue : ICloneable
     {
         public string Name => _name;
 
@@ -55,6 +55,15 @@ namespace GBG.Puppeteer.Parameter
             Assert.IsTrue(paramInfo.Type == paramType || paramInfo.Type == ParamType.Any);
 
             return paramInfo;
+        }
+
+        public object Clone()
+        {
+            return new ParamNameOrValue()
+            {
+                _name = this._name,
+                _value = this._value
+            };
         }
     }
 }

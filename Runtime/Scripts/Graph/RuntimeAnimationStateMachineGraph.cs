@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using GBG.Puppeteer.Node;
+using GBG.Puppeteer.NodeData;
 using GBG.Puppeteer.Parameter;
 using UnityEngine;
 
@@ -8,10 +8,10 @@ namespace GBG.Puppeteer.Graph
 {
     public class RuntimeAnimationStateMachineGraph : ScriptableObject
     {
-        public IReadOnlyList<StateMachineStateNode> Nodes => _nodes;
+        public IReadOnlyList<StateMachineStateNodeData> Nodes => _nodes;
 
         [SerializeField]
-        private StateMachineStateNode[] _nodes = Array.Empty<StateMachineStateNode>();
+        private StateMachineStateNodeData[] _nodes = Array.Empty<StateMachineStateNodeData>();
 
 
         public IReadOnlyList<ParamInfo> Parameters => _parameters;

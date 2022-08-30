@@ -9,14 +9,6 @@ namespace GBG.Puppeteer.Graph
     {
         public abstract AnimationScriptPlayable CreatePlayable(PlayableGraph graph, Skeleton skeleton);
 
-        public virtual void PrepareFrame(float deltaTime)
-        {
-        }
-
-        public virtual void ProcessFrame(float deltaTime)
-        {
-        }
-
         public virtual void Dispose()
         {
         }

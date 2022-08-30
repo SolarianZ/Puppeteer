@@ -35,10 +35,10 @@ namespace GBG.Puppeteer.Editor.AnimationGraph
         private void RebuildGraph()
         {
             // nodes
-            var nodes = new Dictionary<string, AnimationGraphNode>(Asset.Nodes.Count);
-            for (int i = 0; i < Asset.Nodes.Count; i++)
+            var nodes = new Dictionary<string, AnimationGraphNode>(Asset.EditorNodes.Count);
+            for (int i = 0; i < Asset.EditorNodes.Count; i++)
             {
-                var nodeData = Asset.Nodes[i];
+                var nodeData = Asset.EditorNodes[i];
                 var nodeType = Type.GetType(nodeData.TypeAssemblyQualifiedName);
                 var nodeCtor = nodeType.GetConstructor(new Type[] { nodeData.GetType() });
                 var node = (AnimationGraphNode)nodeCtor.Invoke(new object[] { nodeData });
@@ -50,9 +50,9 @@ namespace GBG.Puppeteer.Editor.AnimationGraph
             }
 
             // edges
-            for (int i = 0; i < Asset.Edges.Count; i++)
+            for (int i = 0; i < Asset.EditorEdges.Count; i++)
             {
-                var edgeData = Asset.Edges[i];
+                var edgeData = Asset.EditorEdges[i];
                 nodes.TryGetValue(edgeData.FromNodeGuid, out var fromNode);
                 Assert.IsTrue(fromNode != null);
                 nodes.TryGetValue(edgeData.ToNodeGuid, out var toNode);

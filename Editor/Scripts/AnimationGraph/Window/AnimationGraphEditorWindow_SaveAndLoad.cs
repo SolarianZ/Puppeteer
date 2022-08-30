@@ -7,17 +7,17 @@ namespace GBG.Puppeteer.Editor.AnimationGraph
         private void SaveAsset()
         {
             // nodes
-            _asset.Nodes.Clear();
+            _asset.EditorNodes.Clear();
             foreach (var node in _graphView.nodes)
             {
                 var nodeData = ((AnimationGraphNode)node).NodeData;
                 nodeData.Position = node.GetPosition().position;
                 nodeData.SortPorts();
-                _asset.Nodes.Add(nodeData);
+                _asset.EditorNodes.Add(nodeData);
             }
 
             // edges
-            _asset.Edges.Clear();
+            _asset.EditorEdges.Clear();
             foreach (var edge in _graphView.edges)
             {
                 if (edge.input == null || edge.output == null)
@@ -35,7 +35,7 @@ namespace GBG.Puppeteer.Editor.AnimationGraph
                     ToNodeGuid = toNode.NodeData.Guid,
                     ToPortGuid = ((PortData)edge.input.userData).Guid
                 };
-                _asset.Edges.Add(edgeData);
+                _asset.EditorEdges.Add(edgeData);
             }
 
 

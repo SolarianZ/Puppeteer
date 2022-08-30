@@ -15,7 +15,7 @@ namespace GBG.Puppeteer.Graph
 
         public AnimationGraphInstance Initialize(Animator animator, RuntimeAnimationGraph graphAsset)
         {
-            _animationGraphInstance = new AnimationGraphInstance(_graph, animator, graphAsset);
+            _animationGraphInstance = new AnimationGraphInstance(_graph, animator, graphAsset, null);
             return _animationGraphInstance;
         }
 
@@ -37,10 +37,10 @@ namespace GBG.Puppeteer.Graph
             _animationGraphInstance.PrepareFrame(info.deltaTime);
         }
 
-        public override void ProcessFrame(Playable playable, FrameData info, object playerData)
-        {
-            _animationGraphInstance.ProcessFrame(info.deltaTime);
-        }
+        // public override void ProcessFrame(Playable playable, FrameData info, object playerData)
+        // {
+        //     _animationGraphInstance.ProcessFrame(info.deltaTime);
+        // }
 
         #endregion
     }

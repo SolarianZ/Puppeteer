@@ -5,7 +5,7 @@
         public AnimationMixerGraphView(AnimationGraphAsset asset)
             : base(asset)
         {
-            if (Asset.Nodes.Count == 0)
+            if (Asset.EditorNodes.Count == 0)
             {
                 CreateRootNode();
             }

@@ -5,10 +5,10 @@ using UnityEngine.Playables;
 using GBG.Puppeteer.Parameter;
 using GBG.Puppeteer.NodeInstance;
 
-namespace GBG.Puppeteer.Node
+namespace GBG.Puppeteer.NodeData
 {
     [Serializable]
-    public class AnimationClipNode : AnimationNode
+    public class AnimationClipNodeData : AnimationNodeData
     {
         [SerializeField]
         private AnimationClip _animationClip;
@@ -20,14 +20,25 @@ namespace GBG.Puppeteer.Node
         private ParamNameOrValue _explicitTime;
 
 
-        public override AnimationNodeInstance CreateNodeInstance(PlayableGraph graph, 
-            Animator animator, Dictionary<string, AnimationNode> nodes,
+        public override AnimationNodeInstance CreateNodeInstance(PlayableGraph graph,
+            Animator animator, Dictionary<string, AnimationNodeData> nodes,
             Dictionary<string, ParamInfo> parameters)
         {
             return new AnimationClipInstance(graph, _animationClip,
                 _useExplicitTime.GetParamInfo(parameters, ParamType.Bool),
                 _explicitTime.GetParamInfo(parameters, ParamType.Float),
                 PlaybackSpeed.GetParamInfo(parameters, ParamType.Float));
+        }
+
+
+        protected override AnimationNodeData InternalDeepClone()
+        {
+            return new AnimationClipNodeData()
+            {
+                _animationClip = this._animationClip,
+                _useExplicitTime = (ParamNameOrValue)this._useExplicitTime.Clone(),
+                _explicitTime = (ParamNameOrValue)this._explicitTime.Clone()
+            };
         }
     }
 }

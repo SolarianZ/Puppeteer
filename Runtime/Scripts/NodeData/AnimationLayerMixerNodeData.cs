@@ -5,7 +5,7 @@ using UnityEngine.Playables;
 using GBG.Puppeteer.NodeInstance;
 using GBG.Puppeteer.Parameter;
 
-namespace GBG.Puppeteer.Node
+namespace GBG.Puppeteer.NodeData
 {
     [Serializable]
     public class LayerInputInfo : InputInfo
@@ -20,10 +20,20 @@ namespace GBG.Puppeteer.Node
 
         [SerializeField]
         private AvatarMask _avatarMask;
+
+
+        protected override InputInfo InternalDeepClone()
+        {
+            return new LayerInputInfo()
+            {
+                _isAdditive = this._isAdditive,
+                _avatarMask = this._avatarMask
+            };
+        }
     }
 
     [Serializable]
-    public class AnimationLayerMixerNode : AnimationNode
+    public class AnimationLayerMixerNodeData : AnimationNodeData
     {
         public IReadOnlyList<LayerInputInfo> InputInfos => _inputInfos;
 
@@ -33,7 +43,7 @@ namespace GBG.Puppeteer.Node
 
         public override AnimationNodeInstance CreateNodeInstance(PlayableGraph graph,
             Animator animator,
-            Dictionary<string, AnimationNode> nodes,
+            Dictionary<string, AnimationNodeData> nodes,
             Dictionary<string, ParamInfo> parameters)
         {
             var inputInstances = new AnimationNodeInstance[InputInfos.Count];
@@ -62,6 +72,19 @@ namespace GBG.Puppeteer.Node
             return new AnimationLayerMixerInstance(graph, inputInstances, inputWeights,
                 PlaybackSpeed.GetParamInfo(parameters, ParamType.Float),
                 layerAdditiveStates, layerAvatarMasks);
+        }
+
+
+        protected override AnimationNodeData InternalDeepClone()
+        {
+            var clone = new AnimationLayerMixerNodeData();
+            clone._inputInfos = new LayerInputInfo[_inputInfos.Length];
+            for (int i = 0; i < _inputInfos.Length; i++)
+            {
+                clone._inputInfos[i] = (LayerInputInfo)_inputInfos[i].Clone();
+            }
+
+            return clone;
         }
     }
 }

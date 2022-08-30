@@ -11,13 +11,15 @@ namespace GBG.Puppeteer.Editor.AnimationGraph
 
 
         // nodes
-        public List<NodeData> Nodes => _nodes;
+        public List<NodeData> EditorNodes => _editorNodes;
+
         [SerializeReference]
-        private List<NodeData> _nodes = new List<NodeData>();
+        private List<NodeData> _editorNodes = new List<NodeData>();
 
         // edges
-        public List<EdgeData> Edges => _edges;
+        public List<EdgeData> EditorEdges => _editorEdges;
+
         [SerializeField]
-        private List<EdgeData> _edges = new List<EdgeData>();
+        private List<EdgeData> _editorEdges = new List<EdgeData>();
     }
 }

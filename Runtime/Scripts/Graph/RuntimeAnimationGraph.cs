@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using GBG.Puppeteer.Node;
+using GBG.Puppeteer.NodeData;
 using GBG.Puppeteer.Parameter;
 using UnityEngine;
 
@@ -10,26 +10,26 @@ namespace GBG.Puppeteer.Graph
         menuName = "Puppeteer/[TEST] Runtime Animation Graph")]
     public class RuntimeAnimationGraph : ScriptableObject
     {
-        // Node at index 0 is always the output node
-        public IReadOnlyList<AnimationNode> Nodes => _nodes;
-
-        [SerializeReference]
-        private AnimationNode[] _nodes = Array.Empty<AnimationNode>();
-
-
         public IReadOnlyList<ParamInfo> Parameters => _parameters;
 
         [SerializeField]
         private ParamInfo[] _parameters = Array.Empty<ParamInfo>();
 
+        
+        // Node at index 0 is always the output node
+        public IReadOnlyList<AnimationNodeData> Nodes => _nodes;
+
+        [SerializeReference]
+        private AnimationNodeData[] _nodes = Array.Empty<AnimationNodeData>();
+
 
         // FOR TEST
         private void Reset()
         {
-            _nodes = new AnimationNode[]
+            _nodes = new AnimationNodeData[]
             {
-                new AnimationClipNode(),
-                new AnimationMixerNode(),
+                new AnimationClipNodeData(),
+                new AnimationMixerNodeData(),
             };
         }
     }

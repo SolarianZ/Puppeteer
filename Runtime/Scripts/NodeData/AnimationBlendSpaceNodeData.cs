@@ -5,7 +5,7 @@ using GBG.Puppeteer.Parameter;
 using UnityEngine;
 using UnityEngine.Playables;
 
-namespace GBG.Puppeteer.Node
+namespace GBG.Puppeteer.NodeData
 {
     public enum BlendSpaceDimension
     {
@@ -16,11 +16,17 @@ namespace GBG.Puppeteer.Node
 
     // TODO: AnimationBlendSpaceNode
     [Serializable]
-    public class AnimationBlendSpaceNode : AnimationNode
+    public class AnimationBlendSpaceNodeData : AnimationNodeData
     {
-        public override AnimationNodeInstance CreateNodeInstance(PlayableGraph graph, 
-            Animator animator, Dictionary<string, AnimationNode> nodes,
+        public override AnimationNodeInstance CreateNodeInstance(PlayableGraph graph,
+            Animator animator, Dictionary<string, AnimationNodeData> nodes,
             Dictionary<string, ParamInfo> parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        protected override AnimationNodeData InternalDeepClone()
         {
             throw new NotImplementedException();
         }

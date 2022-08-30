@@ -100,7 +100,18 @@ namespace GBG.Puppeteer.Parameter
         {
             Assert.IsTrue(Type == ParamType.Bool || Type == ParamType.Any);
 
-            return Mathf.Approximately(_value, 1);
+            return !Mathf.Approximately(_value, 0);
+        }
+
+        public void SetRawValue(float value)
+        {
+            _value = value;
+            OnValueChanged?.Invoke(this);
+        }
+
+        public float GetRawValue()
+        {
+            return _value;
         }
     }
 }

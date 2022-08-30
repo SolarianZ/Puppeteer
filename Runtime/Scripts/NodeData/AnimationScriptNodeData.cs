@@ -6,10 +6,10 @@ using GBG.Puppeteer.Graph;
 using GBG.Puppeteer.NodeInstance;
 using GBG.Puppeteer.Parameter;
 
-namespace GBG.Puppeteer.Node
+namespace GBG.Puppeteer.NodeData
 {
     [Serializable]
-    public class AnimationScriptNode : AnimationNode
+    public class AnimationScriptNodeData : AnimationNodeData
     {
         public IReadOnlyList<InputInfo> InputInfos => _inputInfos;
 
@@ -22,7 +22,7 @@ namespace GBG.Puppeteer.Node
 
         public override AnimationNodeInstance CreateNodeInstance(PlayableGraph graph,
             Animator animator,
-            Dictionary<string, AnimationNode> nodes,
+            Dictionary<string, AnimationNodeData> nodes,
             Dictionary<string, ParamInfo> parameters)
         {
             var inputInstances = new AnimationNodeInstance[InputInfos.Count];
@@ -43,6 +43,23 @@ namespace GBG.Puppeteer.Node
             return new AnimationScriptInstance(graph, inputInstances, inputWeights,
                 PlaybackSpeed.GetParamInfo(parameters, ParamType.Float),
                 animator.GetComponent<Skeleton>(), _animationScriptable);
+        }
+
+
+        protected override AnimationNodeData InternalDeepClone()
+        {
+            var clone = new AnimationScriptNodeData()
+            {
+                _animationScriptable = this._animationScriptable,
+            };
+
+            clone._inputInfos = new InputInfo[_inputInfos.Length];
+            for (int i = 0; i < _inputInfos.Length; i++)
+            {
+                clone._inputInfos[i] = (InputInfo)_inputInfos[i].Clone();
+            }
+
+            return clone;
         }
     }
 }

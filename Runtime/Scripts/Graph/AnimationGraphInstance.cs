@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using GBG.Puppeteer.Node;
+using GBG.Puppeteer.NodeData;
 using GBG.Puppeteer.NodeInstance;
 using GBG.Puppeteer.Parameter;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.Playables;
 
 namespace GBG.Puppeteer.Graph
@@ -13,22 +14,38 @@ namespace GBG.Puppeteer.Graph
         public Playable RootPlayable { get; }
 
 
+        private readonly ParamBinding[] _paramBindings;
+
         private readonly AnimationNodeInstance _rootInstance;
 
 
-        public AnimationGraphInstance(PlayableGraph graph, Animator animator, RuntimeAnimationGraph graphAsset)
+        public AnimationGraphInstance(PlayableGraph graph, Animator animator,
+            RuntimeAnimationGraph graphAsset, ParamInfo[] paramBindingSources)
         {
-            // Record all params
-            foreach (var param in graphAsset.Parameters)
+            var bindParams = paramBindingSources != null && paramBindingSources.Length != 0;
+            if (bindParams)
             {
+                Assert.IsTrue(paramBindingSources.Length == graphAsset.Parameters.Count);
+                _paramBindings = new ParamBinding[paramBindingSources.Length];
+            }
+
+            // Record all params
+            for (var i = 0; i < graphAsset.Parameters.Count; i++)
+            {
+                var param = graphAsset.Parameters[i];
                 if (!string.IsNullOrEmpty(param.Name))
                 {
                     _params.Add(param.Name, param);
                 }
+
+                if (bindParams)
+                {
+                    _paramBindings[i] = new ParamBinding(paramBindingSources[i], param);
+                }
             }
 
             // Record all nodes
-            var nodeDict = new Dictionary<string, AnimationNode>(graphAsset.Nodes.Count);
+            var nodeDict = new Dictionary<string, AnimationNodeData>(graphAsset.Nodes.Count);
             foreach (var node in graphAsset.Nodes)
             {
                 nodeDict.Add(node.Guid, node);
@@ -45,14 +62,22 @@ namespace GBG.Puppeteer.Graph
             _rootInstance.PrepareFrame(deltaTime);
         }
 
-        public void ProcessFrame(float deltaTime)
-        {
-            _rootInstance.ProcessFrame(deltaTime);
-        }
+        // public void ProcessFrame(float deltaTime)
+        // {
+        //     _rootInstance.ProcessFrame(deltaTime);
+        // }
 
         public void Dispose()
         {
             _rootInstance?.Dispose();
+
+            if (_paramBindings != null)
+            {
+                foreach (var paramBinding in _paramBindings)
+                {
+                    paramBinding.Dispose();
+                }
+            }
         }
 
 

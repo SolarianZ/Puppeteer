@@ -12,9 +12,9 @@ namespace GBG.Puppeteer.NodeInstance
         {
         }
 
-        public virtual void ProcessFrame(float deltaTime)
-        {
-        }
+        // public virtual void ProcessFrame(float deltaTime)
+        // {
+        // }
 
 
         public virtual void Dispose()
