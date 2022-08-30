@@ -22,10 +22,10 @@ Legends:
     - 📅 Pose Output Node(Graph Root Node)
     - 📅 State Machine Node
     - 📅 State Node(In State Machine)
-    - 📅 Param Node
+    - 🔘 ~~Param Node~~ (Embed into PlayableNode)
     - 📅 Mixer Node
     - 📅 Layer Mixer Node
-    - 📅 Clip Node
+    - ▶️ Clip Node
         - Optional Explicit Time
     - 📅 Script Node
     - ❔ Sub Graph Node
@@ -47,7 +47,7 @@ Legends:
     - 📅 Pose Output Node(Graph Root Node)
     - 📅 State Machine Node
     - 📅 State Node(In State Machine)
-    - ▶️ Param Node
+    - 🔘 ~~Param Node~~ (Embed into PlayableNode)
     - ▶️ Mixer Node
     - ▶️ Layer Mixer Node
     - ▶️ Clip Node
