@@ -10,7 +10,36 @@ namespace GBG.Puppeteer.NodeData
     [Serializable]
     public abstract class AnimationNodeData
     {
-        public string Guid => _guid;
+        #region EDITOR DATA
+
+#if UNITY_EDITOR
+        internal string EditorName
+        {
+            get => _editorName;
+            set => _editorName = value;
+        }
+
+        [SerializeField]
+        private string _editorName;
+
+
+        internal Vector2 EditorPosition
+        {
+            get => _editorPosition;
+            set => _editorPosition = value;
+        }
+
+        [SerializeField]
+        private Vector2 _editorPosition;
+#endif
+
+        #endregion
+
+        public string Guid
+        {
+            get => _guid;
+            internal set => _guid = value;
+        }
 
         [SerializeField]
         private string _guid;

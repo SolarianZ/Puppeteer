@@ -138,7 +138,7 @@ namespace GBG.Puppeteer
             {
                 if (!_bones[i])
                 {
-                    Debug.LogError($"Skeleton bone at index '{i}' is null.");
+                    UDebug.LogError($"[Puppeteer::Skeleton] Skeleton bone at index '{i}' is null.");
                 }
             }
         }
@@ -205,7 +205,7 @@ namespace GBG.Puppeteer
             {
                 if (!boneDict.TryGetValue(skeletonBones[i].name, out var bone))
                 {
-                    UDebug.LogError($"Bone '{skeletonBones[i].name}' not found.");
+                    UDebug.LogError($"[Puppeteer::Skeleton] Bone '{skeletonBones[i].name}' not found.");
                     continue;
                 }
 

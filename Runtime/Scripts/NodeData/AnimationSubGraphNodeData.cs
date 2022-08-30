@@ -15,7 +15,7 @@ namespace GBG.Puppeteer.NodeData
         private RuntimeAnimationGraph _subGraph;
 
         [SerializeField]
-        private ParamNameOrValue[] _paramBindingSources;
+        private ParamBindingNameOrValue[] _paramBindingSources;
 
 
         public override AnimationNodeInstance CreateNodeInstance(PlayableGraph graph,
@@ -27,10 +27,18 @@ namespace GBG.Puppeteer.NodeData
                 return new AnimationSubGraphInstance(graph, animator, _subGraph, null);
             }
 
-            var paramBindingSources = new ParamInfo[_paramBindingSources.Length];
+            var paramBindingSources = new ParamInfo[_subGraph.Parameters.Count];
             for (int i = 0; i < paramBindingSources.Length; i++)
             {
-                paramBindingSources[i] = _paramBindingSources[i].GetParamInfo(parameters);
+                foreach (var bindingSource in _paramBindingSources)
+                {
+                    if (bindingSource.TargetParamName.Equals(_subGraph.Parameters[i].Name))
+                    {
+                        paramBindingSources[i] = bindingSource
+                            .GetParamBindingSource(parameters, _subGraph.Parameters[i].Type);
+                        break;
+                    }
+                }
             }
 
             return new AnimationSubGraphInstance(graph, animator, _subGraph, paramBindingSources);
@@ -44,10 +52,10 @@ namespace GBG.Puppeteer.NodeData
                 _subGraph = this._subGraph,
             };
 
-            clone._paramBindingSources = new ParamNameOrValue[_paramBindingSources.Length];
+            clone._paramBindingSources = new ParamBindingNameOrValue[_paramBindingSources.Length];
             for (int i = 0; i < _paramBindingSources.Length; i++)
             {
-                clone._paramBindingSources[i] = (ParamNameOrValue)_paramBindingSources[i].Clone();
+                clone._paramBindingSources[i] = (ParamBindingNameOrValue)_paramBindingSources[i].Clone();
             }
 
             return clone;

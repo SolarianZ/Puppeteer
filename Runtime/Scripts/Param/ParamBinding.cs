@@ -1,5 +1,4 @@
 ﻿using System;
-using GBG.Puppeteer.Parameter;
 using UnityEngine.Assertions;
 
 namespace GBG.Puppeteer.Parameter
@@ -13,14 +12,18 @@ namespace GBG.Puppeteer.Parameter
 
         public ParamBinding(ParamInfo source, ParamInfo target)
         {
-            Assert.IsTrue((source.Type == target.Type)
-                          || (source.Type == ParamType.Any)
-                          || (target.Type == ParamType.Any));
+            Assert.IsTrue((source == null)
+                          || ((source.Type == target.Type)
+                              || (source.Type == ParamType.Any)
+                              || (target.Type == ParamType.Any)));
 
             Source = source;
             Target = target;
 
-            Source.OnValueChanged += OnSourceValueChanged;
+            if (Source != null)
+            {
+                Source.OnValueChanged += OnSourceValueChanged;
+            }
         }
 
 
@@ -32,7 +35,10 @@ namespace GBG.Puppeteer.Parameter
 
         public void Dispose()
         {
-            Source.OnValueChanged -= OnSourceValueChanged;
+            if (Source != null)
+            {
+                Source.OnValueChanged -= OnSourceValueChanged;
+            }
         }
     }
 }

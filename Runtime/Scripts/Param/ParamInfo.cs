@@ -24,7 +24,7 @@ namespace GBG.Puppeteer.Parameter
     }
 
     [Serializable]
-    public class ParamInfo
+    public class ParamInfo : ICloneable
     {
         /// <summary>
         /// Unique name of a variable.
@@ -46,6 +46,8 @@ namespace GBG.Puppeteer.Parameter
         private float _value;
 
 
+        public bool IsLiteral => string.IsNullOrEmpty(Name);
+
         public event Action<ParamInfo> OnValueChanged;
 
 
@@ -60,6 +62,7 @@ namespace GBG.Puppeteer.Parameter
 
         public void SetFloat(float value)
         {
+            Assert.IsFalse(IsLiteral);
             Assert.IsTrue(Type == ParamType.Float || Type == ParamType.Any);
 
             _value = value;
@@ -75,6 +78,7 @@ namespace GBG.Puppeteer.Parameter
 
         public void SetInt(int value)
         {
+            Assert.IsFalse(IsLiteral);
             Assert.IsTrue(Type == ParamType.Int || Type == ParamType.Any);
 
             _value = value;
@@ -90,6 +94,7 @@ namespace GBG.Puppeteer.Parameter
 
         public void SetBool(bool value)
         {
+            Assert.IsFalse(IsLiteral);
             Assert.IsTrue(Type == ParamType.Bool || Type == ParamType.Any);
 
             _value = value ? 1 : 0;
@@ -105,6 +110,8 @@ namespace GBG.Puppeteer.Parameter
 
         public void SetRawValue(float value)
         {
+            Assert.IsFalse(IsLiteral);
+
             _value = value;
             OnValueChanged?.Invoke(this);
         }
@@ -112,6 +119,16 @@ namespace GBG.Puppeteer.Parameter
         public float GetRawValue()
         {
             return _value;
+        }
+
+        public object Clone()
+        {
+            return new ParamInfo(_name, _type, _value);
+        }
+
+        public static ParamInfo CreateLiteral(ParamType type = ParamType.Any, float rawValue = 0)
+        {
+            return new ParamInfo(null, type, rawValue);
         }
     }
 }

@@ -10,11 +10,19 @@ namespace GBG.Puppeteer.NodeData
     [Serializable]
     public class AnimationClipNodeData : AnimationNodeData
     {
+        internal AnimationClip AnimationClip => _animationClip;
+
         [SerializeField]
         private AnimationClip _animationClip;
 
+
+        internal ParamNameOrValue UseExplicitTime => _useExplicitTime;
+
         [SerializeField]
         private ParamNameOrValue _useExplicitTime;
+
+
+        internal ParamNameOrValue ExplicitTime => _explicitTime;
 
         [SerializeField]
         private ParamNameOrValue _explicitTime;
