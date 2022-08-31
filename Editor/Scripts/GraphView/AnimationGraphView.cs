@@ -8,6 +8,7 @@ using GBG.Puppeteer.NodeData;
 using GBG.Puppeteer.Parameter;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.Playables;
 using UnityEngine.UIElements;
 using UnityGraphView = UnityEditor.Experimental.GraphView.GraphView;
 
@@ -17,7 +18,8 @@ namespace GBG.Puppeteer.Editor.GraphView
     {
         private readonly RootNode _rootNode;
 
-        private readonly List<ParamInfo> _paramInfos = new List<ParamInfo>();
+
+        public bool SuppressGraphViewChangedEvent { get; set; }
 
 
         public AnimationGraphView(RuntimeAnimationGraph graphAsset)
@@ -31,68 +33,84 @@ namespace GBG.Puppeteer.Editor.GraphView
             _rootNode = new RootNode();
             AddElement(_rootNode);
 
-            // Parameters
-            foreach (var param in graphAsset.Parameters)
-            {
-                _paramInfos.Add((ParamInfo)param.Clone());
-                // TODO: Add parameter to blackboard
-            }
-
-            // Active nodes
-            foreach (var nodeData in graphAsset.EditorNodes)
-            {
-                var node = PlayableNodeFactory.InstantiateNode(nodeData);
-                if (node != null)
-                {
-                    AddElement(node);
-                }
-            }
-
-            // TODO: Link active nodes
-
-            // Isolated nodes
-            foreach (var nodeData in graphAsset.EditorIsolatedNodes)
-            {
-                var node = PlayableNodeFactory.InstantiateNode(nodeData);
-                if (node != null)
-                {
-                    AddElement(node);
-                }
-            }
-
             // Graph view change callback
             graphViewChanged += OnGraphViewChanged;
         }
 
-
-        public void SaveToGraphAsset(RuntimeAnimationGraph graphAsset)
+        public void RebuildGraph(IList<AnimationNodeData> linkedNodes, IList<AnimationNodeData> isolatedNodes,
+            List<ParamInfo> paramTable)
         {
-            // Parameters
-            graphAsset.EditorParameters = new ParamInfo[_paramInfos.Count()];
-            for (int i = 0; i < _paramInfos.Count(); i++)
+            // Old elements
+            foreach (var edge in edges)
             {
-                graphAsset.EditorParameters[i] = (ParamInfo)_paramInfos[i].Clone();
+                RemoveElement(edge);
             }
 
-            // Nodes
-            var nodeDict = new Dictionary<string, PlayableNode>(nodes.Count());
+            foreach (var node in nodes)
+            {
+                if (node == _rootNode)
+                {
+                    continue;
+                }
+
+                RemoveElement(node);
+            }
+
+            // Active nodes
+            var nodeTable = new Dictionary<string, PlayableNode>(linkedNodes.Count);
+            var nodeDataTable = new Dictionary<string, AnimationNodeData>(linkedNodes.Count);
+            foreach (var nodeData in linkedNodes)
+            {
+                var node = PlayableNodeFactory.InstantiateNode(nodeData, paramTable);
+                if (node != null)
+                {
+                    AddElement(node);
+                    nodeTable.Add(node.Guid, node);
+                    nodeDataTable.Add(nodeData.Guid, nodeData);
+                }
+            }
+
+            // Isolated nodes
+            foreach (var nodeData in isolatedNodes)
+            {
+                var node = PlayableNodeFactory.InstantiateNode(nodeData, paramTable);
+                if (node != null)
+                {
+                    AddElement(node);
+                }
+            }
+
+            // Link active nodes
+            if (linkedNodes.Count > 0)
+            {
+                var rootPlayableNode = nodeTable[linkedNodes[0].Guid];
+                var edge = _rootNode.InputPort.ConnectTo<AnimationGraphEdge>(rootPlayableNode.OutputPort);
+                AddElement(edge);
+                LinkNodes(rootPlayableNode, nodeTable, nodeDataTable);
+            }
+        }
+
+        public void SaveNodesToGraphAsset(RuntimeAnimationGraph graphAsset)
+        {
+            // Node table
+            var nodeTable = new Dictionary<string, PlayableNode>(nodes.Count());
             foreach (var node in nodes)
             {
                 if (node is PlayableNode animGraphNode)
                 {
-                    nodeDict.Add(animGraphNode.Guid, animGraphNode);
+                    nodeTable.Add(animGraphNode.Guid, animGraphNode);
                 }
             }
 
             // Active nodes
             var activeNodeDataList = new List<AnimationNodeData>(nodes.Count());
-            CollectNodeDataRecursively(_rootNode.Input, nodeDict, activeNodeDataList);
+            CollectNodeDataRecursively(_rootNode.InputNode, nodeTable, activeNodeDataList);
             graphAsset.EditorNodes = activeNodeDataList.ToArray();
 
             // Isolated nodes
-            graphAsset.EditorIsolatedNodes = new AnimationNodeData[nodeDict.Count];
+            graphAsset.EditorIsolatedNodes = new AnimationNodeData[nodeTable.Count];
             var index = 0;
-            foreach (var isolatedNode in nodeDict.Values)
+            foreach (var isolatedNode in nodeTable.Values)
             {
                 graphAsset.EditorIsolatedNodes[index] = isolatedNode.CloneNodeData();
                 index++;
@@ -102,6 +120,11 @@ namespace GBG.Puppeteer.Editor.GraphView
                 Dictionary<string, PlayableNode> nodeDict,
                 List<AnimationNodeData> nodeDataList)
             {
+                if (rootNode == null)
+                {
+                    return;
+                }
+
                 nodeDict.Remove(rootNode.Guid);
                 nodeDataList.Add(rootNode.CloneNodeData());
 
@@ -134,32 +157,36 @@ namespace GBG.Puppeteer.Editor.GraphView
 
         private GraphViewChange OnGraphViewChanged(GraphViewChange graphViewChange)
         {
-            if (graphViewChange.edgesToCreate != null)
+            if (!SuppressGraphViewChangedEvent)
             {
-                foreach (var edge in graphViewChange.edgesToCreate)
-                {
-                    if (edge is AnimationGraphEdge animEdge)
-                    {
-                        animEdge.Input.Node.OnInputConnected(animEdge);
-                    }
-                }
+                OnGraphChanged?.Invoke();
             }
-
-            if (graphViewChange.elementsToRemove != null)
-            {
-                foreach (var elemToRemove in graphViewChange.elementsToRemove)
-                {
-                    if (elemToRemove is AnimationGraphEdge animEdge)
-                    {
-                        animEdge.Input.Node.OnInputDisconnected(animEdge);
-                    }
-                }
-            }
-
-
-            OnGraphChanged?.Invoke();
 
             return graphViewChange;
+        }
+
+        private void LinkNodes(PlayableNode rootNode, Dictionary<string, PlayableNode> nodeTable,
+            Dictionary<string, AnimationNodeData> nodeDataTable)
+        {
+            if (rootNode == null)
+            {
+                return;
+            }
+
+            var rootNodeData = nodeDataTable[rootNode.Guid];
+            if (rootNodeData.InputInfos == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < rootNodeData.InputInfos.Length; i++)
+            {
+                var inputNode = nodeTable[rootNodeData.InputInfos[i].InputNodeGuid];
+                var edge = inputNode.OutputPort.ConnectTo<AnimationGraphEdge>(rootNode.InputPorts[i]);
+                AddElement(edge);
+
+                LinkNodes(inputNode, nodeTable, nodeDataTable);
+            }
         }
     }
 }

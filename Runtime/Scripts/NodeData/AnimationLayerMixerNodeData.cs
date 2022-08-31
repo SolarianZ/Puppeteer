@@ -8,83 +8,61 @@ using GBG.Puppeteer.Parameter;
 namespace GBG.Puppeteer.NodeData
 {
     [Serializable]
-    public class LayerInputInfo : InputInfo
-    {
-        public bool IsAdditive => _isAdditive;
-
-        [SerializeField]
-        private bool _isAdditive;
-
-
-        public AvatarMask AvatarMask => _avatarMask;
-
-        [SerializeField]
-        private AvatarMask _avatarMask;
-
-
-        protected override InputInfo InternalDeepClone()
-        {
-            return new LayerInputInfo()
-            {
-                _isAdditive = this._isAdditive,
-                _avatarMask = this._avatarMask
-            };
-        }
-    }
-
-    [Serializable]
     public class AnimationLayerMixerNodeData : AnimationNodeData
     {
-        public IReadOnlyList<LayerInputInfo> InputInfos => _inputInfos;
-
-        [SerializeField]
-        private LayerInputInfo[] _inputInfos;
-
-
         public override AnimationNodeInstance CreateNodeInstance(PlayableGraph graph,
             Animator animator,
-            Dictionary<string, AnimationNodeData> nodes,
-            Dictionary<string, ParamInfo> parameters)
+            Dictionary<string, AnimationNodeData> nodeTable,
+            Dictionary<string, ParamInfo> paramTable)
         {
-            var inputInstances = new AnimationNodeInstance[InputInfos.Count];
-            var inputWeights = new ParamInfo[InputInfos.Count];
-            var layerAdditiveStates = new bool[InputInfos.Count];
-            var layerAvatarMasks = new AvatarMask[InputInfos.Count];
-            for (var i = 0; i < InputInfos.Count; i++)
+            var inputInstances = new AnimationNodeInstance[InputInfos.Length];
+            var inputWeights = new ParamInfo[InputInfos.Length];
+            var layerAdditiveStates = new bool[InputInfos.Length];
+            var layerAvatarMasks = new AvatarMask[InputInfos.Length];
+            for (var i = 0; i < InputInfos.Length; i++)
             {
-                var inputInfo = InputInfos[i];
+                var inputInfo = (LayerMixerInputInfo)InputInfos[i];
 
                 // Inputs
-                var inputNode = nodes[inputInfo.InputNodeGuid];
-                inputInstances[i] = inputNode.CreateNodeInstance(graph, animator, nodes, parameters);
+                var inputNode = nodeTable[inputInfo.InputNodeGuid];
+                inputInstances[i] = inputNode.CreateNodeInstance(graph, animator, nodeTable, paramTable);
 
                 // Weights
-                var inputWeight = inputInfo.InputWeightParam.GetParamInfo(parameters, ParamType.Float);
+                var inputWeight = inputInfo.InputWeightParam.GetParamInfo(paramTable, ParamType.Float);
                 inputWeights[i] = inputWeight;
 
                 // Additive states
-                layerAdditiveStates[i] = InputInfos[i].IsAdditive;
+                layerAdditiveStates[i] = inputInfo.IsAdditive;
 
                 // AvatarMasks
-                layerAvatarMasks[i] = InputInfos[i].AvatarMask;
+                layerAvatarMasks[i] = inputInfo.AvatarMask;
             }
 
             return new AnimationLayerMixerInstance(graph, inputInstances, inputWeights,
-                PlaybackSpeed.GetParamInfo(parameters, ParamType.Float),
+                PlaybackSpeed.GetParamInfo(paramTable, ParamType.Float),
                 layerAdditiveStates, layerAvatarMasks);
         }
 
 
-        protected override AnimationNodeData InternalDeepClone()
-        {
-            var clone = new AnimationLayerMixerNodeData();
-            clone._inputInfos = new LayerInputInfo[_inputInfos.Length];
-            for (int i = 0; i < _inputInfos.Length; i++)
-            {
-                clone._inputInfos[i] = (LayerInputInfo)_inputInfos[i].Clone();
-            }
+        #region Deep Clone
 
-            return clone;
+        protected override AnimationNodeData CreateCloneInstance()
+        {
+            return new AnimationLayerMixerNodeData();
         }
+
+        protected override void CloneMembers(AnimationNodeData clone)
+        {
+            base.CloneMembers(clone);
+
+            var animLayerMixerNodeData = (AnimationLayerMixerNodeData)clone;
+            animLayerMixerNodeData.InputInfos = new InputInfo[InputInfos.Length];
+            for (int i = 0; i < InputInfos.Length; i++)
+            {
+                animLayerMixerNodeData.InputInfos[i] = (LayerMixerInputInfo)InputInfos[i].Clone();
+            }
+        }
+
+        #endregion
     }
 }

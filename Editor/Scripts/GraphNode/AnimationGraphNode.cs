@@ -8,10 +8,6 @@ namespace GBG.Puppeteer.Editor.GraphNode
 {
     public abstract class AnimationGraphNode : GraphViewNode
     {
-        public abstract void OnInputConnected(AnimationGraphEdge edge);
-
-        public abstract void OnInputDisconnected(AnimationGraphEdge edge);
-
         public override Port InstantiatePort(Orientation orientation,
             Direction direction, Port.Capacity capacity, Type type)
         {

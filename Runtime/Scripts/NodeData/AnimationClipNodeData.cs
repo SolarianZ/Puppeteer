@@ -10,43 +10,64 @@ namespace GBG.Puppeteer.NodeData
     [Serializable]
     public class AnimationClipNodeData : AnimationNodeData
     {
-        internal AnimationClip AnimationClip => _animationClip;
+        public AnimationClip AnimationClip
+        {
+            get => _animationClip;
+            set => _animationClip = value;
+        }
 
         [SerializeField]
         private AnimationClip _animationClip;
 
 
-        internal ParamNameOrValue UseExplicitTime => _useExplicitTime;
+        public ParamNameOrValue UseExplicitTime
+        {
+            get => _useExplicitTime;
+            set => _useExplicitTime = value;
+        }
 
         [SerializeField]
         private ParamNameOrValue _useExplicitTime;
 
 
-        internal ParamNameOrValue ExplicitTime => _explicitTime;
+        public ParamNameOrValue ExplicitTime
+        {
+            get => _explicitTime;
+            set => _explicitTime = value;
+        }
 
         [SerializeField]
         private ParamNameOrValue _explicitTime;
 
 
         public override AnimationNodeInstance CreateNodeInstance(PlayableGraph graph,
-            Animator animator, Dictionary<string, AnimationNodeData> nodes,
-            Dictionary<string, ParamInfo> parameters)
+            Animator animator, Dictionary<string, AnimationNodeData> nodeTable,
+            Dictionary<string, ParamInfo> paramTable)
         {
             return new AnimationClipInstance(graph, _animationClip,
-                _useExplicitTime.GetParamInfo(parameters, ParamType.Bool),
-                _explicitTime.GetParamInfo(parameters, ParamType.Float),
-                PlaybackSpeed.GetParamInfo(parameters, ParamType.Float));
+                _useExplicitTime.GetParamInfo(paramTable, ParamType.Bool),
+                _explicitTime.GetParamInfo(paramTable, ParamType.Float),
+                PlaybackSpeed.GetParamInfo(paramTable, ParamType.Float));
         }
 
 
-        protected override AnimationNodeData InternalDeepClone()
+        #region Deep Clone
+
+        protected override AnimationNodeData CreateCloneInstance()
         {
-            return new AnimationClipNodeData()
-            {
-                _animationClip = this._animationClip,
-                _useExplicitTime = (ParamNameOrValue)this._useExplicitTime.Clone(),
-                _explicitTime = (ParamNameOrValue)this._explicitTime.Clone()
-            };
+            return new AnimationClipNodeData();
         }
+
+        protected override void CloneMembers(AnimationNodeData clone)
+        {
+            base.CloneMembers(clone);
+
+            var animClipNodeData = (AnimationClipNodeData)clone;
+            animClipNodeData._animationClip = _animationClip;
+            animClipNodeData._useExplicitTime = (ParamNameOrValue)_useExplicitTime.Clone();
+            animClipNodeData._explicitTime = (ParamNameOrValue)_explicitTime.Clone();
+        }
+
+        #endregion
     }
 }

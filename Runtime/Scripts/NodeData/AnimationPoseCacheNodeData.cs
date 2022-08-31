@@ -14,14 +14,14 @@ namespace GBG.Puppeteer.NodeData
 
         public override AnimationNodeInstance CreateNodeInstance(PlayableGraph graph,
             Animator animator,
-            Dictionary<string, AnimationNodeData> nodes,
-            Dictionary<string, ParamInfo> parameters)
+            Dictionary<string, AnimationNodeData> nodeTable,
+            Dictionary<string, ParamInfo> paramTable)
         {
             throw new System.NotImplementedException();
         }
 
-
-        protected override AnimationNodeData InternalDeepClone()
+        
+        protected override AnimationNodeData CreateCloneInstance()
         {
             throw new System.NotImplementedException();
         }

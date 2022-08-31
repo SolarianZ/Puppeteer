@@ -19,8 +19,8 @@ namespace GBG.Puppeteer.NodeData
 
 
         public override AnimationNodeInstance CreateNodeInstance(PlayableGraph graph,
-            Animator animator, Dictionary<string, AnimationNodeData> nodes,
-            Dictionary<string, ParamInfo> parameters)
+            Animator animator, Dictionary<string, AnimationNodeData> nodeTable,
+            Dictionary<string, ParamInfo> paramTable)
         {
             if (_paramBindingSources == null || _paramBindingSources.Length == 0)
             {
@@ -35,7 +35,7 @@ namespace GBG.Puppeteer.NodeData
                     if (bindingSource.TargetParamName.Equals(_subGraph.Parameters[i].Name))
                     {
                         paramBindingSources[i] = bindingSource
-                            .GetParamBindingSource(parameters, _subGraph.Parameters[i].Type);
+                            .GetParamBindingSource(paramTable, _subGraph.Parameters[i].Type);
                         break;
                     }
                 }
@@ -45,20 +45,27 @@ namespace GBG.Puppeteer.NodeData
         }
 
 
-        protected override AnimationNodeData InternalDeepClone()
-        {
-            var clone = new AnimationSubGraphNodeData()
-            {
-                _subGraph = this._subGraph,
-            };
+        #region Deep Clone
 
-            clone._paramBindingSources = new ParamBindingNameOrValue[_paramBindingSources.Length];
+        protected override AnimationNodeData CreateCloneInstance()
+        {
+            return new AnimationSubGraphNodeData();
+        }
+
+        protected override void CloneMembers(AnimationNodeData clone)
+        {
+            base.CloneMembers(clone);
+
+            var animSubGraphNodeData = (AnimationSubGraphNodeData)clone;
+            animSubGraphNodeData._subGraph = _subGraph;
+
+            animSubGraphNodeData._paramBindingSources = new ParamBindingNameOrValue[_paramBindingSources.Length];
             for (int i = 0; i < _paramBindingSources.Length; i++)
             {
-                clone._paramBindingSources[i] = (ParamBindingNameOrValue)_paramBindingSources[i].Clone();
+                animSubGraphNodeData._paramBindingSources[i] = (ParamBindingNameOrValue)_paramBindingSources[i].Clone();
             }
-
-            return clone;
         }
+
+        #endregion
     }
 }

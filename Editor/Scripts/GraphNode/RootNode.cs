@@ -1,4 +1,5 @@
-﻿using GBG.Puppeteer.Editor.GraphEdge;
+﻿using System.Linq;
+using GBG.Puppeteer.Editor.GraphEdge;
 using GBG.Puppeteer.Editor.GraphPort;
 using GBG.Puppeteer.Editor.Utility;
 using UnityEditor.Experimental.GraphView;
@@ -7,32 +8,26 @@ using GraphViewNode = UnityEditor.Experimental.GraphView.Node;
 
 namespace GBG.Puppeteer.Editor.GraphNode
 {
-    public class RootNode : AnimationGraphNode
+    public sealed class RootNode : AnimationGraphNode
     {
-        public PlayableNode Input { get; private set; }
+        public AnimationGraphPort InputPort { get; }
+
+        public PlayableNode InputNode => InputPort.connected
+            ? (PlayableNode)InputPort.connections.First().output.node
+            : null;
 
 
         public RootNode()
         {
             title = "Graph Output";
 
-            var inputPort = AnimationGraphPort.Create<AnimationGraphEdge>(Direction.Input, typeof(Playable));
-            inputPort.portName = "Input Pose";
-            inputPort.portColor = ColorTool.GetColor(typeof(Playable));
-            inputContainer.Add(inputPort);
+            InputPort = AnimationGraphPort.Create<AnimationGraphEdge>(Direction.Input, typeof(Playable));
+            InputPort.portName = "Input Pose";
+            InputPort.portColor = ColorTool.GetColor(typeof(Playable));
+            inputContainer.Add(InputPort);
 
             RefreshPorts();
             RefreshExpandedState();
-        }
-
-        public override void OnInputConnected(AnimationGraphEdge edge)
-        {
-            Input = (PlayableNode)edge.Output.Node;
-        }
-
-        public override void OnInputDisconnected(AnimationGraphEdge edge)
-        {
-            Input = null;
         }
     }
 }

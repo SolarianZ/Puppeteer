@@ -24,7 +24,7 @@ namespace GBG.Puppeteer.Parameter
     }
 
     [Serializable]
-    public class ParamInfo : ICloneable
+    public sealed class ParamInfo : ICloneable
     {
         /// <summary>
         /// Unique name of a variable.
@@ -43,7 +43,7 @@ namespace GBG.Puppeteer.Parameter
 
 
         [SerializeField]
-        private float _value;
+        private float _rawValue;
 
 
         public bool IsLiteral => string.IsNullOrEmpty(Name);
@@ -51,13 +51,35 @@ namespace GBG.Puppeteer.Parameter
         public event Action<ParamInfo> OnValueChanged;
 
 
-        public ParamInfo(string name, ParamType type, float value = 0)
+        public ParamInfo(string name, ParamType type, float rawValue = 0)
         {
-            // TODO: Check name rule
-
             _name = name;
             _type = type;
-            _value = value;
+            _rawValue = rawValue;
+        }
+
+        public ParamInfo(string name, Type valueType, float rawValue = 0)
+        {
+            _name = name;
+            _rawValue = rawValue;
+
+            if (valueType == typeof(float))
+            {
+                _type = ParamType.Float;
+            }
+            else if (valueType == typeof(int))
+            {
+                _type = ParamType.Int;
+            }
+            else if (valueType == typeof(bool))
+            {
+                _type = ParamType.Bool;
+            }
+            else
+            {
+                throw new ArgumentException($"Unsupported value type: {valueType.AssemblyQualifiedName}.",
+                    nameof(valueType));
+            }
         }
 
         public void SetFloat(float value)
@@ -65,7 +87,7 @@ namespace GBG.Puppeteer.Parameter
             Assert.IsFalse(IsLiteral);
             Assert.IsTrue(Type == ParamType.Float || Type == ParamType.Any);
 
-            _value = value;
+            _rawValue = value;
             OnValueChanged?.Invoke(this);
         }
 
@@ -73,7 +95,7 @@ namespace GBG.Puppeteer.Parameter
         {
             Assert.IsTrue(Type == ParamType.Float || Type == ParamType.Any);
 
-            return _value;
+            return _rawValue;
         }
 
         public void SetInt(int value)
@@ -81,7 +103,7 @@ namespace GBG.Puppeteer.Parameter
             Assert.IsFalse(IsLiteral);
             Assert.IsTrue(Type == ParamType.Int || Type == ParamType.Any);
 
-            _value = value;
+            _rawValue = value;
             OnValueChanged?.Invoke(this);
         }
 
@@ -89,7 +111,7 @@ namespace GBG.Puppeteer.Parameter
         {
             Assert.IsTrue(Type == ParamType.Int || Type == ParamType.Any);
 
-            return (int)Math.Round(_value);
+            return (int)Math.Round(_rawValue);
         }
 
         public void SetBool(bool value)
@@ -97,7 +119,7 @@ namespace GBG.Puppeteer.Parameter
             Assert.IsFalse(IsLiteral);
             Assert.IsTrue(Type == ParamType.Bool || Type == ParamType.Any);
 
-            _value = value ? 1 : 0;
+            _rawValue = value ? 1 : 0;
             OnValueChanged?.Invoke(this);
         }
 
@@ -105,25 +127,25 @@ namespace GBG.Puppeteer.Parameter
         {
             Assert.IsTrue(Type == ParamType.Bool || Type == ParamType.Any);
 
-            return !Mathf.Approximately(_value, 0);
+            return !Mathf.Approximately(_rawValue, 0);
         }
 
         public void SetRawValue(float value)
         {
             Assert.IsFalse(IsLiteral);
 
-            _value = value;
+            _rawValue = value;
             OnValueChanged?.Invoke(this);
         }
 
         public float GetRawValue()
         {
-            return _value;
+            return _rawValue;
         }
 
         public object Clone()
         {
-            return new ParamInfo(_name, _type, _value);
+            return new ParamInfo(_name, _type, _rawValue);
         }
 
         public static ParamInfo CreateLiteral(ParamType type = ParamType.Any, float rawValue = 0)

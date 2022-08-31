@@ -8,78 +8,52 @@ using GBG.Puppeteer.Parameter;
 namespace GBG.Puppeteer.NodeData
 {
     [Serializable]
-    public class InputInfo : ICloneable
-    {
-        public string InputNodeGuid => _inputNodeGuid;
-
-        [SerializeField]
-        private string _inputNodeGuid;
-
-
-        public ParamNameOrValue InputWeightParam => _inputWeightParam;
-
-        [SerializeField]
-        private ParamNameOrValue _inputWeightParam = new ParamNameOrValue();
-
-        public object Clone()
-        {
-            var clone = InternalDeepClone();
-            clone._inputNodeGuid = _inputNodeGuid;
-            clone._inputWeightParam = _inputWeightParam;
-
-            return clone;
-        }
-
-        protected virtual InputInfo InternalDeepClone()
-        {
-            return new InputInfo();
-        }
-    }
-
-    [Serializable]
     public class AnimationMixerNodeData : AnimationNodeData
     {
-        public IReadOnlyList<InputInfo> InputInfos => _inputInfos;
-
-        [SerializeField]
-        private InputInfo[] _inputInfos;
-
-
         public override AnimationNodeInstance CreateNodeInstance(PlayableGraph graph,
             Animator animator,
-            Dictionary<string, AnimationNodeData> nodes,
-            Dictionary<string, ParamInfo> parameters)
+            Dictionary<string, AnimationNodeData> nodeTable,
+            Dictionary<string, ParamInfo> paramTable)
         {
-            var inputInstances = new AnimationNodeInstance[InputInfos.Count];
-            var inputWeights = new ParamInfo[InputInfos.Count];
-            for (var i = 0; i < InputInfos.Count; i++)
+            var inputInstances = new AnimationNodeInstance[InputInfos.Length];
+            var inputWeights = new ParamInfo[InputInfos.Length];
+            for (var i = 0; i < InputInfos.Length; i++)
             {
-                var inputInfo = InputInfos[i];
+                var inputInfo = (MixerInputInfo)InputInfos[i];
 
                 // Inputs
-                var inputNode = nodes[inputInfo.InputNodeGuid];
-                inputInstances[i] = inputNode.CreateNodeInstance(graph, animator, nodes, parameters);
+                var inputNode = nodeTable[inputInfo.InputNodeGuid];
+                inputInstances[i] = inputNode.CreateNodeInstance(graph, animator, nodeTable, paramTable);
 
                 // Weights
-                var inputWeight = inputInfo.InputWeightParam.GetParamInfo(parameters, ParamType.Float);
+                var inputWeight = inputInfo.InputWeightParam.GetParamInfo(paramTable, ParamType.Float);
                 inputWeights[i] = inputWeight;
             }
 
             return new AnimationMixerInstance(graph, inputInstances, inputWeights,
-                PlaybackSpeed.GetParamInfo(parameters, ParamType.Float));
+                PlaybackSpeed.GetParamInfo(paramTable, ParamType.Float));
         }
 
 
-        protected override AnimationNodeData InternalDeepClone()
+        #region Deep Clone
+
+        protected override AnimationNodeData CreateCloneInstance()
         {
-            var clone = new AnimationMixerNodeData();
-            clone._inputInfos = new InputInfo[_inputInfos.Length];
-            for (int i = 0; i < _inputInfos.Length; i++)
-            {
-                clone._inputInfos[i] = (InputInfo)_inputInfos[i].Clone();
-            }
-
-            return clone;
+            return new AnimationMixerNodeData();
         }
+
+        protected override void CloneMembers(AnimationNodeData clone)
+        {
+            base.CloneMembers(clone);
+
+            var animMixerNodeData = (AnimationMixerNodeData)clone;
+            animMixerNodeData.InputInfos = new InputInfo[InputInfos.Length];
+            for (int i = 0; i < InputInfos.Length; i++)
+            {
+                animMixerNodeData.InputInfos[i] = (MixerInputInfo)InputInfos[i].Clone();
+            }
+        }
+
+        #endregion
     }
 }

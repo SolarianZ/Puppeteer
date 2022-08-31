@@ -1,4 +1,6 @@
-﻿using GBG.Puppeteer.NodeData;
+﻿using System.Collections.Generic;
+using GBG.Puppeteer.NodeData;
+using GBG.Puppeteer.Parameter;
 using UnityEngine;
 
 namespace GBG.Puppeteer.Editor.GraphNode
@@ -15,7 +17,7 @@ namespace GBG.Puppeteer.Editor.GraphNode
         }
 
 
-        public static PlayableNode InstantiateNode(AnimationNodeData nodeData)
+        public static PlayableNode InstantiateNode(AnimationNodeData nodeData, List<ParamInfo> parameters)
         {
             PlayableNode node = null;
             if (_customNodeCreator != null && _customNodeCreator(nodeData, out node))
@@ -40,7 +42,7 @@ namespace GBG.Puppeteer.Editor.GraphNode
             {
                 node.title = nodeData.EditorName;
                 node.SetPosition(new Rect(nodeData.EditorPosition, Vector2.zero));
-                node.PopulateView(nodeData);
+                node.PopulateView(nodeData, parameters);
             }
 
             return node;

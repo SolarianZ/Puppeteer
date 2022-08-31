@@ -1,7 +1,12 @@
 ﻿using System.Collections.Generic;
+using GBG.Puppeteer.Editor.GraphParam;
 using GBG.Puppeteer.Editor.GraphPort;
+using GBG.Puppeteer.Editor.Utility;
 using GBG.Puppeteer.NodeData;
+using GBG.Puppeteer.Parameter;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.Playables;
 using UnityEngine.UIElements;
 using GraphViewNode = UnityEditor.Experimental.GraphView.Node;
 using GraphViewPort = UnityEditor.Experimental.GraphView.Port;
@@ -12,11 +17,17 @@ namespace GBG.Puppeteer.Editor.GraphNode
     {
         public string Guid { get; }
 
-        public abstract AnimationGraphPort OutputPort { get; }
+        public AnimationGraphPort OutputPort { get; }
+
+        public IReadOnlyList<AnimationGraphPort> InputPorts => InternalInputPorts;
+
+        protected List<AnimationGraphPort> InternalInputPorts { get; } = new List<AnimationGraphPort>();
 
         public IReadOnlyList<PlayableNode> InputNodes => InternalInputNodes;
 
-        protected readonly List<PlayableNode> InternalInputNodes = new List<PlayableNode>();
+        protected List<PlayableNode> InternalInputNodes { get; } = new List<PlayableNode>();
+
+        protected abstract ParamField<float> PlaybackSpeedField { get; }
 
 
         protected PlayableNode(string guid)
@@ -55,11 +66,46 @@ namespace GBG.Puppeteer.Editor.GraphNode
                 }
             };
             titleLabelContainer.Add(nodeTypeLabel);
+
+            // Output
+            OutputPort = InstantiatePort(Direction.Output, typeof(Playable));
+            OutputPort.portName = "Output Pose";
+            OutputPort.portColor = ColorTool.GetColor(typeof(Playable));
+            outputContainer.Add(OutputPort);
         }
 
 
-        public abstract void PopulateView(AnimationNodeData nodeData);
+        public abstract void PopulateView(AnimationNodeData nodeData, List<ParamInfo> parameters);
 
-        public abstract AnimationNodeData CloneNodeData();
+
+        #region Deep Clone
+
+        public AnimationNodeData CloneNodeData()
+        {
+            var clone = CreateCloneNodeDataInstance();
+            CloneNodeDataMembers(clone);
+
+            return clone;
+        }
+
+        protected abstract AnimationNodeData CreateCloneNodeDataInstance();
+
+        protected virtual void CloneNodeDataMembers(AnimationNodeData clone)
+        {
+            clone.EditorName = title;
+         
+            clone.EditorPosition = GetPosition().position;
+          
+            clone.Guid = Guid;
+
+            if (!PlaybackSpeedField.GetParamInfo(out var playbackSpeedParam))
+            {
+                Debug.LogError($"[Puppeteer::PlayableNode] Invalid 'PlaybackSpeed' param link on node '{title}'.");
+            }
+
+            clone.PlaybackSpeed = new ParamNameOrValue(playbackSpeedParam);
+        }
+
+        #endregion
     }
 }

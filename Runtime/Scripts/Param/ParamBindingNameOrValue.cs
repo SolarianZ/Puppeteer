@@ -5,7 +5,8 @@ using UnityEngine.Assertions;
 
 namespace GBG.Puppeteer.Parameter
 {
-    public class ParamBindingNameOrValue : ICloneable
+    [Serializable]
+    public sealed class ParamBindingNameOrValue : ICloneable
     {
         public string TargetParamName => _targetParamName;
 

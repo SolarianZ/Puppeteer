@@ -19,14 +19,13 @@ namespace GBG.Puppeteer.NodeData
     public class AnimationBlendSpaceNodeData : AnimationNodeData
     {
         public override AnimationNodeInstance CreateNodeInstance(PlayableGraph graph,
-            Animator animator, Dictionary<string, AnimationNodeData> nodes,
-            Dictionary<string, ParamInfo> parameters)
+            Animator animator, Dictionary<string, AnimationNodeData> nodeTable,
+            Dictionary<string, ParamInfo> paramTable)
         {
             throw new NotImplementedException();
         }
 
-
-        protected override AnimationNodeData InternalDeepClone()
+        protected override AnimationNodeData CreateCloneInstance()
         {
             throw new NotImplementedException();
         }

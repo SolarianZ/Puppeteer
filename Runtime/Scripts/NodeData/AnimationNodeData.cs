@@ -13,7 +13,7 @@ namespace GBG.Puppeteer.NodeData
         #region EDITOR DATA
 
 #if UNITY_EDITOR
-        internal string EditorName
+        public string EditorName
         {
             get => _editorName;
             set => _editorName = value;
@@ -23,7 +23,7 @@ namespace GBG.Puppeteer.NodeData
         private string _editorName;
 
 
-        internal Vector2 EditorPosition
+        public Vector2 EditorPosition
         {
             get => _editorPosition;
             set => _editorPosition = value;
@@ -38,31 +38,57 @@ namespace GBG.Puppeteer.NodeData
         public string Guid
         {
             get => _guid;
-            internal set => _guid = value;
+            set => _guid = value;
         }
 
         [SerializeField]
         private string _guid;
 
+        public InputInfo[] InputInfos
+        {
+            get => _inputInfos;
+            set => _inputInfos = value;
+        }
 
-        protected ParamNameOrValue PlaybackSpeed => _playbackSpeed;
+        [SerializeReference]
+        private InputInfo[] _inputInfos;
+
+        public ParamNameOrValue PlaybackSpeed
+        {
+            get => _playbackSpeed;
+            set => _playbackSpeed = value;
+        }
 
         [SerializeField]
-        private ParamNameOrValue _playbackSpeed;
+        private ParamNameOrValue _playbackSpeed = new ParamNameOrValue(null, 1);
 
 
         public abstract AnimationNodeInstance CreateNodeInstance(PlayableGraph graph,
-            Animator animator, Dictionary<string, AnimationNodeData> nodes,
-            Dictionary<string, ParamInfo> parameters);
+            Animator animator, Dictionary<string, AnimationNodeData> nodeTable,
+            Dictionary<string, ParamInfo> paramTable);
 
+
+        #region Deep Clone
 
         public AnimationNodeData Clone(string newGuid)
         {
-            var clone = InternalDeepClone();
+            var clone = CreateCloneInstance();
             clone._guid = newGuid;
+            CloneMembers(clone);
+
             return clone;
         }
 
-        protected abstract AnimationNodeData InternalDeepClone();
+        
+        protected abstract AnimationNodeData CreateCloneInstance();
+
+        protected virtual void CloneMembers(AnimationNodeData clone)
+        {
+            clone.EditorName = _editorName;
+            clone._editorPosition = _editorPosition;
+            clone._playbackSpeed = (ParamNameOrValue)_playbackSpeed.Clone();
+        }
+
+        #endregion
     }
 }
