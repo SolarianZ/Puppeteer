@@ -20,6 +20,10 @@ namespace GBG.Puppeteer.NodeData
             for (var i = 0; i < InputInfos.Length; i++)
             {
                 var inputInfo = (MixerInputInfo)InputInfos[i];
+                if (inputInfo == null)
+                {
+                    continue;
+                }
 
                 // Inputs
                 var inputNode = nodeTable[inputInfo.InputNodeGuid];

@@ -7,7 +7,6 @@ using GBG.Puppeteer.Graph;
 using GBG.Puppeteer.NodeData;
 using GBG.Puppeteer.Parameter;
 using UnityEditor.Experimental.GraphView;
-using UnityEngine;
 using UnityEngine.UIElements;
 using UDebug = UnityEngine.Debug;
 using UnityGraphView = UnityEditor.Experimental.GraphView.GraphView;
@@ -77,22 +76,24 @@ namespace GBG.Puppeteer.Editor.GraphView
             var nodeDataTable = new Dictionary<string, AnimationNodeData>(linkedNodes.Count);
             foreach (var nodeData in linkedNodes)
             {
-                var node = PlayableNodeFactory.InstantiateNode(nodeData, paramTable);
+                var node = PlayableNodeFactory.CreateNode(nodeData, paramTable);
                 if (node != null)
                 {
                     AddElement(node);
                     nodeTable.Add(node.Guid, node);
                     nodeDataTable.Add(nodeData.Guid, nodeData);
+                    node.OnNodeDataChanged += OnNodeDataChanged;
                 }
             }
 
             // Isolated nodes
             foreach (var nodeData in isolatedNodes)
             {
-                var node = PlayableNodeFactory.InstantiateNode(nodeData, paramTable);
+                var node = PlayableNodeFactory.CreateNode(nodeData, paramTable);
                 if (node != null)
                 {
                     AddElement(node);
+                    node.OnNodeDataChanged += OnNodeDataChanged;
                 }
             }
 
@@ -122,8 +123,14 @@ namespace GBG.Puppeteer.Editor.GraphView
 
             for (int i = 0; i < rootNodeData.InputInfos.Length; i++)
             {
-                var inputNode = nodeTable[rootNodeData.InputInfos[i].InputNodeGuid];
-                var edge = inputNode.OutputPort.ConnectTo<AnimationGraphEdge>(rootNode.InputPorts[i]);
+                var inputInfo = rootNodeData.InputInfos[i];
+                if (inputInfo == null)
+                {
+                    continue;
+                }
+
+                var inputNode = nodeTable[inputInfo.InputNodeGuid];
+                var edge = inputNode.OutputPort.ConnectTo<AnimationGraphEdge>(rootNode.MixerInputs[i].InputPort);
                 AddElement(edge);
 
                 LinkNodes(inputNode, nodeTable, nodeDataTable);
@@ -143,29 +150,19 @@ namespace GBG.Puppeteer.Editor.GraphView
             if (selection.Count == 0)
             {
                 // Collect available nodes
-                _nodeTypesCache ??= from assembly in AppDomain.CurrentDomain.GetAssemblies()
-                    from type in assembly.GetTypes()
-                    where IsPlayableNodeType(type)
-                    select type;
+                _nodeTypesCache ??= PlayableNodeFactory.CollectAvailablePlayableNodeTypes();
 
                 // Build menu items
-                var playableNodeCtorParamTypes = new Type[] { typeof(string) };
                 foreach (var nodeType in _nodeTypesCache)
                 {
-                    evt.menu.AppendAction($"Create {nodeType.Name}", (action) =>
+                    evt.menu.AppendAction($"Create {nodeType.Name}", _ =>
                     {
-                        var ctor = nodeType.GetConstructor(playableNodeCtorParamTypes);
-                        if (ctor == null)
+                        var node = PlayableNodeFactory.CreateNode(nodeType, localMousePos);
+                        if (node != null)
                         {
-                            UDebug.LogError($"[Puppeteer::GraphView] {nodeType.Name} does not have " +
-                                            "a constructor with a single string parameter(guid).");
-                            return;
+                            AddElement(node);
+                            node.OnNodeDataChanged += OnNodeDataChanged;
                         }
-
-                        var playableNodeCtorParams = new object[] { PlayableNode.NewGuid() };
-                        var node = (PlayableNode)ctor.Invoke(playableNodeCtorParams);
-                        node.SetPosition(new Rect(localMousePos, Vector2.zero));
-                        AddElement(node);
                     });
                 }
             }
@@ -173,16 +170,6 @@ namespace GBG.Puppeteer.Editor.GraphView
             {
                 base.BuildContextualMenu(evt);
             }
-        }
-
-        static bool IsPlayableNodeType(Type type)
-        {
-            if (type.IsInterface || type.IsAbstract || (type.IsGenericType && !type.IsConstructedGenericType))
-            {
-                return false;
-            }
-
-            return typeof(PlayableNode).IsAssignableFrom(type);
         }
 
         #endregion
@@ -203,9 +190,9 @@ namespace GBG.Puppeteer.Editor.GraphView
             }
 
             // Active nodes
-            var activeNodeDataList = new List<AnimationNodeData>(nodes.Count());
-            CollectNodeDataRecursively(_rootNode.InputNode, nodeTable, activeNodeDataList);
-            graphAsset.EditorNodes = activeNodeDataList.ToArray();
+            var activeNodeDataTable = new List<AnimationNodeData>(nodes.Count());
+            CollectNodeDataRecursively(_rootNode.InputNode, nodeTable, activeNodeDataTable);
+            graphAsset.EditorNodes = activeNodeDataTable.ToArray();
 
             // Isolated nodes
             graphAsset.EditorIsolatedNodes = new AnimationNodeData[nodeTable.Count];
@@ -217,20 +204,21 @@ namespace GBG.Puppeteer.Editor.GraphView
             }
 
             static void CollectNodeDataRecursively(PlayableNode rootNode,
-                Dictionary<string, PlayableNode> nodeDict,
-                List<AnimationNodeData> nodeDataList)
+                Dictionary<string, PlayableNode> nodeTable,
+                List<AnimationNodeData> nodeDataTable)
             {
                 if (rootNode == null)
                 {
                     return;
                 }
 
-                nodeDict.Remove(rootNode.Guid);
-                nodeDataList.Add(rootNode.CloneNodeData());
+                nodeTable.Remove(rootNode.Guid);
+                nodeDataTable.Add(rootNode.CloneNodeData());
 
-                foreach (var child in rootNode.InputNodes)
+                foreach (var mixerInput in rootNode.MixerInputs)
                 {
-                    CollectNodeDataRecursively(child, nodeDict, nodeDataList);
+                    CollectNodeDataRecursively((PlayableNode)mixerInput.InputPort.ConnectedNode,
+                        nodeTable, nodeDataTable);
                 }
             }
         }
@@ -264,6 +252,14 @@ namespace GBG.Puppeteer.Editor.GraphView
             }
 
             return graphViewChange;
+        }
+
+        private void OnNodeDataChanged(PlayableNode node)
+        {
+            if (!SuppressGraphViewChangedEvent)
+            {
+                OnGraphChanged?.Invoke();
+            }
         }
 
         #endregion

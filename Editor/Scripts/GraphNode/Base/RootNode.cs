@@ -18,7 +18,7 @@ namespace GBG.Puppeteer.Editor.GraphNode
             : null;
 
 
-        public RootNode()
+        public RootNode() : base("RootNode")
         {
             title = "Graph Output";
 

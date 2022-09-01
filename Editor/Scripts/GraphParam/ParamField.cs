@@ -9,10 +9,13 @@ using UnityEngine.UIElements;
 
 namespace GBG.Puppeteer.Editor.GraphParam
 {
-    public class ParamField<TValue> : VisualElement //BaseField<TValue>
+    public class ParamField<TValue> : VisualElement
         where TValue : struct
     {
         public bool IsLinkedToParam { get; private set; }
+
+
+        public event Action<ParamField<TValue>> OnValueChanged;
 
 
         private readonly Label _label;
@@ -32,14 +35,32 @@ namespace GBG.Puppeteer.Editor.GraphParam
         {
             // Style
             style.flexDirection = FlexDirection.Row;
+            style.paddingLeft = 4;
+            style.paddingRight = 1;
+
+            // Param link image
+            _paramLinkImage = new Image
+            {
+                name = "param-link-icon",
+                image = GetParamLinkIcon(IsLinkedToParam),
+                style =
+                {
+                    width = 16,
+                }
+            };
+            _paramLinkImage.RegisterCallback<MouseDownEvent>(OnClickParamLinkImage);
+            Add(_paramLinkImage);
 
             // Label
             _label = new Label(label)
             {
                 style =
                 {
-                    marginLeft = 2,
                     unityTextAlign = TextAnchor.MiddleLeft,
+                    marginLeft = 4,
+                    marginRight = 4,
+                    paddingLeft = 0,
+                    paddingRight = 0,
                 }
             };
 
@@ -49,15 +70,6 @@ namespace GBG.Puppeteer.Editor.GraphParam
             }
 
             Add(_label);
-
-            // Param link image
-            _paramLinkImage = new Image
-            {
-                name = "param-link-icon",
-                image = GetParamLinkIcon(IsLinkedToParam)
-            };
-            _paramLinkImage.RegisterCallback<MouseDownEvent>(OnClickParamLinkImage);
-            Add(_paramLinkImage);
 
             // Param container
             _paramContainer = new VisualElement()
@@ -109,6 +121,8 @@ namespace GBG.Puppeteer.Editor.GraphParam
                 throw new ArgumentException($"Unsupported value type: {valueType.AssemblyQualifiedName}.",
                     nameof(TValue));
             }
+
+            _valueField.RegisterValueChangedCallback(OnParamValueChanged);
 
             // Param popup field
             _paramPopup = new PopupField<ParamInfo>
@@ -225,15 +239,24 @@ namespace GBG.Puppeteer.Editor.GraphParam
             return paramInfo == null ? string.Empty : $"{paramInfo.Name} ({paramInfo.Type})";
         }
 
+        private void OnParamValueChanged(ChangeEvent<TValue> evt)
+        {
+            OnValueChanged?.Invoke(this);
+        }
+
         private void OnClickParamLinkImage(MouseDownEvent _)
         {
             IsLinkedToParam = !IsLinkedToParam;
             RefreshParamView();
+
+            OnValueChanged?.Invoke(this);
         }
 
         private void OnLinkedParamChanged(ChangeEvent<ParamInfo> evt)
         {
             _linkedParam = _paramPopup.value;
+
+            OnValueChanged?.Invoke(this);
         }
 
         private void RefreshParamView()

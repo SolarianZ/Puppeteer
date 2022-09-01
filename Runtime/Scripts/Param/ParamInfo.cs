@@ -30,7 +30,11 @@ namespace GBG.Puppeteer.Parameter
         /// Unique name of a variable.
         /// For a literal, its name is empty.
         /// </summary>
-        public string Name => _name;
+        public string Name
+        {
+            get => _name;
+            set => _name = value;
+        }
 
         [SerializeField]
         private string _name;

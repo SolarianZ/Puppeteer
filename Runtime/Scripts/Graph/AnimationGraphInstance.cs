@@ -45,15 +45,15 @@ namespace GBG.Puppeteer.Graph
             }
 
             // Record all nodes
-            var nodeDict = new Dictionary<string, AnimationNodeData>(graphAsset.Nodes.Count);
+            var nodeTable = new Dictionary<string, AnimationNodeData>(graphAsset.Nodes.Count);
             foreach (var node in graphAsset.Nodes)
             {
-                nodeDict.Add(node.Guid, node);
+                nodeTable.Add(node.Guid, node);
             }
 
             // Initialize node graph
             var rootNode = graphAsset.Nodes[0];
-            _rootInstance = rootNode.CreateNodeInstance(graph, animator, nodeDict, _params);
+            _rootInstance = rootNode.CreateNodeInstance(graph, animator, nodeTable, _params);
             RootPlayable = _rootInstance.Playable;
         }
 

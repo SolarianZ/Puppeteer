@@ -1,7 +1,6 @@
 ﻿using GBG.Puppeteer.Parameter;
 using UnityEngine;
 using UnityEngine.Animations;
-using UnityEngine.Assertions;
 using UnityEngine.Playables;
 
 namespace GBG.Puppeteer.NodeInstance
@@ -59,28 +58,17 @@ namespace GBG.Puppeteer.NodeInstance
             {
                 input.PrepareFrame(deltaTime);
             }
-            
+
             if (!_isInputWeightDirty)
             {
                 return;
             }
 
-            // Total weight
-            var totalWeight = 0f;
-            for (int i = 0; i < _inputWeights.Length; i++)
-            {
-                totalWeight += _inputWeights[i].GetFloat();
-            }
-
-            // Relative weight
+            // Input weights
             for (int i = 0; i < _inputWeights.Length; i++)
             {
                 var originalWeight = _inputWeights[i].GetFloat();
-                Assert.IsTrue(originalWeight >= 0 && originalWeight <= 1);
-                Assert.IsTrue(totalWeight >= originalWeight);
-
-                var relativeWeight = Mathf.Approximately(0, totalWeight) ? 0 : originalWeight / totalWeight;
-                Playable.SetInputWeight(i, relativeWeight);
+                Playable.SetInputWeight(i, originalWeight);
             }
 
             _isInputWeightDirty = false;
@@ -106,7 +94,7 @@ namespace GBG.Puppeteer.NodeInstance
             }
 
             _playbackSpeed.OnValueChanged -= OnPlaybackSpeedChanged;
-            
+
             base.Dispose();
         }
     }

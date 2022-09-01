@@ -45,8 +45,7 @@ namespace GBG.Puppeteer.Editor.GraphWindow
             _openedWindows.Add(this);
 
             // Toolbar
-            _toolbar = new Toolbar();
-            rootVisualElement.Add(_toolbar);
+            CreateToolbar();
 
             // Layout container
             _layoutContainer = new VisualElement

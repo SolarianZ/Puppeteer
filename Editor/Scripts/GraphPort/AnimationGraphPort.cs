@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using GBG.Puppeteer.Editor.GraphEdge;
 using GBG.Puppeteer.Editor.GraphNode;
 using UnityEditor.Experimental.GraphView;
@@ -9,7 +10,19 @@ namespace GBG.Puppeteer.Editor.GraphPort
 {
     public class AnimationGraphPort : GraphViewPort
     {
-        public AnimationGraphNode Node => node as AnimationGraphNode;
+        public AnimationGraphNode OwnerNode => node as AnimationGraphNode;
+
+        public AnimationGraphNode ConnectedNode
+        {
+            get
+            {
+                if (!connected) return null;
+
+                return (AnimationGraphNode)(direction == Direction.Input
+                    ? connections.First().output.node
+                    : connections.First().input.node);
+            }
+        }
 
 
         protected AnimationGraphPort(Direction portDirection, Type portType,

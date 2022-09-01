@@ -5,6 +5,8 @@ namespace GBG.Puppeteer.Editor.GraphWindow
 {
     public partial class AnimationGraphWindow
     {
+        private const float _INSPECTOR_PANEL_WIDTH = 300;
+
         private VisualElement _inspectorPanel;
 
 
@@ -15,7 +17,7 @@ namespace GBG.Puppeteer.Editor.GraphWindow
                 name = "inspector-panel",
                 style =
                 {
-                    width = 300,
+                    width = _INSPECTOR_PANEL_WIDTH,
                     height = Length.Percent(100),
                     borderLeftWidth = 1,
                     borderLeftColor = Color.black

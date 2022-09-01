@@ -8,6 +8,21 @@ namespace GBG.Puppeteer.Editor.GraphNode
 {
     public abstract class AnimationGraphNode : GraphViewNode
     {
+        public string Guid { get; }
+
+        protected virtual string NodeName
+        {
+            get => title;
+            set => title = value;
+        }
+
+
+        protected AnimationGraphNode(string guid)
+        {
+            Guid = guid;
+        }
+
+
         public override Port InstantiatePort(Orientation orientation,
             Direction direction, Port.Capacity capacity, Type type)
         {

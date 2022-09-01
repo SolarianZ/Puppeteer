@@ -5,7 +5,6 @@ using GBG.Puppeteer.Editor.GraphPort;
 using GBG.Puppeteer.Editor.Utility;
 using GBG.Puppeteer.NodeData;
 using GBG.Puppeteer.Parameter;
-using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.Playables;
@@ -22,26 +21,14 @@ namespace GBG.Puppeteer.Editor.GraphNode
         public AnimationGraphPort OutputPort { get; }
 
 
-        public IReadOnlyList<AnimationGraphPort> InputPorts => InternalInputPorts;
+        public IReadOnlyList<MixerInput> MixerInputs => InternalMixerInputs;
 
-        protected List<AnimationGraphPort> InternalInputPorts { get; } = new List<AnimationGraphPort>();
-
-        public IReadOnlyList<PlayableNode> InputNodes => InternalInputNodes;
-
-        protected List<PlayableNode> InternalInputNodes { get; } = new List<PlayableNode>();
+        protected List<MixerInput> InternalMixerInputs { get; } = new List<MixerInput>();
 
         #endregion
 
 
         #region Data
-
-        public string Guid { get; }
-
-        protected virtual string NodeName
-        {
-            get => title;
-            set => title = value;
-        }
 
         protected abstract ParamField<float> PlaybackSpeedField { get; }
 
@@ -56,14 +43,8 @@ namespace GBG.Puppeteer.Editor.GraphNode
         #endregion
 
 
-        protected PlayableNode() : this(NewGuid())
+        protected PlayableNode(string guid) : base(guid)
         {
-        }
-
-        protected PlayableNode(string guid)
-        {
-            Guid = guid;
-
             // Title contents container
             var titleLabelContainer = new VisualElement()
             {
@@ -106,29 +87,6 @@ namespace GBG.Puppeteer.Editor.GraphNode
 
 
         public abstract void PopulateView(AnimationNodeData nodeData, List<ParamInfo> paramTable);
-
-
-        #region GUID
-
-        private static Func<string> _customGuidGenerator;
-
-
-        public static void SetCustomGuidGenerator(Func<string> customGuidGenerator)
-        {
-            _customGuidGenerator = customGuidGenerator;
-        }
-
-        public static string NewGuid()
-        {
-            if (_customGuidGenerator != null)
-            {
-                return _customGuidGenerator();
-            }
-
-            return GUID.Generate().ToString();
-        }
-
-        #endregion
 
 
         #region Deep Clone

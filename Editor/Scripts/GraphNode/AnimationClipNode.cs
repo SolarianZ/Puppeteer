@@ -33,20 +33,27 @@ namespace GBG.Puppeteer.Editor.GraphNode
 
         private readonly ParamField<float> _explicitTimeField;
 
-        private const float _INPUT_LABEL_WIDTH = 92;
+        private const float _INPUT_LABEL_WIDTH = 90;
 
 
         public AnimationClipNode(string guid) : base(guid)
         {
             // Playback speed
             PlaybackSpeedField = new ParamField<float>("Speed", labelWidth: _INPUT_LABEL_WIDTH);
+            PlaybackSpeedField.SetParamInfo(ParamInfo.CreateLiteral(ParamType.Float, 1));
+            PlaybackSpeedField.OnValueChanged += OnPlaybackSpeedValueChanged;
             inputContainer.Add(PlaybackSpeedField);
 
             // Clip
             _clipField = new ObjectField
             {
                 label = "Clip",
-                objectType = typeof(AnimationClip)
+                objectType = typeof(AnimationClip),
+                style =
+                {
+                    paddingRight = 0,
+                    marginRight = 4,
+                }
             };
             _clipField.labelElement.style.minWidth = 0;
             _clipField.RegisterValueChangedCallback(OnClipChanged);
@@ -54,20 +61,13 @@ namespace GBG.Puppeteer.Editor.GraphNode
 
             // Use explicit time
             _useExplicitTimeField = new ParamField<bool>("Use Explicit Time", labelWidth: _INPUT_LABEL_WIDTH);
+            _useExplicitTimeField.OnValueChanged += OnUseExplicitTimeValueChanged;
             inputContainer.Add(_useExplicitTimeField);
 
             // Explicit time
             _explicitTimeField = new ParamField<float>("Explicit Time", labelWidth: _INPUT_LABEL_WIDTH);
+            _explicitTimeField.OnValueChanged += OnExplicitTimeValueChanged;
             inputContainer.Add(_explicitTimeField);
-        }
-
-        private void OnClipChanged(ChangeEvent<UObject> _)
-        {
-            // Update node title(if there is not a explicit title)
-            if (string.IsNullOrEmpty(_nodeTitle))
-            {
-                title = _clipField.value ? _clipField.value.name : null;
-            }
         }
 
         public override void PopulateView(AnimationNodeData nodeData, List<ParamInfo> paramTable)
@@ -100,6 +100,37 @@ namespace GBG.Puppeteer.Editor.GraphNode
             _explicitTimeField.SetParamChoices(paramTable);
             _explicitTimeField.SetParamInfo(clipNodeData.ExplicitTime.GetParamInfo(paramTable, ParamType.Float));
         }
+
+
+        #region Value Change Callbacks
+
+        private void OnPlaybackSpeedValueChanged(ParamField<float> _)
+        {
+            RaiseNodeDataChangedEvent();
+        }
+
+        private void OnClipChanged(ChangeEvent<UObject> _)
+        {
+            // Update node title(if there is not a explicit title)
+            if (string.IsNullOrEmpty(_nodeTitle))
+            {
+                title = _clipField.value ? _clipField.value.name : null;
+            }
+
+            RaiseNodeDataChangedEvent();
+        }
+
+        private void OnUseExplicitTimeValueChanged(ParamField<bool> _)
+        {
+            RaiseNodeDataChangedEvent();
+        }
+
+        private void OnExplicitTimeValueChanged(ParamField<float> _)
+        {
+            RaiseNodeDataChangedEvent();
+        }
+
+        #endregion
 
 
         #region Deep Clone
