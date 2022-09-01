@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using GBG.Puppeteer.Parameter;
-using UnityEngine;
 using UnityEditor;
-using UnityEngine.UIElements;
 using UnityEditor.UIElements;
+using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.UIElements;
 
 namespace GBG.Puppeteer.Editor.GraphParam
 {
@@ -34,24 +34,21 @@ namespace GBG.Puppeteer.Editor.GraphParam
             style.flexDirection = FlexDirection.Row;
 
             // Label
-            if (!string.IsNullOrEmpty(label))
+            _label = new Label(label)
             {
-                _label = new Label(label)
+                style =
                 {
-                    style =
-                    {
-                        marginLeft = 2,
-                        unityTextAlign = TextAnchor.MiddleLeft,
-                    }
-                };
-
-                if (labelWidth != null)
-                {
-                    _label.style.width = labelWidth.Value;
+                    marginLeft = 2,
+                    unityTextAlign = TextAnchor.MiddleLeft,
                 }
+            };
 
-                Add(_label);
+            if (labelWidth != null)
+            {
+                _label.style.width = labelWidth.Value;
             }
+
+            Add(_label);
 
             // Param link image
             _paramLinkImage = new Image
@@ -129,6 +126,11 @@ namespace GBG.Puppeteer.Editor.GraphParam
             {
                 _paramContainer.Add(_valueField);
             }
+        }
+
+        public void SetLabel(string label)
+        {
+            _label.text = label;
         }
 
         public void SetParamChoices(List<ParamInfo> choices)
@@ -261,26 +263,25 @@ namespace GBG.Puppeteer.Editor.GraphParam
 
         #region Param link icon
 
-        private const string _paramLinkedIconName = "Linked";
-        private const string _paramLinkedIconName_Dark = "d_Linked";
-        private const string _paramUnLinkedIconName = "UnLinked";
-        private const string _paramUnLinkedIconName_Dark = "d_UnLinked";
-
-
         private Texture2D GetParamLinkIcon(bool isLinked)
         {
+            const string PARAM_LINKED_ICON_NAME = "Linked";
+            const string PARAM_LINKED_ICON_NAME_DARK = "d_Linked";
+            const string PARAM_UN_LINKED_ICON_NAME = "UnLinked";
+            const string PARAM_UNLINKED_ICON_NAME_DARK = "d_UnLinked";
+
             if (isLinked)
             {
                 var iconName = EditorGUIUtility.isProSkin
-                    ? _paramLinkedIconName_Dark
-                    : _paramLinkedIconName;
+                    ? PARAM_LINKED_ICON_NAME_DARK
+                    : PARAM_LINKED_ICON_NAME;
                 return EditorGUIUtility.Load(iconName) as Texture2D;
             }
             else
             {
                 var iconName = EditorGUIUtility.isProSkin
-                    ? _paramUnLinkedIconName_Dark
-                    : _paramUnLinkedIconName;
+                    ? PARAM_UNLINKED_ICON_NAME_DARK
+                    : PARAM_UN_LINKED_ICON_NAME;
                 return EditorGUIUtility.Load(iconName) as Texture2D;
             }
         }

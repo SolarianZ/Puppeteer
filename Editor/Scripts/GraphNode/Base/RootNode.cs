@@ -4,6 +4,7 @@ using GBG.Puppeteer.Editor.GraphPort;
 using GBG.Puppeteer.Editor.Utility;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.Playables;
+using UnityEngine.UIElements;
 using GraphViewNode = UnityEditor.Experimental.GraphView.Node;
 
 namespace GBG.Puppeteer.Editor.GraphNode
@@ -28,6 +29,11 @@ namespace GBG.Puppeteer.Editor.GraphNode
 
             RefreshPorts();
             RefreshExpandedState();
+        }
+
+        public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
+        {
+            // No option
         }
     }
 }

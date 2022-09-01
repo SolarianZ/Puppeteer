@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using GBG.Puppeteer.NodeInstance;
 using GBG.Puppeteer.Parameter;
 using UnityEngine;
@@ -7,6 +8,7 @@ using UnityEngine.Playables;
 namespace GBG.Puppeteer.NodeData
 {
     // TODO: AnimationPoseCacheNode
+    [Serializable]
     public class AnimationPoseCacheNodeData : AnimationNodeData
     {
         // TODO: A pose cache may be referenced by multi nodes,
@@ -17,13 +19,13 @@ namespace GBG.Puppeteer.NodeData
             Dictionary<string, AnimationNodeData> nodeTable,
             Dictionary<string, ParamInfo> paramTable)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         
         protected override AnimationNodeData CreateCloneInstance()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }

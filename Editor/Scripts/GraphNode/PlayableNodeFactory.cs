@@ -17,7 +17,7 @@ namespace GBG.Puppeteer.Editor.GraphNode
         }
 
 
-        public static PlayableNode InstantiateNode(AnimationNodeData nodeData, List<ParamInfo> parameters)
+        public static PlayableNode InstantiateNode(AnimationNodeData nodeData, List<ParamInfo> paramTable)
         {
             PlayableNode node = null;
             if (_customNodeCreator != null && _customNodeCreator(nodeData, out node))
@@ -42,7 +42,7 @@ namespace GBG.Puppeteer.Editor.GraphNode
             {
                 node.title = nodeData.EditorName;
                 node.SetPosition(new Rect(nodeData.EditorPosition, Vector2.zero));
-                node.PopulateView(nodeData, parameters);
+                node.PopulateView(nodeData, paramTable);
             }
 
             return node;

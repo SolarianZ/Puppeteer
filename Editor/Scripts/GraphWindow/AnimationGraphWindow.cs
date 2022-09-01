@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using GBG.Puppeteer.Editor.GraphView;
+﻿using System.Collections.Generic;
 using GBG.Puppeteer.Graph;
 using UnityEditor;
 using UnityEditor.Callbacks;

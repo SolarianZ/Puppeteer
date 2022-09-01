@@ -19,11 +19,17 @@ namespace GBG.Puppeteer.Editor.GraphPort
         }
 
 
-        public static AnimationGraphPort Create<TEdge>(Direction direction, Type type,
+        public static AnimationGraphPort Create(Direction direction, Type portType,
+            Capacity capacity = Capacity.Single)
+        {
+            return Create<AnimationGraphEdge>(direction, portType, capacity);
+        }
+
+        public static AnimationGraphPort Create<TEdge>(Direction direction, Type portType,
             Capacity capacity = Capacity.Single) where TEdge : Edge, new()
         {
             var connectorListener = new EdgeConnectorListener();
-            var port = new AnimationGraphPort(direction, type, capacity)
+            var port = new AnimationGraphPort(direction, portType, capacity)
             {
                 m_EdgeConnector = new EdgeConnector<TEdge>(connectorListener),
             };

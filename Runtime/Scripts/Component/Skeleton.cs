@@ -20,7 +20,7 @@ namespace GBG.Puppeteer
         public int ParentIndex { get; }
 
 
-        private readonly bool m_isValid;
+        private readonly bool _isValid;
 
 
         public BoneInfo(TransformStreamHandle boneHandle, int boneNameHash, int parentIndex)
@@ -29,12 +29,12 @@ namespace GBG.Puppeteer
             BoneNameHash = boneNameHash;
             ParentIndex = parentIndex;
 
-            m_isValid = BoneNameHash != 0;
+            _isValid = BoneNameHash != 0;
         }
 
         public bool IsValid()
         {
-            return m_isValid;
+            return _isValid;
         }
 
         /// <summary>

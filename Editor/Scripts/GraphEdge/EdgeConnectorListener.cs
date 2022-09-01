@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityGraphView = UnityEditor.Experimental.GraphView.GraphView;
 using GraphViewEdge = UnityEditor.Experimental.GraphView.Edge;
 
+// ReSharper disable All
+
 namespace GBG.Puppeteer.Editor.GraphEdge
 {
     // https://github.com/Unity-Technologies/UnityCsReference/blob/2021.3/Modules/GraphViewEditor/Elements/Port.cs

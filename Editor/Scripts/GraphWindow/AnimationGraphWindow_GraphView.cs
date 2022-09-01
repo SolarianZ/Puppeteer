@@ -26,7 +26,7 @@ namespace GBG.Puppeteer.Editor.GraphWindow
 
         private void BuildGraph()
         {
-            _graphView = new AnimationGraphView(_graphAsset)
+            _graphView = new AnimationGraphView
             {
                 style =
                 {

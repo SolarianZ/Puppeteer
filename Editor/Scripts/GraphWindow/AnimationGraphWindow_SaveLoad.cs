@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using GBG.Puppeteer.Editor.GraphView;
-using GBG.Puppeteer.Graph;
+﻿using GBG.Puppeteer.Graph;
 using GBG.Puppeteer.Parameter;
 using UnityEditor;
-using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.UIElements;
 
 namespace GBG.Puppeteer.Editor.GraphWindow
 {

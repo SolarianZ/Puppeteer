@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using GBG.Puppeteer.NodeInstance;
+using GBG.Puppeteer.Parameter;
 using UnityEngine;
 using UnityEngine.Playables;
-using GBG.Puppeteer.Parameter;
 
 namespace GBG.Puppeteer.NodeData
 {

@@ -89,7 +89,7 @@ namespace GBG.Puppeteer
             // cross fade mixer
             var crossFadeMixer = AnimationMixerPlayable.Create(_graph);
             crossFadeMixer.AddInput(fromPlayable, 0, 1f);
-            crossFadeMixer.AddInput(toPlayable, 0, 0f);
+            crossFadeMixer.AddInput(toPlayable, 0, weight: 0f);
             layerRootMixer.ConnectInput(0, crossFadeMixer, 0, 1);
 
             // only allow one active cross fade per layer

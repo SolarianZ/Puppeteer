@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using GBG.Puppeteer.Editor.GraphParam;
 using GBG.Puppeteer.Editor.GraphPort;
 using GBG.Puppeteer.Editor.Utility;
 using GBG.Puppeteer.NodeData;
 using GBG.Puppeteer.Parameter;
+using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.Playables;
@@ -15,9 +17,10 @@ namespace GBG.Puppeteer.Editor.GraphNode
 {
     public abstract class PlayableNode : AnimationGraphNode
     {
-        public string Guid { get; }
+        #region Port
 
         public AnimationGraphPort OutputPort { get; }
+
 
         public IReadOnlyList<AnimationGraphPort> InputPorts => InternalInputPorts;
 
@@ -27,8 +30,35 @@ namespace GBG.Puppeteer.Editor.GraphNode
 
         protected List<PlayableNode> InternalInputNodes { get; } = new List<PlayableNode>();
 
+        #endregion
+
+
+        #region Data
+
+        public string Guid { get; }
+
+        protected virtual string NodeName
+        {
+            get => title;
+            set => title = value;
+        }
+
         protected abstract ParamField<float> PlaybackSpeedField { get; }
 
+
+        public event Action<PlayableNode> OnNodeDataChanged;
+
+        protected void RaiseNodeDataChangedEvent()
+        {
+            OnNodeDataChanged?.Invoke(this);
+        }
+
+        #endregion
+
+
+        protected PlayableNode() : this(NewGuid())
+        {
+        }
 
         protected PlayableNode(string guid)
         {
@@ -75,7 +105,30 @@ namespace GBG.Puppeteer.Editor.GraphNode
         }
 
 
-        public abstract void PopulateView(AnimationNodeData nodeData, List<ParamInfo> parameters);
+        public abstract void PopulateView(AnimationNodeData nodeData, List<ParamInfo> paramTable);
+
+
+        #region GUID
+
+        private static Func<string> _customGuidGenerator;
+
+
+        public static void SetCustomGuidGenerator(Func<string> customGuidGenerator)
+        {
+            _customGuidGenerator = customGuidGenerator;
+        }
+
+        public static string NewGuid()
+        {
+            if (_customGuidGenerator != null)
+            {
+                return _customGuidGenerator();
+            }
+
+            return GUID.Generate().ToString();
+        }
+
+        #endregion
 
 
         #region Deep Clone
@@ -92,10 +145,10 @@ namespace GBG.Puppeteer.Editor.GraphNode
 
         protected virtual void CloneNodeDataMembers(AnimationNodeData clone)
         {
-            clone.EditorName = title;
-         
+            clone.EditorName = NodeName;
+
             clone.EditorPosition = GetPosition().position;
-          
+
             clone.Guid = Guid;
 
             if (!PlaybackSpeedField.GetParamInfo(out var playbackSpeedParam))

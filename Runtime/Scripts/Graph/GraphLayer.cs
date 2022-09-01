@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -40,7 +41,7 @@ namespace GBG.Puppeteer
         {
             if (HasState(stateName))
             {
-                throw new System.ArgumentException($"State {stateName} already exist.",
+                throw new ArgumentException($"State {stateName} already exist.",
                     nameof(stateName));
             }
 
