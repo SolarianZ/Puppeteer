@@ -5,25 +5,30 @@ namespace GBG.Puppeteer.Editor.GraphWindow
 {
     public partial class AnimationGraphWindow
     {
-        private const float _INSPECTOR_PANEL_WIDTH = 300;
-
-        private VisualElement _inspectorPanel;
-
-
         private void CreateInspectorPanel()
         {
-            _inspectorPanel = new VisualElement
+            // Title bar
+            var titleBar = new VisualElement
             {
-                name = "inspector-panel",
                 style =
                 {
-                    width = _INSPECTOR_PANEL_WIDTH,
-                    height = Length.Percent(100),
-                    borderLeftWidth = 1,
-                    borderLeftColor = Color.black
+                    flexDirection = FlexDirection.Row,
+                    borderBottomWidth = 1,
+                    borderBottomColor = Color.black,
                 }
             };
-            _layoutContainer.Add(_inspectorPanel);
+            _layoutContainer.RightPane.Add(titleBar);
+
+            // Inspector label
+            var inspectorLabel = new Label("Inspector")
+            {
+                style =
+                {
+                    flexGrow = 1,
+                    marginLeft = 4,
+                }
+            };
+            titleBar.Add(inspectorLabel);
         }
     }
 }

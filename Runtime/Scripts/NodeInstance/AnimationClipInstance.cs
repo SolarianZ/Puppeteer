@@ -14,11 +14,15 @@ namespace GBG.Puppeteer.NodeInstance
 
         private readonly ParamInfo _explicitTime;
 
-        private readonly ParamInfo _playbackSpeed;
+        private bool _isUseExplicitTimeDirty;
+
+        private bool _isExplicitTimeDirty;
+
+        private byte _frameCounter = 0;
 
 
         public AnimationClipInstance(PlayableGraph graph, AnimationClip animClip, ParamInfo useExplicitTime,
-            ParamInfo explicitTime, ParamInfo playbackSpeed)
+            ParamInfo explicitTime, ParamInfo playbackSpeed) : base(playbackSpeed)
         {
             Playable = AnimationClipPlayable.Create(graph, animClip);
 
@@ -29,47 +33,67 @@ namespace GBG.Puppeteer.NodeInstance
             _explicitTime = explicitTime;
             _explicitTime.OnValueChanged += OnExplicitTimeChanged;
             OnExplicitTimeChanged(_explicitTime);
-
-            _playbackSpeed = playbackSpeed;
-            _playbackSpeed.OnValueChanged += OnPlaybackSpeedChanged;
-            OnPlaybackSpeedChanged(_playbackSpeed);
         }
 
 
         private void OnUseExplicitTimeChanged(ParamInfo param)
         {
-            var useExplicitTime = param.GetBool();
-            if (useExplicitTime)
-            {
-                Playable.Pause();
-                Playable.SetTime(_explicitTime.GetFloat());
-            }
-            else
-            {
-                Playable.Play();
-            }
+            _isUseExplicitTimeDirty = true;
         }
 
         private void OnExplicitTimeChanged(ParamInfo param)
         {
-            if (Playable.GetPlayState() == PlayState.Paused)
+            _isExplicitTimeDirty = true;
+        }
+
+
+        public override void PrepareFrame(float deltaTime)
+        {
+            base.PrepareFrame(deltaTime);
+
+            // TODO FIXME: Wait at least 2 frames otherwise Playable.Pause() won't take effect! Why?!!
+            if (_frameCounter < 2)
             {
-                Playable.SetTime(param.GetFloat());
+                _frameCounter++;
+                return;
+            }
+
+            if (_isUseExplicitTimeDirty)
+            {
+                _isUseExplicitTimeDirty = false;
+                var useExplicitTime = _useExplicitTime.GetBool();
+                if (useExplicitTime)
+                {
+                    Playable.Pause();
+                    Playable.SetTime(_explicitTime.GetFloat());
+                }
+                else
+                {
+                    Playable.Play();
+                }
+            }
+
+            if (_isExplicitTimeDirty)
+            {
+                _isExplicitTimeDirty = false;
+                Playable.SetTime(_explicitTime.GetFloat());
+
+                if (_useExplicitTime.GetBool())
+                {
+                    Playable.Pause();
+                }
+                else
+                {
+                    Playable.Play();
+                }
             }
         }
-
-        private void OnPlaybackSpeedChanged(ParamInfo param)
-        {
-            Playable.SetSpeed(param.GetFloat());
-        }
-
 
         public override void Dispose()
         {
             _useExplicitTime.OnValueChanged -= OnUseExplicitTimeChanged;
             _explicitTime.OnValueChanged -= OnExplicitTimeChanged;
-            _playbackSpeed.OnValueChanged -= OnPlaybackSpeedChanged;
-            
+
             base.Dispose();
         }
     }

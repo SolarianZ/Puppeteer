@@ -9,35 +9,13 @@ namespace GBG.Puppeteer.Editor.GraphWindow
 {
     public partial class AnimationGraphWindow
     {
-        private const float _BLACKBOARD_PANEL_WIDTH = 300;
-
         private readonly List<ParamInfo> _paramInfos = new List<ParamInfo>();
-
-        private VisualElement _blackboardPanel;
 
         private ListView _paramListView;
 
 
         private void CreateBlackboardPanel()
         {
-            // Panel
-            _blackboardPanel = new VisualElement
-            {
-                name = "blackboard-panel",
-                style =
-                {
-                    width = _BLACKBOARD_PANEL_WIDTH,
-                    height = Length.Percent(100),
-                    borderRightWidth = 1,
-                    borderRightColor = Color.black,
-                    paddingLeft = 2,
-                    paddingRight = 2,
-                    paddingTop = 2,
-                    paddingBottom = 2,
-                }
-            };
-            _layoutContainer.Add(_blackboardPanel);
-
             // Title bar
             var titleBar = new VisualElement
             {
@@ -48,7 +26,7 @@ namespace GBG.Puppeteer.Editor.GraphWindow
                     borderBottomColor = Color.black,
                 }
             };
-            _blackboardPanel.Add(titleBar);
+            _layoutContainer.LeftPane.Add(titleBar);
 
             // Parameter label
             var paramLabel = new Label("Parameters")
@@ -79,12 +57,14 @@ namespace GBG.Puppeteer.Editor.GraphWindow
             {
                 reorderable = true,
                 reorderMode = ListViewReorderMode.Animated,
+                fixedItemHeight = 24,
                 makeItem = CreateNewParamListItem,
                 bindItem = BindAssetListItem,
                 itemsSource = _paramInfos,
                 selectionType = SelectionType.None,
             };
-            _blackboardPanel.Add(_paramListView);
+            _paramListView.itemIndexChanged += OnParamIndexChanged;
+            _layoutContainer.LeftPane.Add(_paramListView);
         }
 
         private void OnAddParamButtonClicked(EventBase evt)
@@ -128,12 +108,18 @@ namespace GBG.Puppeteer.Editor.GraphWindow
                 menuPos = ((VisualElement)evt.target).layout.center;
             }
 
-            menu.DropDown(new Rect(menuPos, Vector2.zero), _blackboardPanel);
+            menu.DropDown(new Rect(menuPos, Vector2.zero), _layoutContainer.LeftPane);
         }
 
         private VisualElement CreateNewParamListItem()
         {
-            return new ParamElement();
+            return new ParamElement
+            {
+                style =
+                {
+                    flexGrow = 1,
+                }
+            };
         }
 
         private void BindAssetListItem(VisualElement listItem, int index)
@@ -142,6 +128,11 @@ namespace GBG.Puppeteer.Editor.GraphWindow
             var paramInfo = _paramInfos[index];
             paramElem.PopulateView(paramInfo);
             paramElem.OnParamChanged += OnParamChanged;
+        }
+
+        private void OnParamIndexChanged(int from, int to)
+        {
+            hasUnsavedChanges = true;
         }
 
         private void OnParamChanged(ParamElement paramElement)

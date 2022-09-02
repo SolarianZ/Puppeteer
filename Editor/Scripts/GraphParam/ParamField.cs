@@ -127,8 +127,8 @@ namespace GBG.Puppeteer.Editor.GraphParam
             // Param popup field
             _paramPopup = new PopupField<ParamInfo>
             {
-                formatSelectedValueCallback = FormatSelectedValue,
-                formatListItemCallback = FormatListItem
+                formatSelectedValueCallback = FormatParamInfo,
+                formatListItemCallback = FormatParamInfo
             };
             _paramPopup.RegisterValueChangedCallback(OnLinkedParamChanged);
 
@@ -159,9 +159,18 @@ namespace GBG.Puppeteer.Editor.GraphParam
             IsLinkedToParam = !paramInfo.IsLiteral;
             if (IsLinkedToParam)
             {
-                _linkedParam = paramInfo;
-                _paramPopup.value = _linkedParam;
-                _paramPopup.MarkDirtyRepaint();
+                if (_linkedParam != paramInfo)
+                {
+                    if (_linkedParam != null)
+                    {
+                        _linkedParam.EditorOnNameChanged -= OnLinkedParamNameChanged;
+                    }
+
+                    _linkedParam = paramInfo;
+                    _linkedParam.EditorOnNameChanged += OnLinkedParamNameChanged;
+                    _paramPopup.value = _linkedParam;
+                    _paramPopup.MarkDirtyRepaint();
+                }
             }
             else
             {
@@ -183,8 +192,6 @@ namespace GBG.Puppeteer.Editor.GraphParam
                     throw new ArgumentException($"Unsupported value type: {valueType.AssemblyQualifiedName}.",
                         nameof(valueType));
                 }
-
-                IsLinkedToParam = false;
             }
 
             RefreshParamView();
@@ -229,12 +236,7 @@ namespace GBG.Puppeteer.Editor.GraphParam
         }
 
 
-        private string FormatListItem(ParamInfo paramInfo)
-        {
-            return paramInfo == null ? string.Empty : $"{paramInfo.Name} ({paramInfo.Type})";
-        }
-
-        private string FormatSelectedValue(ParamInfo paramInfo)
+        private string FormatParamInfo(ParamInfo paramInfo)
         {
             return paramInfo == null ? string.Empty : $"{paramInfo.Name} ({paramInfo.Type})";
         }
@@ -257,6 +259,11 @@ namespace GBG.Puppeteer.Editor.GraphParam
             _linkedParam = _paramPopup.value;
 
             OnValueChanged?.Invoke(this);
+        }
+
+        private void OnLinkedParamNameChanged(ParamInfo paramInfo)
+        {
+            _paramPopup.SetValueWithoutNotify(paramInfo);
         }
 
         private void RefreshParamView()

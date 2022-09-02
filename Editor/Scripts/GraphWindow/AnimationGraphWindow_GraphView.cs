@@ -5,23 +5,11 @@ namespace GBG.Puppeteer.Editor.GraphWindow
 {
     public partial class AnimationGraphWindow
     {
-        private VisualElement _graphViewPanel;
-
         private AnimationGraphView _graphView;
 
 
         private void CreateGraphViewPanel()
         {
-            _graphViewPanel = new VisualElement
-            {
-                name = "graph-view-panel",
-                style =
-                {
-                    width = Length.Percent(100),
-                    height = Length.Percent(100)
-                }
-            };
-            _layoutContainer.Add(_graphViewPanel);
         }
 
         private void BuildGraph()
@@ -39,7 +27,7 @@ namespace GBG.Puppeteer.Editor.GraphWindow
             _graphView.SuppressGraphViewChangedEvent = true;
             _graphView.RebuildGraph(_graphAsset.EditorNodes, _graphAsset.EditorIsolatedNodes, _paramInfos);
             _graphView.SuppressGraphViewChangedEvent = false;
-            _graphViewPanel.Add(_graphView);
+            _layoutContainer.MiddlePane.Add(_graphView);
         }
         
         private void OnGraphChanged()

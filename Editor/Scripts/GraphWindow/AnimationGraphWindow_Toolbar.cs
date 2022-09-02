@@ -57,16 +57,14 @@ namespace GBG.Puppeteer.Editor.GraphWindow
 
         private void ToggleBlackboardPanel()
         {
-            var showPanel = !_blackboardPanel.enabledSelf;
-            _blackboardPanel.SetEnabled(showPanel);
-            _blackboardPanel.style.width = showPanel ? _BLACKBOARD_PANEL_WIDTH : 0;
+            var isVisible = !_layoutContainer.LeftPane.enabledSelf;
+            _layoutContainer.ToggleLeftPane(isVisible);
         }
 
         private void ToggleInspectorPanel()
         {
-            var showPanel = !_inspectorPanel.enabledSelf;
-            _inspectorPanel.SetEnabled(showPanel);
-            _inspectorPanel.style.width = showPanel ? _INSPECTOR_PANEL_WIDTH : 0;
+            var isVisible = !_layoutContainer.RightPane.enabledSelf;
+            _layoutContainer.ToggleRightPane(isVisible);
         }
     }
 }

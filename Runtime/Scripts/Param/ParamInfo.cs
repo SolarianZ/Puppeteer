@@ -30,11 +30,7 @@ namespace GBG.Puppeteer.Parameter
         /// Unique name of a variable.
         /// For a literal, its name is empty.
         /// </summary>
-        public string Name
-        {
-            get => _name;
-            set => _name = value;
-        }
+        public string Name => _name;
 
         [SerializeField]
         private string _name;
@@ -91,8 +87,11 @@ namespace GBG.Puppeteer.Parameter
             Assert.IsFalse(IsLiteral);
             Assert.IsTrue(Type == ParamType.Float || Type == ParamType.Any);
 
-            _rawValue = value;
-            OnValueChanged?.Invoke(this);
+            if (!Mathf.Approximately(_rawValue, value))
+            {
+                _rawValue = value;
+                OnValueChanged?.Invoke(this);
+            }
         }
 
         public float GetFloat()
@@ -107,8 +106,11 @@ namespace GBG.Puppeteer.Parameter
             Assert.IsFalse(IsLiteral);
             Assert.IsTrue(Type == ParamType.Int || Type == ParamType.Any);
 
-            _rawValue = value;
-            OnValueChanged?.Invoke(this);
+            if (!Mathf.Approximately(_rawValue, value))
+            {
+                _rawValue = value;
+                OnValueChanged?.Invoke(this);
+            }
         }
 
         public int GetInt()
@@ -123,8 +125,12 @@ namespace GBG.Puppeteer.Parameter
             Assert.IsFalse(IsLiteral);
             Assert.IsTrue(Type == ParamType.Bool || Type == ParamType.Any);
 
-            _rawValue = value ? 1 : 0;
-            OnValueChanged?.Invoke(this);
+            var newValue = value ? 1 : 0;
+            if (!Mathf.Approximately(_rawValue, newValue))
+            {
+                _rawValue = newValue;
+                OnValueChanged?.Invoke(this);
+            }
         }
 
         public bool GetBool()
@@ -138,8 +144,11 @@ namespace GBG.Puppeteer.Parameter
         {
             Assert.IsFalse(IsLiteral);
 
-            _rawValue = value;
-            OnValueChanged?.Invoke(this);
+            if (!Mathf.Approximately(_rawValue, value))
+            {
+                _rawValue = value;
+                OnValueChanged?.Invoke(this);
+            }
         }
 
         public float GetRawValue()
@@ -156,5 +165,19 @@ namespace GBG.Puppeteer.Parameter
         {
             return new ParamInfo(null, type, rawValue);
         }
+
+
+#if UNITY_EDITOR
+        public event Action<ParamInfo> EditorOnNameChanged;
+
+        public void EditorSetName(string name)
+        {
+            if (name != _name)
+            {
+                _name = name;
+                EditorOnNameChanged?.Invoke(this);
+            }
+        }
+#endif
     }
 }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Text;
+using System.Text.RegularExpressions;
 using GBG.Puppeteer.Parameter;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -28,11 +30,15 @@ namespace GBG.Puppeteer.Editor.GraphWindow
 
         public ParamElement()
         {
+            style.flexDirection = FlexDirection.Row;
+
             // Type
             _paramTypeLabel = new Label
             {
                 style =
                 {
+                    fontSize = 12,
+                    width = 12,
                     unityTextAlign = TextAnchor.MiddleCenter,
                 }
             };
@@ -44,7 +50,7 @@ namespace GBG.Puppeteer.Editor.GraphWindow
                 style =
                 {
                     flexGrow = 1,
-                    maxWidth = 92,
+                    flexShrink = 1,
                 }
             };
             ParamName.RegisterValueChangedCallback(OnParamNameValueChanged);
@@ -55,7 +61,7 @@ namespace GBG.Puppeteer.Editor.GraphWindow
             {
                 style =
                 {
-                    width = 48,
+                    width = Length.Percent(35),
                 }
             };
             ParamFloatValue.RegisterValueChangedCallback(OnFloatValueChanged);
@@ -65,20 +71,24 @@ namespace GBG.Puppeteer.Editor.GraphWindow
             {
                 style =
                 {
-                    width = 48,
+                    width = Length.Percent(35),
                 }
             };
             ParamIntValue.RegisterValueChangedCallback(OnIntValueChanged);
 
             // Bool value
-            ParamBoolValue = new Toggle();
+            ParamBoolValue = new Toggle
+            {
+                style =
+                {
+                    width = Length.Percent(35),
+                }
+            };
             ParamBoolValue.RegisterValueChangedCallback(OnBoolValueChanged);
         }
 
         public void PopulateView(ParamInfo paramInfo)
         {
-            style.flexDirection = FlexDirection.Row;
-
             Assert.IsFalse(string.IsNullOrEmpty(paramInfo.Name));
             ParamInfo = paramInfo;
 
@@ -86,7 +96,7 @@ namespace GBG.Puppeteer.Editor.GraphWindow
             _paramTypeLabel.text = ParamInfo.Type.ToString().Substring(0, 1);
 
             // Name
-            ParamName.value = ParamInfo.Name;
+            ParamName.SetValueWithoutNotify(ParamInfo.Name);
 
             // Value
             // Remove all value fields
@@ -97,18 +107,17 @@ namespace GBG.Puppeteer.Editor.GraphWindow
             // Add value field and set value
             if (ParamInfo.Type == ParamType.Float)
             {
-                ParamFloatValue.value = ParamInfo.GetFloat();
+                ParamFloatValue.SetValueWithoutNotify(ParamInfo.GetFloat());
                 Add(ParamFloatValue);
             }
             else if (ParamInfo.Type == ParamType.Int)
             {
-                ParamIntValue.value = ParamInfo.GetInt();
+                ParamIntValue.SetValueWithoutNotify(ParamInfo.GetInt());
                 Add(ParamIntValue);
             }
             else if (ParamInfo.Type == ParamType.Bool)
             {
-                ParamBoolValue.value = ParamInfo.GetBool();
-                ParamBoolValue.value = ParamInfo.GetBool();
+                ParamBoolValue.SetValueWithoutNotify(ParamInfo.GetBool());
                 Add(ParamBoolValue);
             }
             else
@@ -118,9 +127,44 @@ namespace GBG.Puppeteer.Editor.GraphWindow
             }
         }
 
-        private void OnParamNameValueChanged(ChangeEvent<string> _)
+        private void OnParamNameValueChanged(ChangeEvent<string> evt)
         {
-            ParamInfo.Name = ParamName.value;
+            // Check param name
+            var newName = evt.newValue;
+            if (!Regex.IsMatch(newName, "^[a-zA-Z_][a-zA-Z0-9_]*$"))
+            {
+                var nameBuilder = new StringBuilder(evt.newValue.Length);
+                for (var i = 0; i < evt.newValue.Length; i++)
+                {
+                    var ch = evt.newValue[i];
+                    if ((ch >= 'a' && ch <= 'z') ||
+                        (ch >= 'A' && ch <= 'Z') ||
+                        (ch >= '0' && ch <= '9' && nameBuilder.Length != 0) ||
+                        ch == '_')
+                    {
+                        nameBuilder.Append(ch);
+                    }
+                }
+
+                if (nameBuilder.Length == 0)
+                {
+                    // Use old name
+                    ParamName.SetValueWithoutNotify(ParamInfo.Name);
+                }
+                else
+                {
+                    // Use new name
+                    ParamName.SetValueWithoutNotify(nameBuilder.ToString());
+                }
+
+                Debug.LogError("[Puppeteer::Param] " +
+                               $"Rename invalid parameter name '{evt.newValue}' to '{ParamName.value}'.");
+            }
+            else
+            {
+                ParamInfo.EditorSetName(ParamName.value);
+            }
+
             OnParamChanged?.Invoke(this);
         }
 

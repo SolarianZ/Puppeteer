@@ -15,6 +15,7 @@ namespace GBG.Puppeteer.NodeInstance
 
         public AnimationSubGraphInstance(PlayableGraph graph, Animator animator,
             RuntimeAnimationGraph subGraph, ParamInfo[] paramBindingSources)
+            : base(ParamInfo.CreateLiteral(ParamType.Float, 1.0f))
         {
             _animationGraphInstance = new AnimationGraphInstance(graph, animator, subGraph, paramBindingSources);
             Playable = _animationGraphInstance.RootPlayable;

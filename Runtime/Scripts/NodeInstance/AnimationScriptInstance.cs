@@ -16,13 +16,11 @@ namespace GBG.Puppeteer.NodeInstance
 
         private readonly ParamInfo[] _inputWeights;
 
-        private readonly ParamInfo _playbackSpeed;
-
         private bool _isInputWeightDirty = true;
 
 
         public AnimationScriptInstance(PlayableGraph graph, AnimationNodeInstance[] inputs, ParamInfo[] inputWeights,
-            ParamInfo playbackSpeed, Skeleton skeleton, AnimationScriptableObject animScriptable)
+            ParamInfo playbackSpeed, Skeleton skeleton, AnimationScriptableObject animScriptable) : base(playbackSpeed)
         {
             _animScriptable = animScriptable;
             Playable = _animScriptable.CreatePlayable(graph, skeleton);
@@ -38,10 +36,12 @@ namespace GBG.Puppeteer.NodeInstance
             {
                 inputWeight.OnValueChanged += OnInputWeightChanged;
             }
+        }
 
-            _playbackSpeed = playbackSpeed;
-            _playbackSpeed.OnValueChanged += OnPlaybackSpeedChanged;
-            OnPlaybackSpeedChanged(_playbackSpeed);
+
+        private void OnInputWeightChanged(ParamInfo param)
+        {
+            _isInputWeightDirty = true;
         }
 
 
@@ -58,6 +58,8 @@ namespace GBG.Puppeteer.NodeInstance
             {
                 return;
             }
+
+            _isInputWeightDirty = false;
 
             // Total weight
             var totalWeight = 0f;
@@ -76,21 +78,7 @@ namespace GBG.Puppeteer.NodeInstance
                 var relativeWeight = Mathf.Approximately(0, totalWeight) ? 0 : originalWeight / totalWeight;
                 Playable.SetInputWeight(i, relativeWeight);
             }
-
-            _isInputWeightDirty = false;
         }
-
-
-        private void OnInputWeightChanged(ParamInfo param)
-        {
-            _isInputWeightDirty = true;
-        }
-
-        private void OnPlaybackSpeedChanged(ParamInfo param)
-        {
-            Playable.SetSpeed(param.GetFloat());
-        }
-
 
         public override void Dispose()
         {
@@ -100,8 +88,6 @@ namespace GBG.Puppeteer.NodeInstance
             {
                 inputWeight.OnValueChanged -= OnInputWeightChanged;
             }
-
-            _playbackSpeed.OnValueChanged -= OnPlaybackSpeedChanged;
 
             base.Dispose();
         }

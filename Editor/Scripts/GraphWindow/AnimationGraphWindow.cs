@@ -2,9 +2,7 @@
 using GBG.Puppeteer.Graph;
 using UnityEditor;
 using UnityEditor.Callbacks;
-using UnityEditor.UIElements;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace GBG.Puppeteer.Editor.GraphWindow
 {
@@ -13,8 +11,10 @@ namespace GBG.Puppeteer.Editor.GraphWindow
         private static readonly List<AnimationGraphWindow> _openedWindows
             = new List<AnimationGraphWindow>();
 
+        private static AnimationGraphWindow _focusedWindow;
+
         [OnOpenAsset]
-        internal static bool OnOpenAnimationGraphAsset(int instanceId, int line)
+        public static bool OnOpenAnimationGraphAsset(int instanceId, int line)
         {
             var asset = EditorUtility.InstanceIDToObject(instanceId);
             if (asset is RuntimeAnimationGraph animGraphAsset)
@@ -36,8 +36,41 @@ namespace GBG.Puppeteer.Editor.GraphWindow
             return false;
         }
 
+        public static bool ShowNotificationOnFocusedWindow(string message, MessageType messageType, float duration)
+        {
+            if (!_focusedWindow)
+            {
+                return false;
+            }
 
-        private VisualElement _layoutContainer;
+            GUIContent content;
+            switch (messageType)
+            {
+                case MessageType.None:
+                case MessageType.Info:
+                    content = EditorGUIUtility.IconContent("console.infoicon");
+                    break;
+
+                case MessageType.Warning:
+                    content = EditorGUIUtility.IconContent("console.warnicon");
+                    break;
+
+                case MessageType.Error:
+                    content = EditorGUIUtility.IconContent("console.erroricon");
+                    break;
+
+                default:
+                    return false;
+            }
+
+            content.text = message;
+            _focusedWindow.ShowNotification(content);
+
+            return true;
+        }
+
+
+        private TripleSplitterRowView _layoutContainer;
 
 
         private void OnEnable()
@@ -48,15 +81,7 @@ namespace GBG.Puppeteer.Editor.GraphWindow
             CreateToolbar();
 
             // Layout container
-            _layoutContainer = new VisualElement
-            {
-                style =
-                {
-                    flexDirection = FlexDirection.Row,
-                    width = Length.Percent(100),
-                    height = Length.Percent(100)
-                }
-            };
+            _layoutContainer = new TripleSplitterRowView(new Vector2(200, 400), new Vector2(200, 400));
             rootVisualElement.Add(_layoutContainer);
 
             // Fill view
@@ -75,6 +100,19 @@ namespace GBG.Puppeteer.Editor.GraphWindow
         private void OnDisable()
         {
             _openedWindows.Remove(this);
+        }
+
+        private void OnFocus()
+        {
+            _focusedWindow = this;
+        }
+
+        private void OnLostFocus()
+        {
+            if (_focusedWindow == this)
+            {
+                _focusedWindow = null;
+            }
         }
 
         private void OnProjectChange()

@@ -14,14 +14,12 @@ namespace GBG.Puppeteer.NodeInstance
 
         private readonly ParamInfo[] _inputWeights;
 
-        private readonly ParamInfo _playbackSpeed;
-
         private bool _isInputWeightDirty = true;
 
 
         public AnimationLayerMixerInstance(PlayableGraph graph, AnimationNodeInstance[] inputs,
             ParamInfo[] inputWeights, ParamInfo playbackSpeed,
-            bool[] layerAdditiveStates, AvatarMask[] layerAvatarMasks)
+            bool[] layerAdditiveStates, AvatarMask[] layerAvatarMasks) : base(playbackSpeed)
         {
             var layerMixer = AnimationLayerMixerPlayable.Create(graph);
             Playable = layerMixer;
@@ -43,10 +41,12 @@ namespace GBG.Puppeteer.NodeInstance
             {
                 inputWeight.OnValueChanged += OnInputWeightChanged;
             }
+        }
 
-            _playbackSpeed = playbackSpeed;
-            _playbackSpeed.OnValueChanged += OnPlaybackSpeedChanged;
-            OnPlaybackSpeedChanged(_playbackSpeed);
+
+        private void OnInputWeightChanged(ParamInfo param)
+        {
+            _isInputWeightDirty = true;
         }
 
 
@@ -64,27 +64,15 @@ namespace GBG.Puppeteer.NodeInstance
                 return;
             }
 
+            _isInputWeightDirty = false;
+
             // Input weights
             for (int i = 0; i < _inputWeights.Length; i++)
             {
                 var originalWeight = _inputWeights[i].GetFloat();
                 Playable.SetInputWeight(i, originalWeight);
             }
-
-            _isInputWeightDirty = false;
         }
-
-
-        private void OnInputWeightChanged(ParamInfo param)
-        {
-            _isInputWeightDirty = true;
-        }
-
-        private void OnPlaybackSpeedChanged(ParamInfo param)
-        {
-            Playable.SetSpeed(param.GetFloat());
-        }
-
 
         public override void Dispose()
         {
@@ -92,8 +80,6 @@ namespace GBG.Puppeteer.NodeInstance
             {
                 inputWeight.OnValueChanged -= OnInputWeightChanged;
             }
-
-            _playbackSpeed.OnValueChanged -= OnPlaybackSpeedChanged;
 
             base.Dispose();
         }

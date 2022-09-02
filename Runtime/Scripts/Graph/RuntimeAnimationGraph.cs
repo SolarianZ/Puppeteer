@@ -12,6 +12,7 @@ namespace GBG.Puppeteer.Graph
     {
         public IReadOnlyList<ParamInfo> Parameters => _parameters;
 
+        [NonReorderable]
         [SerializeField]
         private ParamInfo[] _parameters = Array.Empty<ParamInfo>();
 
@@ -19,6 +20,7 @@ namespace GBG.Puppeteer.Graph
         // Node at index 0 is always the output node
         public IReadOnlyList<AnimationNodeData> Nodes => _nodes;
 
+        [NonReorderable]
         [SerializeReference]
         private AnimationNodeData[] _nodes = Array.Empty<AnimationNodeData>();
 
@@ -32,6 +34,7 @@ namespace GBG.Puppeteer.Graph
             set => _editorIsolatedNodes = value;
         }
 
+        [NonReorderable]
         [SerializeReference]
         private AnimationNodeData[] _editorIsolatedNodes = Array.Empty<AnimationNodeData>();
 
@@ -50,19 +53,5 @@ namespace GBG.Puppeteer.Graph
 #endif
 
         #endregion
-
-
-        // FOR TEST
-        private void Reset()
-        {
-            _nodes = new AnimationNodeData[]
-            {
-                new AnimationClipNodeData(),
-                // new AnimationMixerNodeData(),
-                // new AnimationLayerMixerNodeData(),
-                // new AnimationScriptNodeData(),
-                // new AnimationSubGraphNodeData(),
-            };
-        }
     }
 }
