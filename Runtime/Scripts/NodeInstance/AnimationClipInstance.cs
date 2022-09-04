@@ -18,7 +18,8 @@ namespace GBG.Puppeteer.NodeInstance
 
         private bool _isExplicitTimeDirty;
 
-        private byte _frameCounter = 0;
+        // TODO FIXME: Wait at least 2 frames otherwise Playable.Pause() won't take effect! Why?!!
+        private byte _waitGraphFrame = 2;
 
 
         public AnimationClipInstance(PlayableGraph graph, AnimationClip animClip, ParamInfo useExplicitTime,
@@ -51,10 +52,9 @@ namespace GBG.Puppeteer.NodeInstance
         {
             base.PrepareFrame(deltaTime);
 
-            // TODO FIXME: Wait at least 2 frames otherwise Playable.Pause() won't take effect! Why?!!
-            if (_frameCounter < 2)
+            if (_waitGraphFrame > 0)
             {
-                _frameCounter++;
+                _waitGraphFrame--;
                 return;
             }
 
