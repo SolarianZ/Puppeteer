@@ -12,16 +12,13 @@ namespace GBG.Puppeteer
 
         public float PlaybackSpeed
         {
-            get
-            {
-                return Playable.IsValid() ? (float)Playable.GetSpeed() : _playbackSpeed;
-            }
+            get { return Playable.IsValid() ? (float)Playable.GetSpeed() : _playbackSpeed; }
             set
             {
                 _playbackSpeed = value;
                 if (Playable.IsValid())
                 {
-                    Playable.SetSpeed(value);
+                    Playable.SetSpeed<Playable>(value);
                 }
             }
         }
@@ -37,10 +34,7 @@ namespace GBG.Puppeteer
 
         public float Time
         {
-            get
-            {
-                return Playable.IsValid() ? (float)Playable.GetTime() : 0;
-            }
+            get { return Playable.IsValid() ? (float)Playable.GetTime() : 0; }
         }
 
 

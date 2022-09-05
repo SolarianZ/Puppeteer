@@ -8,7 +8,9 @@ namespace GBG.Puppeteer.NodeInstance
     {
         public abstract Playable Playable { get; }
 
-        
+        public bool IsPlaying { get; private set; } = true;
+
+
         private readonly ParamInfo _playbackSpeed;
 
         private bool _isPlaybackSpeedDirty;
@@ -19,6 +21,19 @@ namespace GBG.Puppeteer.NodeInstance
             _playbackSpeed = playbackSpeed;
             _playbackSpeed.OnValueChanged += OnPlaybackSpeedChanged;
             OnPlaybackSpeedChanged(_playbackSpeed);
+        }
+
+
+        public void Play()
+        {
+            IsPlaying = true;
+            Playable.SetSpeed<Playable>(_playbackSpeed.GetFloat());
+        }
+
+        public void Pause()
+        {
+            IsPlaying = false;
+            Playable.SetSpeed<Playable>(0);
         }
 
 
@@ -33,7 +48,10 @@ namespace GBG.Puppeteer.NodeInstance
             if (_isPlaybackSpeedDirty)
             {
                 _isPlaybackSpeedDirty = false;
-                Playable.SetSpeed(_playbackSpeed.GetFloat());
+                if (IsPlaying)
+                {
+                    Playable.SetSpeed<Playable>(_playbackSpeed.GetFloat());
+                }
             }
         }
 
