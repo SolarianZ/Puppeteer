@@ -61,13 +61,21 @@ namespace GBG.Puppeteer
             var zPCxPA = pc.x * pa.y - pc.y * pa.x;
 
             // Sign of z value
-            var signZ_PAxPB = IsPositive(zPAxPB);
-            var signZ_PBxPC = IsPositive(zPBxPC);
-            var signZ_PCxPA = IsPositive(zPCxPA);
+            var signZ_PAxPB = Sign(zPAxPB);
+            var signZ_PBxPC = Sign(zPBxPC);
+            var signZ_PCxPA = Sign(zPCxPA);
+            var signSum = signZ_PAxPB + signZ_PBxPC + signZ_PCxPA;
 
-            return (signZ_PAxPB == signZ_PBxPC) && (signZ_PBxPC == signZ_PCxPA);
+            // When point inside a triangle, all signs of z value must be the same,
+            // the sum is (-1 + -1 + -1) or (1 + 1 + 1) or (1 + 0 + 1) or (-1 + 0 + -1).
+            return (signSum < -1) || (signSum > 1);
 
-            static bool IsPositive(float value) => value >= 0;
+            static sbyte Sign(float value)
+            {
+                if (value > 0) return 1;
+                if (value < 0) return -1;
+                return 0;
+            }
         }
 
         public static bool IsPointInTriangle_CentroidMethod(Vector2 point, Vector2 vertexA, Vector2 vertexB,

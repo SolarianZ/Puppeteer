@@ -1,0 +1,16 @@
+{
+    "name": "GBG.Puppeteer.Tests.Runtime",
+    "rootNamespace": "GBG.Puppeteer.Tests",
+    "references": [
+        "GUID:b215e5ac804ebde479456841787631a1"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
