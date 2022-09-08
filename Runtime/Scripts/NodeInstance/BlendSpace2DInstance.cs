@@ -1,4 +1,5 @@
 ﻿using System;
+using GBG.Puppeteer.Parameter;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
@@ -6,7 +7,7 @@ using UnityEngine.Playables;
 namespace GBG.Puppeteer.NodeInstance
 {
     [Serializable]
-    public class MotionField2D
+    public class MotionField2D : ICloneable
     {
         [SerializeField]
         public AnimationClip Clip;
@@ -19,14 +20,26 @@ namespace GBG.Puppeteer.NodeInstance
 
         // [SerializeField]
         // public bool Mirror; // Not yet supported
+
+
+        public object Clone()
+        {
+            return new MotionField2D
+            {
+                Clip = this.Clip,
+                Position = this.Position,
+                PlaybackSpeed = this.PlaybackSpeed
+            };
+        }
     }
 
-    public class BlendSpace2DInstance
+    public class BlendSpace2DInstance : AnimationNodeInstance
     {
-        public AnimationMixerPlayable Mixer { get; }
+        public override Playable Playable { get; }
 
-        public Vector2 Position { get; private set; }
+        private readonly ParamInfo _positionX;
 
+        private readonly ParamInfo _positionY;
 
         private readonly MotionField2D[] _motionFields;
 
@@ -34,25 +47,34 @@ namespace GBG.Puppeteer.NodeInstance
 
 
         public BlendSpace2DInstance(PlayableGraph graph, MotionField2D[] motionFields, int[] triangles,
-            Vector2 position)
+            ParamInfo positionX, ParamInfo positionY, ParamInfo playbackSpeed) : base(playbackSpeed)
         {
             _motionFields = motionFields;
             _triangles = triangles;
+            _positionX = positionX;
+            _positionY = positionY;
 
-            Mixer = AnimationMixerPlayable.Create(graph, _motionFields.Length);
+            _positionX.OnValueChanged += OnPositionValueChanged;
+            _positionY.OnValueChanged += OnPositionValueChanged;
+
+            Playable = AnimationMixerPlayable.Create(graph, _motionFields.Length);
             for (int i = 0; i < _motionFields.Length; i++)
             {
                 var clipPlayable = AnimationClipPlayable.Create(graph, _motionFields[i].Clip);
-                Mixer.ConnectInput(i, clipPlayable, 0);
+                Playable.ConnectInput(i, clipPlayable, 0);
             }
 
-            SetPosition(position);
+            SetPosition(new Vector2(_positionX.GetFloat(), _positionY.GetFloat()));
         }
 
-        public void SetPosition(Vector2 position)
-        {
-            Position = position;
 
+        private void OnPositionValueChanged(ParamInfo _)
+        {
+            SetPosition(new Vector2(_positionX.GetFloat(), _positionY.GetFloat()));
+        }
+
+        private void SetPosition(Vector2 position)
+        {
             if (_motionFields.Length == 0)
             {
                 return;
@@ -60,7 +82,7 @@ namespace GBG.Puppeteer.NodeInstance
 
             if (_motionFields.Length == 1)
             {
-                Mixer.SetInputWeight(0, 1);
+                Playable.SetInputWeight(0, 1);
                 return;
             }
 
@@ -90,8 +112,8 @@ namespace GBG.Puppeteer.NodeInstance
 
                 var weights = CalculateWeights(position, _motionFields[indexA].Position,
                     _motionFields[indexB].Position);
-                Mixer.SetInputWeight(indexA, weights.x);
-                Mixer.SetInputWeight(indexB, weights.y);
+                Playable.SetInputWeight(indexA, weights.x);
+                Playable.SetInputWeight(indexB, weights.y);
                 return;
             }
 
@@ -134,21 +156,10 @@ namespace GBG.Puppeteer.NodeInstance
                 indices = new Vector3Int(index0, index1, index2);
             }
 
-            Mixer.SetInputWeight(indices.x, vertexWeights.x);
-            Mixer.SetInputWeight(indices.y, vertexWeights.y);
-            Mixer.SetInputWeight(indices.z, vertexWeights.z);
+            Playable.SetInputWeight(indices.x, vertexWeights.x);
+            Playable.SetInputWeight(indices.y, vertexWeights.y);
+            Playable.SetInputWeight(indices.z, vertexWeights.z);
         }
-
-        public void SetXPosition(float x)
-        {
-            SetPosition(new Vector2(x, Position.y));
-        }
-
-        public void SetYPosition(float y)
-        {
-            SetPosition(new Vector2(Position.x, y));
-        }
-
 
         private void GetTriangleVertices(int triangleIndex, out Vector2 point0, out Vector2 point1, out Vector2 point2)
         {
@@ -164,6 +175,16 @@ namespace GBG.Puppeteer.NodeInstance
             pointIndex1 = _triangles[3 * triangleIndex + 1];
             pointIndex2 = _triangles[3 * triangleIndex + 2];
         }
+
+
+        public override void Dispose()
+        {
+            _positionX.OnValueChanged -= OnPositionValueChanged;
+            _positionY.OnValueChanged -= OnPositionValueChanged;
+
+            base.Dispose();
+        }
+
 
         private static Vector2 GetCentroid(Vector2 point0, Vector2 point1, Vector2 point2)
         {

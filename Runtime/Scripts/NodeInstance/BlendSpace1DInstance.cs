@@ -1,4 +1,5 @@
 ﻿using System;
+using GBG.Puppeteer.Parameter;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Assertions;
@@ -7,7 +8,7 @@ using UnityEngine.Playables;
 namespace GBG.Puppeteer.NodeInstance
 {
     [Serializable]
-    public class MotionField1D
+    public class MotionField1D : ICloneable
     {
         [SerializeField]
         public AnimationClip Clip;
@@ -20,48 +21,67 @@ namespace GBG.Puppeteer.NodeInstance
 
         // [SerializeField]
         // public bool Mirror; // Not yet supported
+
+
+        public object Clone()
+        {
+            return new MotionField1D
+            {
+                Clip = this.Clip,
+                Position = this.Position,
+                PlaybackSpeed = this.PlaybackSpeed
+            };
+        }
     }
 
-    public class BlendSpace1DInstance
+    public class BlendSpace1DInstance : AnimationNodeInstance
     {
-        public AnimationMixerPlayable Mixer { get; }
+        public override Playable Playable { get; }
 
-        public float Position { get; private set; }
 
+        private readonly ParamInfo _position;
 
         private readonly MotionField1D[] _motionFields;
 
 
-        public BlendSpace1DInstance(PlayableGraph graph, MotionField1D[] motionFields, float position)
+        public BlendSpace1DInstance(PlayableGraph graph, MotionField1D[] motionFields, ParamInfo position,
+            ParamInfo playbackSpeed) : base(playbackSpeed)
         {
+            _position = position;
+            _position.OnValueChanged += OnPositionValueChanged;
+
             _motionFields = motionFields;
             SortMotionFields(_motionFields);
 
-            Mixer = AnimationMixerPlayable.Create(graph, _motionFields.Length);
+            Playable = AnimationMixerPlayable.Create(graph, _motionFields.Length);
             for (int i = 0; i < _motionFields.Length; i++)
             {
                 var clipPlayable = AnimationClipPlayable.Create(graph, _motionFields[i].Clip);
                 clipPlayable.SetSpeed(_motionFields[i].PlaybackSpeed);
-                Mixer.ConnectInput(i, clipPlayable, 0);
+                Playable.ConnectInput(i, clipPlayable, 0);
             }
 
-            SetPosition(position);
+            SetPosition(position.GetFloat());
         }
 
-        public void SetPosition(float position)
-        {
-            Position = position;
 
+        private void OnPositionValueChanged(ParamInfo _)
+        {
+            SetPosition(_position.GetFloat());
+        }
+
+        private void SetPosition(float position)
+        {
             var leftIndex = new int?();
             for (int i = 0; i < _motionFields.Length; i++)
             {
                 if (leftIndex == null)
                 {
                     // The left most motion
-                    if (Position < _motionFields[i].Position)
+                    if (position < _motionFields[i].Position)
                     {
                         Assert.AreEqual(i, 0);
-                        Mixer.SetInputWeight(i, 1);
+                        Playable.SetInputWeight(i, 1);
                         leftIndex = -1;
                         continue;
                     }
@@ -69,37 +89,45 @@ namespace GBG.Puppeteer.NodeInstance
                     if (i < _motionFields.Length - 1)
                     {
                         // Not in the interval
-                        if (Position > _motionFields[i + 1].Position)
+                        if (position > _motionFields[i + 1].Position)
                         {
-                            Mixer.SetInputWeight(i, 0);
+                            Playable.SetInputWeight(i, 0);
                             continue;
                         }
 
                         // In the interval
-                        var rightWeight = (Position - _motionFields[i].Position) /
+                        var rightWeight = (position - _motionFields[i].Position) /
                                           (_motionFields[i + 1].Position - _motionFields[i].Position);
                         var leftWeight = 1 - rightWeight;
-                        Mixer.SetInputWeight(i, leftWeight);
-                        Mixer.SetInputWeight(i + 1, rightWeight);
+                        Playable.SetInputWeight(i, leftWeight);
+                        Playable.SetInputWeight(i + 1, rightWeight);
                         leftIndex = i;
                         continue;
                     }
 
                     // The most right motion
                     Assert.AreEqual(i, _motionFields.Length - 1);
-                    Mixer.SetInputWeight(i, 1);
+                    Playable.SetInputWeight(i, 1);
                     leftIndex = i;
                 }
                 else if (leftIndex.Value + 1 != i)
                 {
                     // Not in the interval
-                    Mixer.SetInputWeight(i, 0);
+                    Playable.SetInputWeight(i, 0);
                 }
             }
         }
 
 
-        private static void SortMotionFields(MotionField1D[] motionFields)
+        public override void Dispose()
+        {
+            _position.OnValueChanged -= OnPositionValueChanged;
+
+            base.Dispose();
+        }
+
+
+        public static void SortMotionFields(MotionField1D[] motionFields)
         {
             for (int i = 0; i < motionFields.Length; i++)
             {
