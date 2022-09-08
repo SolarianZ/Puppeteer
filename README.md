@@ -52,8 +52,8 @@ Legends:
     - ✅ Layer Mixer Node
     - ✅ Blend Space 1D Node
     - ✅ Blend Space 2D Node
-    - ▶️ Script Node
-    - ▶️ Sub Graph Node
+    - ✅ Script Node
+    - ✅ Sub Graph Node
     - 📅 State Machine Node
     - 📅 State Node(In State Machine)
     - 🔘 ~~Param Node~~ (Embed into PlayableNode)
