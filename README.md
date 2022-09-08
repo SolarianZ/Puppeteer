@@ -24,16 +24,16 @@ Legends:
     - ✅ Layer Mixer Node
     - ✅ Clip Node
         - ✅ Optional Explicit Time
+    - 📅 Blend Space 1D Node
+    - 📅 Blend Space 2D Node
     - 📅 Script Node
+    - 📅 Sub Graph Node
     - 📅 State Machine Node
     - 📅 State Node(In State Machine)
     - 🔘 ~~Param Node~~ (Embed into PlayableNode)
-    - ❔ Sub Graph Node
-    - ❔ Blend Space 1D Node
-    - ❔ Blend Space 2D Node
-    - ❔ Mirror Pose Node
     - ❔ Pose Cache Node
     - ❔ Light Mode
+    - ❔ Mirror Pose Node
 - State Machine
     - 📅 Transition
         - Smooth Transition
@@ -50,14 +50,14 @@ Legends:
         - ✅ Optional Explicit Time
     - ✅ Mixer Node
     - ✅ Layer Mixer Node
+    - ▶️ Blend Space 1D Node
+    - ▶️ Blend Space 2D Node
     - ▶️ Script Node
     - ▶️ Sub Graph Node
-    - 🔘 ~~Param Node~~ (Embed into PlayableNode)
     - 📅 State Machine Node
     - 📅 State Node(In State Machine)
+    - 🔘 ~~Param Node~~ (Embed into PlayableNode)
     - ❔ Pose Cache Node
-    - ❔ Blend Space 1D Node
-    - ❔ Blend Space 2D Node
     - ❔ Mirror Pose Node
 - Events
     - 📅 Playable State Events

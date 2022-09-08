@@ -101,14 +101,14 @@ namespace GBG.Puppeteer.NodeInstance
             var closestTriangleSqrDist = float.MaxValue;
             for (int i = 0; i < _triangles.Length / 3; i++)
             {
-                GetTriangleVertices(i, out var vertA, out var vertB, out var vertC);
-                if (TriangleTool.IsPointInTriangle(position, vertA, vertB, vertC))
+                GetTriangleVertices(i, out var vert0, out var vert1, out var vert2);
+                if (TriangleTool.IsPointInTriangle(position, vert0, vert1, vert2))
                 {
                     containerTriangleIndex = i;
                     break;
                 }
 
-                var triangleCentroid = GetCentroid(vertA, vertB, vertC);
+                var triangleCentroid = GetCentroid(vert0, vert1, vert2);
                 var sqrDist = Vector2.SqrMagnitude(triangleCentroid - position);
                 if (sqrDist < closestTriangleSqrDist)
                 {
@@ -121,15 +121,15 @@ namespace GBG.Puppeteer.NodeInstance
             Vector3Int indices;
             if (containerTriangleIndex > -1)
             {
-                GetTriangleVertices(containerTriangleIndex, out var p0, out var p1, out var p2);
-                vertexWeights = TriangleTool.CalculateWeightsInsideTriangle(position, p0, p1, p2);
+                GetTriangleVertices(containerTriangleIndex, out var vert0, out var vert1, out var vert2);
+                vertexWeights = TriangleTool.CalculateWeights(position, vert0, vert1, vert2, true);
                 GetTriangleVertexIndices(containerTriangleIndex, out var index0, out var index1, out var index2);
                 indices = new Vector3Int(index0, index1, index2);
             }
             else
             {
-                GetTriangleVertices(closestTriangleIndex, out var p0, out var p1, out var p2);
-                vertexWeights = TriangleTool.CalculateWeights(position, p0, p1, p2);
+                GetTriangleVertices(closestTriangleIndex, out var vert0, out var vert1, out var vert2);
+                vertexWeights = TriangleTool.CalculateWeights(position, vert0, vert1, vert2, false);
                 GetTriangleVertexIndices(closestTriangleIndex, out var index0, out var index1, out var index2);
                 indices = new Vector3Int(index0, index1, index2);
             }

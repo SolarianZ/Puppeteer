@@ -76,9 +76,9 @@ namespace GBG.Puppeteer.NodeInstance
                         }
 
                         // In the interval
-                        var leftWeight = (Position - _motionFields[i].Position) /
-                                         (_motionFields[i + 1].Position - _motionFields[i].Position);
-                        var rightWeight = 1 - leftWeight;
+                        var rightWeight = (Position - _motionFields[i].Position) /
+                                          (_motionFields[i + 1].Position - _motionFields[i].Position);
+                        var leftWeight = 1 - rightWeight;
                         Mixer.SetInputWeight(i, leftWeight);
                         Mixer.SetInputWeight(i + 1, rightWeight);
                         leftIndex = i;
@@ -103,17 +103,20 @@ namespace GBG.Puppeteer.NodeInstance
         {
             for (int i = 0; i < motionFields.Length; i++)
             {
-                var fi = motionFields[i];
-                for (int j = 0; j < motionFields.Length; j++)
+                var swapped = false;
+                for (int j = 0; j < motionFields.Length - 1 - i; j++)
                 {
-                    if (j == i) continue;
-
-                    var fj = motionFields[j];
-                    if (fi.Position > fj.Position)
+                    if (motionFields[j].Position > motionFields[j + 1].Position)
                     {
-                        motionFields[i] = fj;
-                        motionFields[j] = fi;
+                        (motionFields[j], motionFields[j + 1]) = (motionFields[j + 1], motionFields[j]);
+                        swapped = true;
                     }
+                }
+
+                // Ordered data
+                if (!swapped)
+                {
+                    return;
                 }
             }
         }
