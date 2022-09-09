@@ -22,6 +22,12 @@ namespace GBG.Puppeteer.Graph
         public AnimationGraphInstance(PlayableGraph graph, Animator animator,
             RuntimeAnimationGraph graphAsset, ParamInfo[] paramBindingSources)
         {
+            if (!graphAsset)
+            {
+                RootPlayable = Playable.Null;
+                return;
+            }
+
             var bindParams = paramBindingSources != null && paramBindingSources.Length != 0;
             if (bindParams)
             {
@@ -59,12 +65,12 @@ namespace GBG.Puppeteer.Graph
 
         public void PrepareFrame(float deltaTime)
         {
-            _rootInstance.PrepareFrame(deltaTime);
+            _rootInstance?.PrepareFrame(deltaTime);
         }
 
         // public void ProcessFrame(float deltaTime)
         // {
-        //     _rootInstance.ProcessFrame(deltaTime);
+        //     _rootInstance?.ProcessFrame(deltaTime);
         // }
 
         public void Dispose()

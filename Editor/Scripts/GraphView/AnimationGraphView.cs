@@ -7,6 +7,7 @@ using GBG.Puppeteer.Graph;
 using GBG.Puppeteer.NodeData;
 using GBG.Puppeteer.Parameter;
 using UnityEditor.Experimental.GraphView;
+using UnityEngine;
 using UnityEngine.UIElements;
 using UDebug = UnityEngine.Debug;
 using UnityGraphView = UnityEditor.Experimental.GraphView.GraphView;
@@ -15,15 +16,29 @@ namespace GBG.Puppeteer.Editor.GraphView
 {
     public class AnimationGraphView : UnityGraphView
     {
+        private const string _GRID_BACKGROUND_STYLE_PATH = "AnimationGraph/GridBackground";
+
+        private readonly IReadOnlyList<ParamInfo> _paramTable;
+
         private readonly RootNode _rootNode;
 
 
-        public AnimationGraphView()
+        public AnimationGraphView(List<ParamInfo> paramTable)
         {
             this.AddManipulator(new ContentDragger());
             this.AddManipulator(new SelectionDragger());
             this.AddManipulator(new RectangleSelector());
             SetupZoom(ContentZoomer.DefaultMinScale, ContentZoomer.DefaultMaxScale);
+
+            // Grid background
+            var gridStyleSheet = Resources.Load<StyleSheet>(_GRID_BACKGROUND_STYLE_PATH);
+            styleSheets.Add(gridStyleSheet);
+            var gridBackground = new GridBackground();
+            gridBackground.StretchToParentSize();
+            Insert(0, gridBackground);
+
+            // Parameters
+            _paramTable = paramTable;
 
             // Root node
             _rootNode = new RootNode();
@@ -157,7 +172,8 @@ namespace GBG.Puppeteer.Editor.GraphView
                 {
                     evt.menu.AppendAction($"Create {nodeType.Name}", _ =>
                     {
-                        var node = PlayableNodeFactory.CreateNode(nodeType, localMousePos);
+                        var node = PlayableNodeFactory.CreateNode(nodeType, localMousePos,
+                            (List<ParamInfo>)_paramTable);
                         if (node != null)
                         {
                             AddElement(node);

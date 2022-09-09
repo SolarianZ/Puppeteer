@@ -12,10 +12,7 @@ namespace GBG.Puppeteer.Parameter
 
         public ParamBinding(ParamInfo source, ParamInfo target)
         {
-            Assert.IsTrue((source == null)
-                          || ((source.Type == target.Type)
-                              || (source.Type == ParamType.Any)
-                              || (target.Type == ParamType.Any)));
+            Assert.IsTrue((source == null) || (source.Type == target.Type));
 
             Source = source;
             Target = target;

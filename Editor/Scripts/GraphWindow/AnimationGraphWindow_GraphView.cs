@@ -14,7 +14,7 @@ namespace GBG.Puppeteer.Editor.GraphWindow
 
         private void BuildGraph()
         {
-            _graphView = new AnimationGraphView
+            _graphView = new AnimationGraphView(_paramTable)
             {
                 style =
                 {
@@ -25,11 +25,11 @@ namespace GBG.Puppeteer.Editor.GraphWindow
             _graphView.RegisterCallback<GeometryChangedEvent>(OnGraphGeometryChanged);
             _graphView.OnGraphChanged += OnGraphChanged;
             _graphView.SuppressGraphViewChangedEvent = true;
-            _graphView.RebuildGraph(_graphAsset.EditorNodes, _graphAsset.EditorIsolatedNodes, _paramInfos);
+            _graphView.RebuildGraph(_graphAsset.EditorNodes, _graphAsset.EditorIsolatedNodes, _paramTable);
             _graphView.SuppressGraphViewChangedEvent = false;
             _layoutContainer.MiddlePane.Add(_graphView);
         }
-        
+
         private void OnGraphChanged()
         {
             hasUnsavedChanges = true;

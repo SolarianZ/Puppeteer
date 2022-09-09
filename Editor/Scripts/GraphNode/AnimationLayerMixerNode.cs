@@ -14,7 +14,7 @@ namespace GBG.Puppeteer.Editor.GraphNode
         private const float _INPUT_LABEL_WIDTH = 76;
 
 
-        public AnimationLayerMixerNode(string guid) : base(guid)
+        public AnimationLayerMixerNode(string guid, List<ParamInfo> paramTable) : base(guid, paramTable)
         {
             // Add input button
             var addInputButton = new Button(AddLayerMixerInput)
@@ -35,9 +35,10 @@ namespace GBG.Puppeteer.Editor.GraphNode
             RegisterCallback<DetachFromPanelEvent>(OnDetachFromPanel);
         }
 
-        public override void PopulateView(AnimationNodeData nodeData, List<ParamInfo> paramTable)
+        public override void PopulateView(AnimationNodeData nodeData)
         {
             var animLayerMixerNodeData = (AnimationLayerMixerNodeData)nodeData;
+            var paramTable = (List<ParamInfo>)ParamTable;
 
             // Playback speed
             PlaybackSpeedField.SetParamChoices(paramTable);

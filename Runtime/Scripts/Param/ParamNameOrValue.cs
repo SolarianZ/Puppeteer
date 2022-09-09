@@ -6,15 +6,23 @@ using UnityEngine.Assertions;
 namespace GBG.Puppeteer.Parameter
 {
     [Serializable]
-    public sealed class ParamNameOrValue : ICloneable
+    public class ParamNameOrValue : ICloneable
     {
-        public string Name => _name;
+        public string Name
+        {
+            get => _name;
+            set => _name = value;
+        }
 
         [SerializeField]
         private string _name;
 
 
-        public float RawValue => _rawValue;
+        public float RawValue
+        {
+            get => _rawValue;
+            set => _rawValue = value;
+        }
 
         [SerializeField]
         private float _rawValue = 1f;
@@ -23,16 +31,14 @@ namespace GBG.Puppeteer.Parameter
         public bool IsValue => string.IsNullOrEmpty(Name);
 
 
-        public ParamNameOrValue(string name, float rawRawValue)
+        public ParamNameOrValue(string name, float rawValue)
         {
             _name = name;
-            _rawValue = rawRawValue;
+            _rawValue = rawValue;
         }
 
-        public ParamNameOrValue(ParamInfo paramInfo)
+        public ParamNameOrValue(ParamInfo paramInfo) : this(paramInfo.Name, paramInfo.GetRawValue())
         {
-            _name = paramInfo.Name;
-            _rawValue = paramInfo.GetRawValue();
         }
 
         public float GetFloat()
@@ -56,7 +62,7 @@ namespace GBG.Puppeteer.Parameter
             return Mathf.Approximately(_rawValue, 1);
         }
 
-        public ParamInfo GetParamInfo(IDictionary<string, ParamInfo> paramTable, ParamType paramType = ParamType.Any)
+        public ParamInfo GetParamInfo(IDictionary<string, ParamInfo> paramTable, ParamType paramType)
         {
             if (IsValue)
             {
@@ -64,14 +70,12 @@ namespace GBG.Puppeteer.Parameter
             }
 
             var paramInfo = paramTable[Name];
-            Assert.IsTrue(paramType == ParamType.Any
-                          || paramInfo.Type == ParamType.Any
-                          || paramInfo.Type == paramType);
+            Assert.IsTrue(paramInfo.Type == paramType);
 
             return paramInfo;
         }
 
-        public ParamInfo GetParamInfo(IList<ParamInfo> paramTable, ParamType paramType = ParamType.Any)
+        public ParamInfo GetParamInfo(IList<ParamInfo> paramTable, ParamType paramType)
         {
             if (IsValue)
             {
@@ -83,9 +87,7 @@ namespace GBG.Puppeteer.Parameter
                 if (paramTable[i].Name.Equals(Name))
                 {
                     var paramInfo = paramTable[i];
-                    Assert.IsTrue(paramType == ParamType.Any
-                                  || paramInfo.Type == ParamType.Any
-                                  || paramInfo.Type == paramType);
+                    Assert.IsTrue(paramInfo.Type == paramType);
                     return paramInfo;
                 }
             }
@@ -93,7 +95,7 @@ namespace GBG.Puppeteer.Parameter
             return null;
         }
 
-        public object Clone()
+        public virtual object Clone()
         {
             return new ParamNameOrValue(_name, _rawValue);
         }

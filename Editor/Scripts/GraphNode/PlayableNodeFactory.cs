@@ -9,7 +9,8 @@ using UDebug = UnityEngine.Debug;
 
 namespace GBG.Puppeteer.Editor.GraphNode
 {
-    public delegate bool AnimationGraphNodeCreator(AnimationNodeData nodeData, out PlayableNode node);
+    public delegate bool AnimationGraphNodeCreator(AnimationNodeData nodeData,
+        List<ParamInfo> paramTable, out PlayableNode node);
 
     public static class PlayableNodeFactory
     {
@@ -28,21 +29,28 @@ namespace GBG.Puppeteer.Editor.GraphNode
             { typeof(AnimationClipNodeData), typeof(AnimationClipNode) },
             { typeof(AnimationMixerNodeData), typeof(AnimationMixerNode) },
             { typeof(AnimationLayerMixerNodeData), typeof(AnimationLayerMixerNode) },
+            { typeof(AnimationSubGraphNodeData), typeof(AnimationSubGraphNode) },
         };
 
-        private static readonly Type[] _playableNodeCtorParamTypes = new Type[] { typeof(string) };
+        private static readonly Type[] _playableNodeCtorParamTypes = new Type[]
+        {
+            // Guid
+            typeof(string),
+            // Param table
+            typeof(List<ParamInfo>)
+        };
 
-        public static PlayableNode CreateNode(Type nodeType, Vector2 nodePosition)
+        public static PlayableNode CreateNode(Type nodeType, Vector2 nodePosition, List<ParamInfo> paramTable)
         {
             var ctor = nodeType.GetConstructor(_playableNodeCtorParamTypes);
             if (ctor == null)
             {
-                UDebug.LogError($"[Puppeteer::AnimationNodeFactory] {nodeType.Name} does not have " +
-                                "a constructor with a single string parameter(guid).");
+                UDebug.LogError($"[Puppeteer::AnimationNodeFactory] {nodeType.Name} does not have a constructor " +
+                                "with a string parameter(guid) and a List<ParamInfo> parameter(param table).");
                 return null;
             }
 
-            var playableNodeCtorParams = new object[] { NewGuid() };
+            var playableNodeCtorParams = new object[] { NewGuid(), paramTable };
             var node = (PlayableNode)ctor.Invoke(playableNodeCtorParams);
             node.SetPosition(new Rect(nodePosition, Vector2.zero));
 
@@ -51,11 +59,11 @@ namespace GBG.Puppeteer.Editor.GraphNode
 
         public static PlayableNode CreateNode(AnimationNodeData nodeData, List<ParamInfo> paramTable)
         {
-            if (_customNodeCreator != null && _customNodeCreator(nodeData, out var node))
+            if (_customNodeCreator != null && _customNodeCreator(nodeData, paramTable, out var node))
             {
                 node.title = nodeData.EditorName;
                 node.SetPosition(new Rect(nodeData.EditorPosition, Vector2.zero));
-                node.PopulateView(nodeData, paramTable);
+                node.PopulateView(nodeData);
                 return node;
             }
 
@@ -72,16 +80,16 @@ namespace GBG.Puppeteer.Editor.GraphNode
             var ctor = nodeType.GetConstructor(_playableNodeCtorParamTypes);
             if (ctor == null)
             {
-                UDebug.LogError($"[Puppeteer::AnimationNodeFactory] {nodeType.Name} does not have " +
-                                "a constructor with a single string parameter(guid).");
+                UDebug.LogError($"[Puppeteer::AnimationNodeFactory] {nodeType.Name} does not have a constructor " +
+                                "with a string parameter(guid) and a List<ParamInfo> parameter(param table).");
                 return null;
             }
 
-            var playableNodeCtorParams = new object[] { nodeData.Guid };
+            var playableNodeCtorParams = new object[] { nodeData.Guid, paramTable };
             node = (PlayableNode)ctor.Invoke(playableNodeCtorParams);
             node.title = nodeData.EditorName;
             node.SetPosition(new Rect(nodeData.EditorPosition, Vector2.zero));
-            node.PopulateView(nodeData, paramTable);
+            node.PopulateView(nodeData);
 
             return node;
         }

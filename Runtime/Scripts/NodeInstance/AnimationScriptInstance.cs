@@ -54,30 +54,30 @@ namespace GBG.Puppeteer.NodeInstance
                 input.PrepareFrame(deltaTime);
             }
 
-            if (!_isInputWeightDirty)
+            if (_isInputWeightDirty)
             {
-                return;
+                _isInputWeightDirty = false;
+
+                // Total weight
+                var totalWeight = 0f;
+                for (int i = 0; i < _inputWeights.Length; i++)
+                {
+                    totalWeight += _inputWeights[i].GetFloat();
+                }
+
+                // Relative weight
+                for (int i = 0; i < _inputWeights.Length; i++)
+                {
+                    var originalWeight = _inputWeights[i].GetFloat();
+                    Assert.IsTrue(originalWeight >= 0 && originalWeight <= 1);
+                    Assert.IsTrue(totalWeight >= originalWeight);
+
+                    var relativeWeight = Mathf.Approximately(0, totalWeight) ? 0 : originalWeight / totalWeight;
+                    Playable.SetInputWeight(i, relativeWeight);
+                }
             }
 
-            _isInputWeightDirty = false;
-
-            // Total weight
-            var totalWeight = 0f;
-            for (int i = 0; i < _inputWeights.Length; i++)
-            {
-                totalWeight += _inputWeights[i].GetFloat();
-            }
-
-            // Relative weight
-            for (int i = 0; i < _inputWeights.Length; i++)
-            {
-                var originalWeight = _inputWeights[i].GetFloat();
-                Assert.IsTrue(originalWeight >= 0 && originalWeight <= 1);
-                Assert.IsTrue(totalWeight >= originalWeight);
-
-                var relativeWeight = Mathf.Approximately(0, totalWeight) ? 0 : originalWeight / totalWeight;
-                Playable.SetInputWeight(i, relativeWeight);
-            }
+            _animScriptable.PrepareFrame(deltaTime);
         }
 
         public override void Dispose()

@@ -13,10 +13,10 @@ namespace GBG.Puppeteer.Editor.GraphWindow
         public override void SaveChanges()
         {
             // Parameters
-            _graphAsset.EditorParameters = new ParamInfo[_paramInfos.Count];
-            for (int i = 0; i < _paramInfos.Count; i++)
+            _graphAsset.EditorParameters = new ParamInfo[_paramTable.Count];
+            for (int i = 0; i < _paramTable.Count; i++)
             {
-                _graphAsset.EditorParameters[i] = (ParamInfo)_paramInfos[i].Clone();
+                _graphAsset.EditorParameters[i] = (ParamInfo)_paramTable[i].Clone();
             }
 
             // Nodes
@@ -36,10 +36,10 @@ namespace GBG.Puppeteer.Editor.GraphWindow
             Assert.IsNull(_graphView);
 
             // Parameter
-            _paramInfos.Clear();
+            _paramTable.Clear();
             foreach (var param in _graphAsset.Parameters)
             {
-                _paramInfos.Add((ParamInfo)param.Clone());
+                _paramTable.Add((ParamInfo)param.Clone());
             }
 
             // Graph

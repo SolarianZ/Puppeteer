@@ -9,13 +9,41 @@ using UnityEngine.UIElements;
 
 namespace GBG.Puppeteer.Editor.GraphParam
 {
-    public class ParamField<TValue> : VisualElement
+    public abstract class ParamField : VisualElement
+    {
+        public abstract string ParamName { get; }
+
+        public event Action<ParamField> OnValueChanged;
+
+
+        public abstract void SetLabel(string label);
+
+        public abstract void SetParamChoices(List<ParamInfo> choices);
+
+        public abstract void SetParamInfo(ParamInfo paramInfo);
+
+        public abstract bool GetParamInfo(out ParamInfo paramInfo);
+
+
+        protected void RaiseBaseValueChangedEvent()
+        {
+            OnValueChanged?.Invoke(this);
+        }
+    }
+
+    public class ParamField<TValue> : ParamField
         where TValue : struct
     {
-        public bool IsLinkedToParam { get; private set; }
+        public override string ParamName => Linked ? LinkedParam.Name : string.Empty;
+
+        protected BaseField<TValue> ValueField { get; }
+
+        protected ParamInfo LinkedParam { get; private set; }
+
+        protected bool Linked { get; private set; }
 
 
-        public event Action<ParamField<TValue>> OnValueChanged;
+        public new event Action<ParamField<TValue>> OnValueChanged;
 
 
         private readonly Label _label;
@@ -24,11 +52,7 @@ namespace GBG.Puppeteer.Editor.GraphParam
 
         private readonly VisualElement _paramContainer;
 
-        private readonly BaseField<TValue> _valueField;
-
         private readonly PopupField<ParamInfo> _paramPopup;
-
-        private ParamInfo _linkedParam;
 
 
         public ParamField(string label, Length? labelWidth = null)
@@ -42,7 +66,7 @@ namespace GBG.Puppeteer.Editor.GraphParam
             _paramLinkImage = new Image
             {
                 name = "param-link-icon",
-                image = GetParamLinkIcon(IsLinkedToParam),
+                image = GetParamLinkIcon(Linked),
                 style =
                 {
                     width = 16,
@@ -87,7 +111,7 @@ namespace GBG.Puppeteer.Editor.GraphParam
             var valueType = typeof(TValue);
             if (valueType == typeof(float))
             {
-                _valueField = new FloatField
+                ValueField = new FloatField
                 {
                     style =
                     {
@@ -97,7 +121,7 @@ namespace GBG.Puppeteer.Editor.GraphParam
             }
             else if (valueType == typeof(int))
             {
-                _valueField = new IntegerField
+                ValueField = new IntegerField
                 {
                     style =
                     {
@@ -107,7 +131,7 @@ namespace GBG.Puppeteer.Editor.GraphParam
             }
             else if (valueType == typeof(bool))
             {
-                _valueField = new Toggle
+                ValueField = new Toggle
                 {
                     style =
                     {
@@ -122,53 +146,57 @@ namespace GBG.Puppeteer.Editor.GraphParam
                     nameof(TValue));
             }
 
-            _valueField.RegisterValueChangedCallback(OnParamValueChanged);
+            ValueField.RegisterValueChangedCallback(OnParamValueChanged);
 
             // Param popup field
             _paramPopup = new PopupField<ParamInfo>
             {
                 formatSelectedValueCallback = FormatParamInfo,
-                formatListItemCallback = FormatParamInfo
+                formatListItemCallback = FormatParamInfo,
+                style =
+                {
+                    flexGrow = 1,
+                }
             };
             _paramPopup.RegisterValueChangedCallback(OnLinkedParamChanged);
 
-            if (IsLinkedToParam)
+            if (Linked)
             {
                 _paramContainer.Add(_paramPopup);
             }
             else
             {
-                _paramContainer.Add(_valueField);
+                _paramContainer.Add(ValueField);
             }
         }
 
-        public void SetLabel(string label)
+        public override void SetLabel(string label)
         {
             _label.text = label;
         }
 
-        public void SetParamChoices(List<ParamInfo> choices)
+        public override void SetParamChoices(List<ParamInfo> choices)
         {
             _paramPopup.choices = choices;
         }
 
-        public void SetParamInfo(ParamInfo paramInfo)
+        public override void SetParamInfo(ParamInfo paramInfo)
         {
             Assert.IsNotNull(paramInfo);
 
-            IsLinkedToParam = !paramInfo.IsLiteral;
-            if (IsLinkedToParam)
+            Linked = !paramInfo.IsLiteral;
+            if (Linked)
             {
-                if (_linkedParam != paramInfo)
+                if (LinkedParam != paramInfo)
                 {
-                    if (_linkedParam != null)
+                    if (LinkedParam != null)
                     {
-                        _linkedParam.EditorOnNameChanged -= OnLinkedParamNameChanged;
+                        LinkedParam.EditorOnNameChanged -= OnLinkedParamNameChanged;
                     }
 
-                    _linkedParam = paramInfo;
-                    _linkedParam.EditorOnNameChanged += OnLinkedParamNameChanged;
-                    _paramPopup.value = _linkedParam;
+                    LinkedParam = paramInfo;
+                    LinkedParam.EditorOnNameChanged += OnLinkedParamNameChanged;
+                    _paramPopup.value = LinkedParam;
                     _paramPopup.MarkDirtyRepaint();
                 }
             }
@@ -177,15 +205,15 @@ namespace GBG.Puppeteer.Editor.GraphParam
                 var valueType = typeof(TValue);
                 if (valueType == typeof(float))
                 {
-                    _valueField.value = (TValue)(object)paramInfo.GetRawValue();
+                    ValueField.value = (TValue)(object)paramInfo.GetRawValue();
                 }
                 else if (valueType == typeof(int))
                 {
-                    _valueField.value = (TValue)(object)Mathf.RoundToInt(paramInfo.GetRawValue());
+                    ValueField.value = (TValue)(object)Mathf.RoundToInt(paramInfo.GetRawValue());
                 }
                 else if (valueType == typeof(bool))
                 {
-                    _valueField.value = (TValue)(object)(!Mathf.Approximately(0, paramInfo.GetRawValue()));
+                    ValueField.value = (TValue)(object)(!Mathf.Approximately(0, paramInfo.GetRawValue()));
                 }
                 else
                 {
@@ -197,36 +225,31 @@ namespace GBG.Puppeteer.Editor.GraphParam
             RefreshParamView();
         }
 
-        public bool GetParamInfo(out ParamInfo paramInfo)
+        public override bool GetParamInfo(out ParamInfo paramInfo)
         {
-            if (IsLinkedToParam)
+            if (Linked && LinkedParam != null)
             {
-                if (_linkedParam == null)
-                {
-                    paramInfo = ParamInfo.CreateLiteral();
-                    return false;
-                }
-
-                paramInfo = _linkedParam;
+                paramInfo = LinkedParam;
                 return true;
             }
 
+            object boxedValue = Linked ? 0f : ValueField.value;
             var valueType = typeof(TValue);
             if (valueType == typeof(float))
             {
-                paramInfo = ParamInfo.CreateLiteral(ParamType.Float, (float)(object)_valueField.value);
+                paramInfo = ParamInfo.CreateLiteral(ParamType.Float, (float)boxedValue);
                 return true;
             }
 
             if (valueType == typeof(int))
             {
-                paramInfo = ParamInfo.CreateLiteral(ParamType.Int, (int)(object)_valueField.value);
+                paramInfo = ParamInfo.CreateLiteral(ParamType.Int, (int)boxedValue);
                 return true;
             }
 
             if (valueType == typeof(bool))
             {
-                var rawValue = (bool)(object)_valueField.value ? 1 : 0;
+                var rawValue = (bool)boxedValue ? 1 : 0;
                 paramInfo = ParamInfo.CreateLiteral(ParamType.Bool, rawValue);
                 return true;
             }
@@ -244,21 +267,24 @@ namespace GBG.Puppeteer.Editor.GraphParam
         private void OnParamValueChanged(ChangeEvent<TValue> evt)
         {
             OnValueChanged?.Invoke(this);
+            RaiseBaseValueChangedEvent();
         }
 
         private void OnClickParamLinkImage(MouseDownEvent _)
         {
-            IsLinkedToParam = !IsLinkedToParam;
+            Linked = !Linked;
             RefreshParamView();
 
             OnValueChanged?.Invoke(this);
+            RaiseBaseValueChangedEvent();
         }
 
         private void OnLinkedParamChanged(ChangeEvent<ParamInfo> evt)
         {
-            _linkedParam = _paramPopup.value;
+            LinkedParam = _paramPopup.value;
 
             OnValueChanged?.Invoke(this);
+            RaiseBaseValueChangedEvent();
         }
 
         private void OnLinkedParamNameChanged(ParamInfo paramInfo)
@@ -268,13 +294,13 @@ namespace GBG.Puppeteer.Editor.GraphParam
 
         private void RefreshParamView()
         {
-            _paramLinkImage.image = GetParamLinkIcon(IsLinkedToParam);
+            _paramLinkImage.image = GetParamLinkIcon(Linked);
 
-            if (IsLinkedToParam)
+            if (Linked)
             {
-                if (_paramContainer.Contains(_valueField))
+                if (_paramContainer.Contains(ValueField))
                 {
-                    _paramContainer.Remove(_valueField);
+                    _paramContainer.Remove(ValueField);
                 }
 
                 _paramContainer.Add(_paramPopup);
@@ -286,14 +312,14 @@ namespace GBG.Puppeteer.Editor.GraphParam
                     _paramContainer.Remove(_paramPopup);
                 }
 
-                _paramContainer.Add(_valueField);
+                _paramContainer.Add(ValueField);
             }
         }
 
 
         #region Param link icon
 
-        private Texture2D GetParamLinkIcon(bool isLinked)
+        private static Texture2D GetParamLinkIcon(bool isLinked)
         {
             const string PARAM_LINKED_ICON_NAME = "Linked";
             const string PARAM_LINKED_ICON_NAME_DARK = "d_Linked";

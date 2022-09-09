@@ -6,6 +6,7 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UObject = UnityEngine.Object;
+using UDebug = UnityEngine.Debug;
 using GraphViewPort = UnityEditor.Experimental.GraphView.Port;
 
 namespace GBG.Puppeteer.Editor.GraphNode
@@ -36,7 +37,7 @@ namespace GBG.Puppeteer.Editor.GraphNode
         private const float _INPUT_LABEL_WIDTH = 90;
 
 
-        public AnimationClipNode(string guid) : base(guid)
+        public AnimationClipNode(string guid, List<ParamInfo> paramTable) : base(guid, paramTable)
         {
             // Playback speed
             PlaybackSpeedField = new ParamField<float>("Speed", labelWidth: _INPUT_LABEL_WIDTH);
@@ -70,9 +71,10 @@ namespace GBG.Puppeteer.Editor.GraphNode
             inputContainer.Add(_explicitTimeField);
         }
 
-        public override void PopulateView(AnimationNodeData nodeData, List<ParamInfo> paramTable)
+        public override void PopulateView(AnimationNodeData nodeData)
         {
             var clipNodeData = (AnimationClipNodeData)nodeData;
+            var paramTable = (List<ParamInfo>)ParamTable;
 
             // Playback speed
             PlaybackSpeedField.SetParamChoices(paramTable);
@@ -152,7 +154,7 @@ namespace GBG.Puppeteer.Editor.GraphNode
             // Use explicit time
             if (!_useExplicitTimeField.GetParamInfo(out var useExplicitTimeParam))
             {
-                Debug.LogError($"[Puppeteer::PlayableNode] Invalid 'UseExplicitTime' param link on node '{title}'.");
+                UDebug.LogError($"[Puppeteer::PlayableNode] Invalid 'UseExplicitTime' param link on node '{title}'.");
             }
 
             clipNodeData.UseExplicitTime = new ParamNameOrValue(useExplicitTimeParam);
@@ -160,7 +162,7 @@ namespace GBG.Puppeteer.Editor.GraphNode
             // Explicit time
             if (!_explicitTimeField.GetParamInfo(out var explicitTimeParam))
             {
-                Debug.LogError($"[Puppeteer::PlayableNode] Invalid 'ExplicitTime' param link on node '{title}'.");
+                UDebug.LogError($"[Puppeteer::PlayableNode] Invalid 'ExplicitTime' param link on node '{title}'.");
             }
 
             clipNodeData.ExplicitTime = new ParamNameOrValue(explicitTimeParam);

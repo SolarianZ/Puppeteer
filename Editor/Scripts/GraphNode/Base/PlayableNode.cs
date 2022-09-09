@@ -30,8 +30,9 @@ namespace GBG.Puppeteer.Editor.GraphNode
 
         #region Data
 
-        protected abstract ParamField<float> PlaybackSpeedField { get; }
+        protected IReadOnlyList<ParamInfo> ParamTable { get; }
 
+        protected abstract ParamField<float> PlaybackSpeedField { get; }
 
         public event Action<PlayableNode> OnNodeDataChanged;
 
@@ -43,8 +44,10 @@ namespace GBG.Puppeteer.Editor.GraphNode
         #endregion
 
 
-        protected PlayableNode(string guid) : base(guid)
+        protected PlayableNode(string guid, List<ParamInfo> paramTable) : base(guid)
         {
+            ParamTable = paramTable;
+
             // Title contents container
             var titleLabelContainer = new VisualElement()
             {
@@ -86,7 +89,7 @@ namespace GBG.Puppeteer.Editor.GraphNode
         }
 
 
-        public abstract void PopulateView(AnimationNodeData nodeData, List<ParamInfo> paramTable);
+        public abstract void PopulateView(AnimationNodeData nodeData);
 
 
         #region Deep Clone

@@ -6,43 +6,59 @@ using UnityEngine.Assertions;
 namespace GBG.Puppeteer.Parameter
 {
     [Serializable]
-    public sealed class ParamBindingNameOrValue : ICloneable
+    public sealed class ParamBindingNameOrValue : ParamNameOrValue
     {
-        public string TargetParamName => _targetParamName;
+        public string BindToName => _bindToName;
 
         [SerializeField]
-        private string _targetParamName;
+        private string _bindToName;
 
 
-        public string SourceParamName => _sourceParamName;
+        public ParamBindingNameOrValue(string bindToName, string inputParamName, float inputRawValue)
+            : base(inputParamName, inputRawValue)
+        {
+            _bindToName = bindToName;
+        }
 
-        [SerializeField]
-        private string _sourceParamName;
+        public ParamBindingNameOrValue(ParamBindingInfo paramBindingInfo)
+            : this(paramBindingInfo.BindToName, paramBindingInfo.Name, paramBindingInfo.GetRawValue())
+        {
+        }
 
-
-        public float SourceValue => _sourceValue;
-
-        [SerializeField]
-        private float _sourceValue = 1f;
-
-
-        public bool IsValue => string.IsNullOrEmpty(SourceParamName);
-
-
-        public ParamInfo GetParamBindingSource(Dictionary<string, ParamInfo> sourceParams,
-            ParamType targetParamType = ParamType.Any)
+        public ParamInfo GetParamBindingSource(IEnumerable<ParamInfo> paramTable, ParamType targetParamType)
         {
             // Literal
             if (IsValue)
             {
-                return new ParamInfo(null, targetParamType, SourceValue);
+                return new ParamInfo(null, targetParamType, RawValue);
+            }
+
+            foreach (var paramInfo in paramTable)
+            {
+                if (paramInfo.Name.Equals(Name))
+                {
+                    return paramInfo;
+                }
+            }
+
+            Debug.LogError($"[Puppeteer::ParamBinding] Can not find input param info with name '{Name}'.");
+
+            return null;
+        }
+
+        public ParamInfo GetParamBindingSource(Dictionary<string, ParamInfo> sourceParams, ParamType targetParamType)
+        {
+            // Literal
+            if (IsValue)
+            {
+                return new ParamInfo(null, targetParamType, RawValue);
             }
 
             // Invalid source
-            if (!sourceParams.TryGetValue(SourceParamName, out var sourceParam))
+            if (!sourceParams.TryGetValue(Name, out var sourceParam))
             {
                 Debug.LogError(
-                    $"[Puppeteer::ParamBinding] Can not find source param info with name '{SourceParamName}'.");
+                    $"[Puppeteer::ParamBinding] Can not find input param info with name '{Name}'.");
 
                 return null;
             }
@@ -50,14 +66,14 @@ namespace GBG.Puppeteer.Parameter
             return sourceParam;
         }
 
-        public ParamBinding GetParamBinding(Dictionary<string, ParamInfo> sourceParams,
-            Dictionary<string, ParamInfo> targetParams)
+        public ParamBinding GetParamBinding(Dictionary<string, ParamInfo> inputParamTable,
+            Dictionary<string, ParamInfo> outputParamTable)
         {
             // Invalid target
-            if (!targetParams.TryGetValue(TargetParamName, out var targetParam))
+            if (!outputParamTable.TryGetValue(BindToName, out var targetParam))
             {
                 Debug.LogError(
-                    $"[Puppeteer::ParamBinding] Can not find target param info with name '{TargetParamName}'.");
+                    $"[Puppeteer::ParamBinding] Can not find output param info with name '{BindToName}'.");
 
                 return null;
             }
@@ -65,34 +81,27 @@ namespace GBG.Puppeteer.Parameter
             // Literal
             if (IsValue)
             {
-                return new ParamBinding(new ParamInfo(null, targetParam.Type, SourceValue), targetParam);
+                return new ParamBinding(new ParamInfo(null, targetParam.Type, RawValue), targetParam);
             }
 
             // Invalid source
-            if (!sourceParams.TryGetValue(SourceParamName, out var sourceParam))
+            if (!inputParamTable.TryGetValue(Name, out var sourceParam))
             {
                 Debug.LogError(
-                    $"[Puppeteer::ParamBinding] Can not find source param info with name '{SourceParamName}'.");
+                    $"[Puppeteer::ParamBinding] Can not find input param info with name '{Name}'.");
 
                 return null;
             }
 
-            Assert.IsTrue(sourceParam.Type == targetParam.Type
-                          || sourceParam.Type == ParamType.Any
-                          || targetParam.Type == ParamType.Any);
+            Assert.IsTrue(sourceParam.Type == targetParam.Type);
 
             // Binding
             return new ParamBinding(sourceParam, targetParam);
         }
 
-        public object Clone()
+        public override object Clone()
         {
-            return new ParamBindingNameOrValue()
-            {
-                _targetParamName = this._targetParamName,
-                _sourceParamName = this._sourceParamName,
-                _sourceValue = this._sourceValue
-            };
+            return new ParamBindingNameOrValue(_bindToName, Name, RawValue);
         }
     }
 }

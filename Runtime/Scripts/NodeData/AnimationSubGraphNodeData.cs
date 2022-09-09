@@ -11,8 +11,20 @@ namespace GBG.Puppeteer.NodeData
     [Serializable]
     public class AnimationSubGraphNodeData : AnimationNodeData
     {
+        public RuntimeAnimationGraph SubGraph
+        {
+            get => _subGraph;
+            set => _subGraph = value;
+        }
+
         [SerializeField]
         private RuntimeAnimationGraph _subGraph;
+
+        public ParamBindingNameOrValue[] ParamBindingSources
+        {
+            get => _paramBindingSources;
+            set => _paramBindingSources = value;
+        }
 
         [SerializeField]
         private ParamBindingNameOrValue[] _paramBindingSources;
@@ -22,26 +34,26 @@ namespace GBG.Puppeteer.NodeData
             Animator animator, Dictionary<string, AnimationNodeData> nodeTable,
             Dictionary<string, ParamInfo> paramTable)
         {
-            if (_paramBindingSources == null || _paramBindingSources.Length == 0)
+            if (ParamBindingSources == null || ParamBindingSources.Length == 0)
             {
-                return new AnimationSubGraphInstance(graph, animator, _subGraph, null);
+                return new AnimationSubGraphInstance(graph, animator, SubGraph, null);
             }
 
-            var paramBindingSources = new ParamInfo[_subGraph.Parameters.Count];
+            var paramBindingSources = new ParamInfo[SubGraph.Parameters.Count];
             for (int i = 0; i < paramBindingSources.Length; i++)
             {
-                foreach (var bindingSource in _paramBindingSources)
+                foreach (var bindingSource in ParamBindingSources)
                 {
-                    if (bindingSource.TargetParamName.Equals(_subGraph.Parameters[i].Name))
+                    if (bindingSource.BindToName.Equals(SubGraph.Parameters[i].Name))
                     {
                         paramBindingSources[i] = bindingSource
-                            .GetParamBindingSource(paramTable, _subGraph.Parameters[i].Type);
+                            .GetParamBindingSource(paramTable, SubGraph.Parameters[i].Type);
                         break;
                     }
                 }
             }
 
-            return new AnimationSubGraphInstance(graph, animator, _subGraph, paramBindingSources);
+            return new AnimationSubGraphInstance(graph, animator, SubGraph, paramBindingSources);
         }
 
 
@@ -57,12 +69,12 @@ namespace GBG.Puppeteer.NodeData
             base.CloneMembers(clone);
 
             var animSubGraphNodeData = (AnimationSubGraphNodeData)clone;
-            animSubGraphNodeData._subGraph = _subGraph;
+            animSubGraphNodeData.SubGraph = SubGraph;
 
-            animSubGraphNodeData._paramBindingSources = new ParamBindingNameOrValue[_paramBindingSources.Length];
-            for (int i = 0; i < _paramBindingSources.Length; i++)
+            animSubGraphNodeData.ParamBindingSources = new ParamBindingNameOrValue[ParamBindingSources.Length];
+            for (int i = 0; i < ParamBindingSources.Length; i++)
             {
-                animSubGraphNodeData._paramBindingSources[i] = (ParamBindingNameOrValue)_paramBindingSources[i].Clone();
+                animSubGraphNodeData.ParamBindingSources[i] = (ParamBindingNameOrValue)ParamBindingSources[i].Clone();
             }
         }
 

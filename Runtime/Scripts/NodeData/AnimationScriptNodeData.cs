@@ -5,6 +5,7 @@ using GBG.Puppeteer.NodeInstance;
 using GBG.Puppeteer.Parameter;
 using UnityEngine;
 using UnityEngine.Playables;
+using UObject = UnityEngine.Object;
 
 namespace GBG.Puppeteer.NodeData
 {
@@ -37,7 +38,7 @@ namespace GBG.Puppeteer.NodeData
 
             return new AnimationScriptInstance(graph, inputInstances, inputWeights,
                 PlaybackSpeed.GetParamInfo(paramTable, ParamType.Float),
-                animator.GetComponent<Skeleton>(), _animationScriptable);
+                animator.GetComponent<Skeleton>(), UObject.Instantiate(_animationScriptable));
         }
 
 

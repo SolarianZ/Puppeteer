@@ -4,14 +4,6 @@ using UnityEngine.Assertions;
 
 namespace GBG.Puppeteer.Parameter
 {
-    // TODO: Move to Editor
-    public enum ParamSource
-    {
-        Literal,
-
-        Variable
-    }
-
     public enum ParamType
     {
         Float,
@@ -19,13 +11,17 @@ namespace GBG.Puppeteer.Parameter
         Int,
 
         Bool,
-
-        Any,
     }
 
     [Serializable]
-    public sealed class ParamInfo : ICloneable
+    public class ParamInfo : ICloneable
     {
+        public string Guid => _guid;
+
+        [SerializeField]
+        private string _guid;
+
+
         /// <summary>
         /// Unique name of a variable.
         /// For a literal, its name is empty.
@@ -85,7 +81,7 @@ namespace GBG.Puppeteer.Parameter
         public void SetFloat(float value)
         {
             Assert.IsFalse(IsLiteral);
-            Assert.IsTrue(Type == ParamType.Float || Type == ParamType.Any);
+            Assert.IsTrue(Type == ParamType.Float);
 
             if (!Mathf.Approximately(_rawValue, value))
             {
@@ -96,7 +92,7 @@ namespace GBG.Puppeteer.Parameter
 
         public float GetFloat()
         {
-            Assert.IsTrue(Type == ParamType.Float || Type == ParamType.Any);
+            Assert.IsTrue(Type == ParamType.Float);
 
             return _rawValue;
         }
@@ -104,7 +100,7 @@ namespace GBG.Puppeteer.Parameter
         public void SetInt(int value)
         {
             Assert.IsFalse(IsLiteral);
-            Assert.IsTrue(Type == ParamType.Int || Type == ParamType.Any);
+            Assert.IsTrue(Type == ParamType.Int);
 
             if (!Mathf.Approximately(_rawValue, value))
             {
@@ -115,7 +111,7 @@ namespace GBG.Puppeteer.Parameter
 
         public int GetInt()
         {
-            Assert.IsTrue(Type == ParamType.Int || Type == ParamType.Any);
+            Assert.IsTrue(Type == ParamType.Int);
 
             return (int)Math.Round(_rawValue);
         }
@@ -123,7 +119,7 @@ namespace GBG.Puppeteer.Parameter
         public void SetBool(bool value)
         {
             Assert.IsFalse(IsLiteral);
-            Assert.IsTrue(Type == ParamType.Bool || Type == ParamType.Any);
+            Assert.IsTrue(Type == ParamType.Bool);
 
             var newValue = value ? 1 : 0;
             if (!Mathf.Approximately(_rawValue, newValue))
@@ -135,7 +131,7 @@ namespace GBG.Puppeteer.Parameter
 
         public bool GetBool()
         {
-            Assert.IsTrue(Type == ParamType.Bool || Type == ParamType.Any);
+            Assert.IsTrue(Type == ParamType.Bool);
 
             return !Mathf.Approximately(_rawValue, 0);
         }
@@ -161,7 +157,7 @@ namespace GBG.Puppeteer.Parameter
             return new ParamInfo(_name, _type, _rawValue);
         }
 
-        public static ParamInfo CreateLiteral(ParamType type = ParamType.Any, float rawValue = 0)
+        public static ParamInfo CreateLiteral(ParamType type, float rawValue)
         {
             return new ParamInfo(null, type, rawValue);
         }

@@ -9,7 +9,7 @@ namespace GBG.Puppeteer.Editor.GraphWindow
 {
     public partial class AnimationGraphWindow
     {
-        private readonly List<ParamInfo> _paramInfos = new List<ParamInfo>();
+        private readonly List<ParamInfo> _paramTable = new List<ParamInfo>();
 
         private ListView _paramListView;
 
@@ -60,7 +60,7 @@ namespace GBG.Puppeteer.Editor.GraphWindow
                 fixedItemHeight = 24,
                 makeItem = CreateNewParamListItem,
                 bindItem = BindAssetListItem,
-                itemsSource = _paramInfos,
+                itemsSource = _paramTable,
                 selectionType = SelectionType.None,
             };
             _paramListView.itemIndexChanged += OnParamIndexChanged;
@@ -77,19 +77,19 @@ namespace GBG.Puppeteer.Editor.GraphWindow
             var menu = new GenericDropdownMenu();
             menu.AddItem("Float", false, () =>
             {
-                _paramInfos.Add(new ParamInfo($"Float_{GenerateUniqueSuffix()}", ParamType.Float));
+                _paramTable.Add(new ParamInfo($"Float_{GenerateUniqueSuffix()}", ParamType.Float));
                 _paramListView.RefreshItems();
                 hasUnsavedChanges = true;
             });
             menu.AddItem("Integer", false, () =>
             {
-                _paramInfos.Add(new ParamInfo($"Integer_{GenerateUniqueSuffix()}", ParamType.Int));
+                _paramTable.Add(new ParamInfo($"Integer_{GenerateUniqueSuffix()}", ParamType.Int));
                 _paramListView.RefreshItems();
                 hasUnsavedChanges = true;
             });
             menu.AddItem("Bool", false, () =>
             {
-                _paramInfos.Add(new ParamInfo($"Bool_{GenerateUniqueSuffix()}", ParamType.Bool));
+                _paramTable.Add(new ParamInfo($"Bool_{GenerateUniqueSuffix()}", ParamType.Bool));
                 _paramListView.RefreshItems();
                 hasUnsavedChanges = true;
             });
@@ -125,7 +125,7 @@ namespace GBG.Puppeteer.Editor.GraphWindow
         private void BindAssetListItem(VisualElement listItem, int index)
         {
             var paramElem = (ParamElement)listItem;
-            var paramInfo = _paramInfos[index];
+            var paramInfo = _paramTable[index];
             paramElem.PopulateView(paramInfo);
             paramElem.OnParamChanged += OnParamChanged;
         }
