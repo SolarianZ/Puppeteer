@@ -5,6 +5,8 @@ using UnityEngine;
 namespace GBG.Puppeteer.ThirdParties
 {
     // Upstream: https://github.com/godotengine/godot/blob/master/core/math/delaunay_2d.h
+    // Copyright (c) 2007-2022 Juan Linietsky, Ariel Manzur.
+    // Copyright (c) 2014-2022 Godot Engine contributors
     // License: MIT
 
     public static class Delaunay2D
