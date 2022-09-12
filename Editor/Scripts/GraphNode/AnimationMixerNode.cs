@@ -15,19 +15,19 @@ namespace GBG.Puppeteer.Editor.GraphNode
 
         public AnimationMixerNode(string guid, List<ParamInfo> readOnlyParamTable) : base(guid, readOnlyParamTable)
         {
+            // Playback speed
+            PlaybackSpeedField = new ParamField<float>("Speed", labelWidth: _INPUT_LABEL_WIDTH);
+            PlaybackSpeedField.SetParamChoices(ReadOnlyParamTable);
+            PlaybackSpeedField.SetParamInfo(ParamInfo.CreateLiteral(ParamType.Float, 1));
+            PlaybackSpeedField.OnValueChanged += OnPlaybackSpeedValueChanged;
+            inputContainer.Add(PlaybackSpeedField);
+
             // Add input button
             var addInputButton = new Button(AddMixerInput)
             {
                 text = "Add Input Port"
             };
             inputContainer.Add(addInputButton);
-
-            // Playback speed
-            PlaybackSpeedField = new ParamField<float>("Speed", labelWidth: _INPUT_LABEL_WIDTH);
-            PlaybackSpeedField.SetParamChoices(ReadOnlyParamTable);
-            PlaybackSpeedField.SetParamInfo(ParamInfo.CreateLiteral(ParamType.Float, 1));
-            PlaybackSpeedField.OnValueChanged += OnPlaybackSpeedValueChanged;
-            inputContainer.Insert(inputContainer.childCount - 1, PlaybackSpeedField);
 
             // Default mixer input
             AddMixerInput();

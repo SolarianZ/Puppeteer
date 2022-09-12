@@ -12,8 +12,23 @@ namespace GBG.Puppeteer.NodeData
     [Serializable]
     public class AnimationScriptNodeData : AnimationNodeData
     {
+        public AnimationScriptableObject AnimationScriptable
+        {
+            get => _animationScriptable;
+            set => _animationScriptable = value;
+        }
+
         [SerializeField]
         private AnimationScriptableObject _animationScriptable;
+
+        public ParamBindingNameOrValue[] ParamBindingSources
+        {
+            get => _paramBindingSources;
+            set => _paramBindingSources = value;
+        }
+
+        [SerializeField]
+        private ParamBindingNameOrValue[] _paramBindingSources;
 
 
         public override AnimationNodeInstance CreateNodeInstance(PlayableGraph graph,
@@ -54,6 +69,14 @@ namespace GBG.Puppeteer.NodeData
             base.CloneMembers(clone);
 
             var animScriptNodeData = (AnimationScriptNodeData)clone;
+            animScriptNodeData.AnimationScriptable = AnimationScriptable;
+            
+            animScriptNodeData.ParamBindingSources = new ParamBindingNameOrValue[ParamBindingSources.Length];
+            for (int i = 0; i < ParamBindingSources.Length; i++)
+            {
+                animScriptNodeData.ParamBindingSources[i] = (ParamBindingNameOrValue)ParamBindingSources[i].Clone();
+            }
+            
             animScriptNodeData.InputInfos = new InputInfo[InputInfos.Length];
             for (int i = 0; i < InputInfos.Length; i++)
             {

@@ -24,10 +24,10 @@ Legends:
     - ✅ Layer Mixer Node
     - ✅ Clip Node
         - ✅ Optional Explicit Time
-    - 📅 Blend Space 1D Node
-    - 📅 Blend Space 2D Node
-    - 📅 Script Node
-    - 📅 Sub Graph Node
+    - ▶ Blend Space 1D Node
+    - ▶ Blend Space 2D Node
+    - ✅ Script Node
+    - ✅ Sub Graph Node
     - 📅 State Machine Node
     - 📅 State Node(In State Machine)
     - 🔘 ~~Param Node~~ (Embed into PlayableNode)

@@ -30,6 +30,7 @@ namespace GBG.Puppeteer.Editor.GraphNode
             { typeof(AnimationMixerNodeData), typeof(AnimationMixerNode) },
             { typeof(AnimationLayerMixerNodeData), typeof(AnimationLayerMixerNode) },
             { typeof(AnimationSubGraphNodeData), typeof(AnimationSubGraphNode) },
+            { typeof(AnimationScriptNodeData), typeof(AnimationScriptNode) },
         };
 
         private static readonly Type[] _playableNodeCtorParamTypes = new Type[]
