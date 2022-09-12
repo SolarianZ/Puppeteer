@@ -13,7 +13,7 @@ namespace GBG.Puppeteer.Editor.GraphNode
         private const float _INPUT_LABEL_WIDTH = 76;
 
 
-        public AnimationMixerNode(string guid, List<ParamInfo> paramTable) : base(guid, paramTable)
+        public AnimationMixerNode(string guid, List<ParamInfo> readOnlyParamTable) : base(guid, readOnlyParamTable)
         {
             // Add input button
             var addInputButton = new Button(AddMixerInput)
@@ -24,6 +24,7 @@ namespace GBG.Puppeteer.Editor.GraphNode
 
             // Playback speed
             PlaybackSpeedField = new ParamField<float>("Speed", labelWidth: _INPUT_LABEL_WIDTH);
+            PlaybackSpeedField.SetParamChoices(ReadOnlyParamTable);
             PlaybackSpeedField.SetParamInfo(ParamInfo.CreateLiteral(ParamType.Float, 1));
             PlaybackSpeedField.OnValueChanged += OnPlaybackSpeedValueChanged;
             inputContainer.Insert(inputContainer.childCount - 1, PlaybackSpeedField);
@@ -37,11 +38,9 @@ namespace GBG.Puppeteer.Editor.GraphNode
         public override void PopulateView(AnimationNodeData nodeData)
         {
             var animMixerNodeData = (AnimationMixerNodeData)nodeData;
-            var paramTable = (List<ParamInfo>)ParamTable;
 
             // Playback speed
-            PlaybackSpeedField.SetParamChoices(paramTable);
-            PlaybackSpeedField.SetParamInfo(animMixerNodeData.PlaybackSpeed.GetParamInfo(paramTable, ParamType.Float));
+            PlaybackSpeedField.SetParamInfo(animMixerNodeData.PlaybackSpeed.GetParamInfo(ReadOnlyParamTable, ParamType.Float));
 
             // Mixer inputs
             // Remove default mixer inputs
@@ -59,7 +58,7 @@ namespace GBG.Puppeteer.Editor.GraphNode
                 var mixerInputInfo = (MixerInputInfo)inputInfo;
                 if (mixerInputInfo != null)
                 {
-                    var inputWeightParam = mixerInputInfo.InputWeightParam.GetParamInfo(paramTable, ParamType.Float);
+                    var inputWeightParam = mixerInputInfo.InputWeightParam.GetParamInfo(ReadOnlyParamTable, ParamType.Float);
                     mixerInput.InputWeightField.SetParamInfo(inputWeightParam);
                 }
 
@@ -76,6 +75,7 @@ namespace GBG.Puppeteer.Editor.GraphNode
         private void AddMixerInput()
         {
             var mixerInput = new MixerInput(DeleteMixerInput, _INPUT_LABEL_WIDTH);
+            mixerInput.InputWeightField.SetParamChoices(ReadOnlyParamTable);
             mixerInput.InputWeightField.OnValueChanged += OnInputWeightValueChanged;
             inputContainer.Insert(inputContainer.childCount - 1, mixerInput);
             InternalMixerInputs.Add(mixerInput);

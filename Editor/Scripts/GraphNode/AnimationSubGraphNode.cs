@@ -35,10 +35,11 @@ namespace GBG.Puppeteer.Editor.GraphNode
         private const float _INPUT_LABEL_WIDTH = 90;
 
 
-        public AnimationSubGraphNode(string guid, List<ParamInfo> paramTable) : base(guid, paramTable)
+        public AnimationSubGraphNode(string guid, List<ParamInfo> readOnlyParamTable) : base(guid, readOnlyParamTable)
         {
             // Playback speed
             PlaybackSpeedField = new ParamField<float>("Speed", labelWidth: _INPUT_LABEL_WIDTH);
+            PlaybackSpeedField.SetParamChoices(ReadOnlyParamTable);
             PlaybackSpeedField.SetParamInfo(ParamInfo.CreateLiteral(ParamType.Float, 1));
             PlaybackSpeedField.OnValueChanged += OnPlaybackSpeedValueChanged;
             inputContainer.Add(PlaybackSpeedField);
@@ -62,11 +63,9 @@ namespace GBG.Puppeteer.Editor.GraphNode
         public override void PopulateView(AnimationNodeData nodeData)
         {
             var subGraphNodeData = (AnimationSubGraphNodeData)nodeData;
-            var paramTable = (List<ParamInfo>)ParamTable;
 
             // Playback speed
-            PlaybackSpeedField.SetParamChoices(paramTable);
-            PlaybackSpeedField.SetParamInfo(subGraphNodeData.PlaybackSpeed.GetParamInfo(paramTable, ParamType.Float));
+            PlaybackSpeedField.SetParamInfo(subGraphNodeData.PlaybackSpeed.GetParamInfo(ReadOnlyParamTable, ParamType.Float));
 
             // Sub graph
             _subGraphField.value = subGraphNodeData.SubGraph;
@@ -83,9 +82,9 @@ namespace GBG.Puppeteer.Editor.GraphNode
                         binding = new ParamBindingNameOrValue(subGraphParamInfo.Name, null, 0);
                     }
 
-                    var inputParamInfo = binding.GetParamBindingSource(paramTable, subGraphParamInfo.Type);
+                    var inputParamInfo = binding.GetParamBindingSource(ReadOnlyParamTable, subGraphParamInfo.Type);
                     var bindingField = CreateParamBindingField(subGraphParamInfo.Name, subGraphParamInfo.Type);
-                    bindingField.SetParamChoices((List<ParamInfo>)ParamTable);
+                    bindingField.SetParamChoices(ReadOnlyParamTable);
                     bindingField.SetParamInfo(inputParamInfo);
                     bindingField.OnValueChanged += OnParamBindingChanged;
                     _paramBindingFields.Add((IParamBindingField)bindingField);
@@ -128,7 +127,7 @@ namespace GBG.Puppeteer.Editor.GraphNode
             foreach (var paramInfo in subGraph.Parameters)
             {
                 var bindingField = CreateParamBindingField(paramInfo.Name, paramInfo.Type);
-                bindingField.SetParamChoices((List<ParamInfo>)ParamTable);
+                bindingField.SetParamChoices((List<ParamInfo>)ReadOnlyParamTable);
                 bindingField.OnValueChanged += OnParamBindingChanged;
                 _paramBindingFields.Add((IParamBindingField)bindingField);
                 inputContainer.Add(bindingField);

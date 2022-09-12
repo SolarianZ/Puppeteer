@@ -18,12 +18,13 @@ namespace GBG.Puppeteer.Editor.GraphView
     {
         private const string _GRID_BACKGROUND_STYLE_PATH = "AnimationGraph/GridBackground";
 
-        private readonly IReadOnlyList<ParamInfo> _paramTable;
+        private readonly List<ParamInfo> _paramTable;
 
         private readonly RootNode _rootNode;
 
 
-        public AnimationGraphView(List<ParamInfo> paramTable)
+        public AnimationGraphView(List<ParamInfo> paramTable, IList<AnimationNodeData> linkedNodes,
+            IList<AnimationNodeData> isolatedNodes)
         {
             this.AddManipulator(new ContentDragger());
             this.AddManipulator(new SelectionDragger());
@@ -43,6 +44,9 @@ namespace GBG.Puppeteer.Editor.GraphView
             // Root node
             _rootNode = new RootNode();
             AddElement(_rootNode);
+
+            // Build graph
+            RebuildGraph(linkedNodes, isolatedNodes);
 
             // Graph view change callback
             graphViewChanged += OnGraphViewChanged;
@@ -67,8 +71,7 @@ namespace GBG.Puppeteer.Editor.GraphView
             return compatiblePorts;
         }
 
-        public void RebuildGraph(IList<AnimationNodeData> linkedNodes, IList<AnimationNodeData> isolatedNodes,
-            List<ParamInfo> paramTable)
+        public void RebuildGraph(IList<AnimationNodeData> linkedNodes, IList<AnimationNodeData> isolatedNodes)
         {
             // Old elements
             foreach (var edge in edges)
@@ -91,7 +94,7 @@ namespace GBG.Puppeteer.Editor.GraphView
             var nodeDataTable = new Dictionary<string, AnimationNodeData>(linkedNodes.Count);
             foreach (var nodeData in linkedNodes)
             {
-                var node = PlayableNodeFactory.CreateNode(nodeData, paramTable);
+                var node = PlayableNodeFactory.CreateNode(nodeData, _paramTable);
                 if (node != null)
                 {
                     AddElement(node);
@@ -104,7 +107,7 @@ namespace GBG.Puppeteer.Editor.GraphView
             // Isolated nodes
             foreach (var nodeData in isolatedNodes)
             {
-                var node = PlayableNodeFactory.CreateNode(nodeData, paramTable);
+                var node = PlayableNodeFactory.CreateNode(nodeData, _paramTable);
                 if (node != null)
                 {
                     AddElement(node);
@@ -172,8 +175,7 @@ namespace GBG.Puppeteer.Editor.GraphView
                 {
                     evt.menu.AppendAction($"Create {nodeType.Name}", _ =>
                     {
-                        var node = PlayableNodeFactory.CreateNode(nodeType, localMousePos,
-                            (List<ParamInfo>)_paramTable);
+                        var node = PlayableNodeFactory.CreateNode(nodeType, localMousePos, _paramTable);
                         if (node != null)
                         {
                             AddElement(node);

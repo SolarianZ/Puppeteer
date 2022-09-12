@@ -30,7 +30,7 @@ namespace GBG.Puppeteer.Editor.GraphNode
 
         #region Data
 
-        protected IReadOnlyList<ParamInfo> ParamTable { get; }
+        protected List<ParamInfo> ReadOnlyParamTable { get; }
 
         protected abstract ParamField<float> PlaybackSpeedField { get; }
 
@@ -44,9 +44,9 @@ namespace GBG.Puppeteer.Editor.GraphNode
         #endregion
 
 
-        protected PlayableNode(string guid, List<ParamInfo> paramTable) : base(guid)
+        protected PlayableNode(string guid, List<ParamInfo> readOnlyParamTable) : base(guid)
         {
-            ParamTable = paramTable;
+            ReadOnlyParamTable = readOnlyParamTable;
 
             // Title contents container
             var titleLabelContainer = new VisualElement()

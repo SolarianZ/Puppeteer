@@ -37,10 +37,11 @@ namespace GBG.Puppeteer.Editor.GraphNode
         private const float _INPUT_LABEL_WIDTH = 90;
 
 
-        public AnimationClipNode(string guid, List<ParamInfo> paramTable) : base(guid, paramTable)
+        public AnimationClipNode(string guid, List<ParamInfo> readOnlyParamTable) : base(guid, readOnlyParamTable)
         {
             // Playback speed
             PlaybackSpeedField = new ParamField<float>("Speed", labelWidth: _INPUT_LABEL_WIDTH);
+            PlaybackSpeedField.SetParamChoices(ReadOnlyParamTable);
             PlaybackSpeedField.SetParamInfo(ParamInfo.CreateLiteral(ParamType.Float, 1));
             PlaybackSpeedField.OnValueChanged += OnPlaybackSpeedValueChanged;
             inputContainer.Add(PlaybackSpeedField);
@@ -62,11 +63,13 @@ namespace GBG.Puppeteer.Editor.GraphNode
 
             // Use explicit time
             _useExplicitTimeField = new ParamField<bool>("Use Explicit Time", labelWidth: _INPUT_LABEL_WIDTH);
+            _useExplicitTimeField.SetParamChoices(ReadOnlyParamTable);
             _useExplicitTimeField.OnValueChanged += OnUseExplicitTimeValueChanged;
             inputContainer.Add(_useExplicitTimeField);
 
             // Explicit time
             _explicitTimeField = new ParamField<float>("Explicit Time", labelWidth: _INPUT_LABEL_WIDTH);
+            _explicitTimeField.SetParamChoices(ReadOnlyParamTable);
             _explicitTimeField.OnValueChanged += OnExplicitTimeValueChanged;
             inputContainer.Add(_explicitTimeField);
         }
@@ -74,11 +77,9 @@ namespace GBG.Puppeteer.Editor.GraphNode
         public override void PopulateView(AnimationNodeData nodeData)
         {
             var clipNodeData = (AnimationClipNodeData)nodeData;
-            var paramTable = (List<ParamInfo>)ParamTable;
 
             // Playback speed
-            PlaybackSpeedField.SetParamChoices(paramTable);
-            PlaybackSpeedField.SetParamInfo(clipNodeData.PlaybackSpeed.GetParamInfo(paramTable, ParamType.Float));
+            PlaybackSpeedField.SetParamInfo(clipNodeData.PlaybackSpeed.GetParamInfo(ReadOnlyParamTable, ParamType.Float));
 
             // Clip
             _clipField.value = clipNodeData.AnimationClip;
@@ -95,12 +96,10 @@ namespace GBG.Puppeteer.Editor.GraphNode
             }
 
             // Use explicit time
-            _useExplicitTimeField.SetParamChoices(paramTable);
-            _useExplicitTimeField.SetParamInfo(clipNodeData.UseExplicitTime.GetParamInfo(paramTable, ParamType.Bool));
+            _useExplicitTimeField.SetParamInfo(clipNodeData.UseExplicitTime.GetParamInfo(ReadOnlyParamTable, ParamType.Bool));
 
             // Explicit time
-            _explicitTimeField.SetParamChoices(paramTable);
-            _explicitTimeField.SetParamInfo(clipNodeData.ExplicitTime.GetParamInfo(paramTable, ParamType.Float));
+            _explicitTimeField.SetParamInfo(clipNodeData.ExplicitTime.GetParamInfo(ReadOnlyParamTable, ParamType.Float));
         }
 
 

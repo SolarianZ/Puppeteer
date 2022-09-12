@@ -14,7 +14,7 @@ namespace GBG.Puppeteer.Editor.GraphNode
         private const float _INPUT_LABEL_WIDTH = 76;
 
 
-        public AnimationLayerMixerNode(string guid, List<ParamInfo> paramTable) : base(guid, paramTable)
+        public AnimationLayerMixerNode(string guid, List<ParamInfo> readOnlyParamTable) : base(guid, readOnlyParamTable)
         {
             // Add input button
             var addInputButton = new Button(AddLayerMixerInput)
@@ -25,6 +25,7 @@ namespace GBG.Puppeteer.Editor.GraphNode
 
             // Playback speed
             PlaybackSpeedField = new ParamField<float>("Speed", labelWidth: _INPUT_LABEL_WIDTH);
+            PlaybackSpeedField.SetParamChoices(ReadOnlyParamTable);
             PlaybackSpeedField.SetParamInfo(ParamInfo.CreateLiteral(ParamType.Float, 1));
             PlaybackSpeedField.OnValueChanged += OnPlaybackSpeedValueChanged;
             inputContainer.Insert(inputContainer.childCount - 1, PlaybackSpeedField);
@@ -38,12 +39,10 @@ namespace GBG.Puppeteer.Editor.GraphNode
         public override void PopulateView(AnimationNodeData nodeData)
         {
             var animLayerMixerNodeData = (AnimationLayerMixerNodeData)nodeData;
-            var paramTable = (List<ParamInfo>)ParamTable;
 
             // Playback speed
-            PlaybackSpeedField.SetParamChoices(paramTable);
             PlaybackSpeedField.SetParamInfo(animLayerMixerNodeData.PlaybackSpeed
-                .GetParamInfo(paramTable, ParamType.Float));
+                .GetParamInfo(ReadOnlyParamTable, ParamType.Float));
 
             // Mixer inputs
             // Remove default mixer inputs
@@ -62,7 +61,7 @@ namespace GBG.Puppeteer.Editor.GraphNode
                 if (layerMixerInputInfo != null)
                 {
                     var inputWeightParam = layerMixerInputInfo.InputWeightParam
-                        .GetParamInfo(paramTable, ParamType.Float);
+                        .GetParamInfo(ReadOnlyParamTable, ParamType.Float);
                     layerMixerInput.InputWeightField.SetParamInfo(inputWeightParam);
                     layerMixerInput.IsAdditive.value = layerMixerInputInfo.IsAdditive;
                     layerMixerInput.AvatarMask.value = layerMixerInputInfo.AvatarMask;
@@ -81,6 +80,7 @@ namespace GBG.Puppeteer.Editor.GraphNode
         private void AddLayerMixerInput()
         {
             var layerMixerInput = new LayerMixerInput(DeleteMixerInput, _INPUT_LABEL_WIDTH);
+            layerMixerInput.InputWeightField.SetParamChoices(ReadOnlyParamTable);
             layerMixerInput.InputWeightField.OnValueChanged += OnInputWeightValueChanged;
             layerMixerInput.IsAdditive.RegisterValueChangedCallback(OnAdditiveValueChanged);
             layerMixerInput.AvatarMask.RegisterValueChangedCallback(OnAvatarMaskChanged);

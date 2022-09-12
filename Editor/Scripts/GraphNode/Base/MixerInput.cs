@@ -17,6 +17,7 @@ namespace GBG.Puppeteer.Editor.GraphNode
     {
         public AnimationGraphPort InputPort { get; }
 
+        // TODO: Restrict available parameters by date type
         public ParamField<float> InputWeightField { get; }
 
 

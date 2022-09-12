@@ -89,6 +89,10 @@ namespace GBG.Puppeteer.Editor.GraphWindow
             CreateGraphViewPanel();
             CreateInspectorPanel();
 
+            // On create view end
+            // Hide inspector by default
+            ToggleInspectorPanel();
+
             // Restore graph after code compiling,
             // but will lose all unsaved changes
             if (_graphAsset)
