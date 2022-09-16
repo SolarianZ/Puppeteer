@@ -1,0 +1,14 @@
+{
+    "name": "GBG.AnimationGraph",
+    "rootNamespace": "GBG.AnimationGraph",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

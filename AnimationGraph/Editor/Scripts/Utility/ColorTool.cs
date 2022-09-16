@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Playables;
 using Random = UnityEngine.Random;
 
-namespace GBG.Puppeteer.Editor.Utility
+namespace GBG.AnimationGraph.Editor.Utility
 {
     public static class ColorTool
     {
@@ -14,19 +14,14 @@ namespace GBG.Puppeteer.Editor.Utility
         };
 
 
-        public static void SetColor(Type type, Color color)
-        {
-            _colors[type] = color;
-        }
-
-        public static Color GetColor(Type type, Color? defaultColor = null)
+        public static Color GetColor(Type type)
         {
             if (_colors.TryGetValue(type, out var color))
             {
                 return color;
             }
 
-            return defaultColor ?? Color.white;
+            return GetRandomColor();
         }
 
         public static Color GetRandomColor(byte rgbMax = 200, byte minInterval = 25, int? randomSeed = null)
