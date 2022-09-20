@@ -13,7 +13,7 @@ namespace GBG.AnimationGraph.Editor.Node
     {
         public abstract string Guid { get; }
 
-        protected AnimationGraphAsset GraphAsset { get; }
+        internal AnimationGraphAsset GraphAsset { get; }
 
 
         /// <summary>
@@ -22,6 +22,8 @@ namespace GBG.AnimationGraph.Editor.Node
         public VisualElement BannerContainer { get; }
 
         public VisualElement IconContainer { get; }
+
+        public event Action OnNodeChanged;
 
 
         protected GraphNode(AnimationGraphAsset graphAsset)
@@ -35,8 +37,6 @@ namespace GBG.AnimationGraph.Editor.Node
 
             // Use title button container as icon container
             IconContainer = base.titleButtonContainer;
-            // Move icon container to the left side of the title label
-            IconContainer.PlaceBehind(titleLabel);
 
             // Banner container
             BannerContainer = mainContainer.Q("divider");
@@ -46,7 +46,11 @@ namespace GBG.AnimationGraph.Editor.Node
         public override UPort InstantiatePort(Orientation orientation,
             Direction direction, UPort.Capacity capacity, Type type)
         {
-            return GraphPort.Create<FlowingGraphEdge>(direction, type, capacity);
+            var port = GraphPort.Create<FlowingGraphEdge>(direction, type, capacity);
+            port.OnConnected += OnPortConnected;
+            port.OnDisconnected += OnPortDisconnected;
+
+            return port;
         }
 
         protected GraphPort InstantiatePort(Direction direction, Type type,
@@ -55,13 +59,37 @@ namespace GBG.AnimationGraph.Editor.Node
             return (GraphPort)InstantiatePort(Orientation.Horizontal, direction, capacity, type);
         }
 
-        
-        public event Action<GraphNode> OnNodeDataChanged;
-
-        protected void RaiseNodeDataChangedEvent()
+        protected virtual void OnPortConnected(UEdge edge)
         {
-            OnNodeDataChanged?.Invoke(this);
+            RaiseNodeChangedEvent();
         }
+
+        protected virtual void OnPortDisconnected(UEdge edge)
+        {
+            RaiseNodeChangedEvent();
+        }
+
+
+        /// <summary>
+        /// Don't raise events if the event is contained in GraphView.graphViewChanged callback.
+        /// </summary>
+        protected void RaiseNodeChangedEvent()
+        {
+            OnNodeChanged?.Invoke();
+        }
+
+
+        #region Inspector
+
+        public virtual GraphNodeInspector GetInspector()
+        {
+            var defaultInspector = new GraphNodeInspector();
+            defaultInspector.SetTargetNode(this);
+
+            return defaultInspector;
+        }
+
+        #endregion
     }
 
     // Api Masks

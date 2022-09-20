@@ -1,5 +1,4 @@
 ﻿using System;
-using GBG.AnimationGraph.Editor.ViewElement;
 using GBG.AnimationGraph.Parameter;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -11,9 +10,11 @@ namespace GBG.AnimationGraph.Editor.Blackboard
     {
         // public const string PARAM_NAME_MATCH_REGEX = "^[a-zA-Z_][a-zA-Z0-9_]*$";
 
-        public event Action<ParamInfo> OnParamChanged;
+        public event Action<ParamInfo> OnParamValueChanged;
 
-        public event Action<ParamInfo> OnWantDeleteParam;
+        public event Action<ParamInfo> OnWantsToRenameParam;
+
+        public event Action<ParamInfo> OnWantsToDeleteParam;
 
 
         private readonly Label _typeLabel;
@@ -94,7 +95,6 @@ namespace GBG.AnimationGraph.Editor.Blackboard
 
         public void SetParamInfo(ParamInfo paramInfo)
         {
-            if (_paramInfo == paramInfo) return;
             _paramInfo = paramInfo;
 
             // Type
@@ -136,7 +136,7 @@ namespace GBG.AnimationGraph.Editor.Blackboard
             // Left mouse button double click to rename param
             if (evt.button == 0 && evt.clickCount > 1)
             {
-                RenameWindow.Open(_paramInfo.Name, OnNameChanged);
+                OnWantsToRenameParam?.Invoke(_paramInfo);
                 return;
             }
 
@@ -147,57 +147,32 @@ namespace GBG.AnimationGraph.Editor.Blackboard
                 var menu = new GenericDropdownMenu();
 
                 // Rename
-                menu.AddItem("Rename", false, () => { RenameWindow.Open(_paramInfo.Name, OnNameChanged); });
+                menu.AddItem("Rename", false, () => { OnWantsToRenameParam?.Invoke(_paramInfo); });
 
                 // Delete
-                menu.AddItem("Delete", false, () => { OnWantDeleteParam?.Invoke(_paramInfo); });
+                menu.AddItem("Delete", false, () => { OnWantsToDeleteParam?.Invoke(_paramInfo); });
 
                 menu.DropDown(new Rect(menuPos, Vector2.zero), this);
             }
         }
 
 
-        private void OnNameChanged(string newName)
-        {
-            if (_nameLabel.text.Equals(newName))
-            {
-                return;
-            }
-
-            _nameLabel.text = newName;
-
-            if (_paramInfo == null)
-            {
-                OnParamChanged?.Invoke(null);
-                return;
-            }
-
-            if (_paramInfo.Name.Equals(newName))
-            {
-                return;
-            }
-
-            _paramInfo.EditorSetName(newName);
-
-            OnParamChanged?.Invoke(_paramInfo);
-        }
-
         private void OnFloatValueChanged(ChangeEvent<float> _)
         {
             _paramInfo?.SetFloat(_floatField.value);
-            OnParamChanged?.Invoke(_paramInfo);
+            OnParamValueChanged?.Invoke(_paramInfo);
         }
 
         private void OnIntValueChanged(ChangeEvent<int> _)
         {
             _paramInfo?.SetInt(_intField.value);
-            OnParamChanged?.Invoke(_paramInfo);
+            OnParamValueChanged?.Invoke(_paramInfo);
         }
 
         private void OnBoolValueChanged(ChangeEvent<bool> _)
         {
             _paramInfo?.SetBool(_boolField.value);
-            OnParamChanged?.Invoke(_paramInfo);
+            OnParamValueChanged?.Invoke(_paramInfo);
         }
     }
 }

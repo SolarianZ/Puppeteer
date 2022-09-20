@@ -9,16 +9,16 @@ namespace GBG.AnimationGraph.Parameter
     /// Only used for serialization.
     /// </summary>
     [Serializable]
-    public class ParamNameOrValue
+    public class ParamGuidOrValue
     {
-        public string Name
+        public string Guid
         {
-            get => _name;
-            set => _name = value;
+            get => _guid;
+            set => _guid = value;
         }
 
         [SerializeField]
-        private string _name;
+        private string _guid;
 
 
         public float RawValue
@@ -31,16 +31,16 @@ namespace GBG.AnimationGraph.Parameter
         private float _rawValue = 1f;
 
 
-        public bool IsValue => string.IsNullOrEmpty(Name);
+        public bool IsValue => string.IsNullOrEmpty(Guid);
 
 
-        public ParamNameOrValue(string name, float rawValue)
+        public ParamGuidOrValue(string guid, float rawValue)
         {
-            _name = name;
+            _guid = guid;
             _rawValue = rawValue;
         }
 
-        public ParamNameOrValue(ParamInfo paramInfo) : this(paramInfo.Name, paramInfo.RawValue)
+        public ParamGuidOrValue(ParamInfo paramInfo) : this(paramInfo.Guid, paramInfo.RawValue)
         {
         }
 
@@ -74,7 +74,7 @@ namespace GBG.AnimationGraph.Parameter
                 return new ParamInfo(null, null, paramType, RawValue);
             }
 
-            var paramInfo = paramTable[Name];
+            var paramInfo = paramTable[Guid];
             Assert.IsTrue(paramInfo.Type == paramType);
 
             return paramInfo;
@@ -89,7 +89,7 @@ namespace GBG.AnimationGraph.Parameter
 
             for (int i = 0; i < paramTable.Count; i++)
             {
-                if (paramTable[i].Name.Equals(Name))
+                if (paramTable[i].Name.Equals(Guid))
                 {
                     var paramInfo = paramTable[i];
                     Assert.IsTrue(paramInfo.Type == paramType);

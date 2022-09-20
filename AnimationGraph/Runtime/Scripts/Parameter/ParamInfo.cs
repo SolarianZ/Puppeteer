@@ -19,12 +19,6 @@ namespace GBG.AnimationGraph.Parameter
     [Serializable]
     public class ParamInfo : IDisposable
     {
-        public string Guid => _guid;
-
-        [SerializeField]
-        private string _guid;
-
-
         /// <summary>
         /// Unique name of a variable.
         /// For a literal, its name is empty.
@@ -33,6 +27,12 @@ namespace GBG.AnimationGraph.Parameter
 
         [SerializeField]
         private string _name;
+
+
+        public string Guid => _guid;
+
+        [SerializeField]
+        private string _guid;
 
 
         public ParamType Type => _type;

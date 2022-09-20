@@ -9,7 +9,7 @@ namespace GBG.AnimationGraph.Parameter
     /// Only used for serialization.
     /// </summary>
     [Serializable]
-    public class ParamBindingNameOrValue : ParamNameOrValue
+    public class ParamBindingGuidOrValue : ParamGuidOrValue
     {
         public string ToParamName => toParamName;
 
@@ -17,8 +17,8 @@ namespace GBG.AnimationGraph.Parameter
         private string toParamName;
 
 
-        public ParamBindingNameOrValue(string fromParamName, string toParamName, float rawValue)
-            : base(fromParamName, rawValue)
+        public ParamBindingGuidOrValue(string fromParamGuid, string toParamName, float rawValue)
+            : base(fromParamGuid, rawValue)
         {
             this.toParamName = toParamName;
         }
@@ -34,7 +34,7 @@ namespace GBG.AnimationGraph.Parameter
 
             foreach (var fromParam in fromParamTable)
             {
-                if (fromParam.Name.Equals(Name))
+                if (fromParam.Name.Equals(Guid))
                 {
                     Assert.IsTrue(fromParam.Type == toParamType);
                     return fromParam;
@@ -53,7 +53,7 @@ namespace GBG.AnimationGraph.Parameter
             }
 
             // Invalid source
-            if (!fromParamTable.TryGetValue(Name, out var fromParam))
+            if (!fromParamTable.TryGetValue(Guid, out var fromParam))
             {
                 return null;
             }
@@ -78,7 +78,7 @@ namespace GBG.AnimationGraph.Parameter
             }
 
             // Invalid source
-            if (!fromParamTable.TryGetValue(Name, out var fromParam))
+            if (!fromParamTable.TryGetValue(Guid, out var fromParam))
             {
                 return null;
             }

@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace GBG.AnimationGraph
 {
-    [CreateAssetMenu(fileName = nameof(AnimationGraphAsset),
-        menuName = "Puppeteer/[TEST] Animation Graph")]
+    // [CreateAssetMenu(fileName = nameof(AnimationGraphAsset),
+    //     menuName = "Puppeteer/[TEST] Animation Graph")]
     public class AnimationGraphAsset : ScriptableObject
     {
         public List<ParamInfo> Parameters => _parameters;
@@ -13,6 +13,7 @@ namespace GBG.AnimationGraph
         [SerializeField]
         private List<ParamInfo> _parameters = new List<ParamInfo>();
 
+        
         public string RootGraphGuid
         {
             get => _rootGraphGuid;
@@ -22,6 +23,7 @@ namespace GBG.AnimationGraph
         [SerializeField]
         private string _rootGraphGuid;
 
+        
         public List<GraphData.GraphData> Graphs => _graphs;
 
         [SerializeField]

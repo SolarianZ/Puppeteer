@@ -20,13 +20,7 @@ namespace GBG.AnimationGraph.Editor.Node
         public override void SetPosition(Rect newPos)
         {
             base.SetPosition(newPos);
-
             NodeData.EditorPosition = newPos.position;
-            EditorUtility.SetDirty(GraphAsset);
-
-            // User may moves many nodes, so don't raise data changed event,
-            // handle nodes move event in GraphView.graphViewChanged callback
-            // RaiseNodeDataChangedEvent();
         }
     }
 }

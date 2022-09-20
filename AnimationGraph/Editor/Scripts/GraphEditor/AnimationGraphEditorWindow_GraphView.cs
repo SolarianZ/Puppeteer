@@ -2,7 +2,10 @@
 using System.Linq;
 using GBG.AnimationGraph.Editor.GraphView;
 using GBG.AnimationGraph.GraphData;
+using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
+using UnityEngine.Assertions;
+using UnityEngine.UIElements;
 
 namespace GBG.AnimationGraph.Editor.GraphEditor
 {
@@ -24,10 +27,44 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
         {
             var graphViewToolbar = new Toolbar();
             _layoutContainer.MiddlePane.Add(graphViewToolbar);
+
             _graphViewBreadcrumbs = new ToolbarBreadcrumbs();
             graphViewToolbar.Add(_graphViewBreadcrumbs);
         }
 
+
+        private void OpenGraphView(string graphGuid, bool clearStack)
+        {
+            if (clearStack)
+            {
+                CloseGraphViews(null);
+            }
+
+            if (_openedGraphGuids.Contains(graphGuid))
+            {
+                CloseGraphViews(graphGuid);
+                return;
+            }
+
+            if (ActiveGraphView != null)
+            {
+                _layoutContainer.MiddlePane.Remove(ActiveGraphView);
+            }
+
+            var graphData = Graphs.Find(graph => graph.Guid.Equals(graphGuid));
+            GraphViewBase graphView = graphData.GraphType == GraphType.StateMachine
+                ? new StateMachineGraphView(_graphAsset, graphData)
+                : new MixerGraphView(_graphAsset, graphData);
+            graphView.OnGraphViewChanged += OnGraphViewContentChanged;
+            graphView.OnSelectionChanged += SetInspectTarget;
+            _layoutContainer.MiddlePane.Add(graphView);
+            _openedGraphViews.Push(graphView);
+            _openedGraphGuids.Add(graphData.Guid);
+            _graphViewBreadcrumbs.PushItem(graphData.Name, () => { CloseGraphViews(graphData.Guid); });
+            _graphListView.SetSelection(_graphAsset.Graphs.IndexOf(graphData));
+
+            SetInspectTarget(null);
+        }
 
         private void CloseGraphViews(string stopAtGuid)
         {
@@ -57,34 +94,6 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             }
         }
 
-        private void OpenGraphView(string graphGuid, bool clearStack)
-        {
-            if (clearStack)
-            {
-                CloseGraphViews(null);
-            }
-
-            if (_openedGraphGuids.Contains(graphGuid))
-            {
-                CloseGraphViews(graphGuid);
-                return;
-            }
-
-            if (ActiveGraphView != null)
-            {
-                _layoutContainer.MiddlePane.Remove(ActiveGraphView);
-            }
-
-            var graphData = Graphs.Find(graph => graph.Guid.Equals(graphGuid));
-            GraphViewBase graphView = graphData.GraphType == GraphType.StateMachine
-                ? new StateMachineGraphView(_graphAsset, graphData)
-                : new BlendGraphView(_graphAsset, graphData);
-            _layoutContainer.MiddlePane.Add(graphView);
-            _openedGraphViews.Push(graphView);
-            _openedGraphGuids.Add(graphData.Guid);
-            _graphViewBreadcrumbs.PushItem(graphData.Name, () => { CloseGraphViews(graphData.Guid); });
-        }
-
         private void RestoreGraphViews()
         {
             if (_openedGraphGuids.Count == 0)
@@ -99,19 +108,28 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             for (int i = 0; i < graphGuids.Length; i++)
             {
                 var graphGuid = graphGuids[i];
-                var graphData = Graphs.First(graph => graph.Guid.Equals(graphGuid));
-                GraphViewBase graphView = graphData.GraphType == GraphType.StateMachine
-                    ? new StateMachineGraphView(_graphAsset, graphData)
-                    : new BlendGraphView(_graphAsset, graphData);
-                _openedGraphViews.Push(graphView);
-                _openedGraphGuids.Add(graphData.Guid);
-                _graphViewBreadcrumbs.PushItem(graphData.Name, () => { CloseGraphViews(graphData.Guid); });
+                OpenGraphView(graphGuid, false);
+            }
+        }
 
-                if (i == graphGuids.Length - 1)
+        private void RefreshGraphViewBreadcrumbLabel(string graphGuid, string graphName)
+        {
+            Assert.AreEqual(_graphViewBreadcrumbs.childCount, _openedGraphGuids.Count);
+
+            for (int i = 0; i < _openedGraphGuids.Count; i++)
+            {
+                if (_openedGraphGuids[i].Equals(graphGuid))
                 {
-                    _layoutContainer.MiddlePane.Add(graphView);
+                    ((TextElement)_graphViewBreadcrumbs[i]).text = graphName;
+                    break;
                 }
             }
+        }
+
+
+        private void OnGraphViewContentChanged()
+        {
+            hasUnsavedChanges = true;
         }
     }
 }

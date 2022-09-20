@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using GBG.AnimationGraph.Editor.Node;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
@@ -40,9 +41,17 @@ namespace GBG.AnimationGraph.Editor.GraphView
             Insert(0, gridBackground);
 
             // Callbacks
-            graphViewChanged += OnGraphViewChanged;
             RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
         }
+
+        public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
+        {
+            if (selection.Count > 0 && !selection.Contains(RootNode))
+            {
+                base.BuildContextualMenu(evt);
+            }
+        }
+
 
         private void OnGeometryChanged(GeometryChangedEvent evt)
         {
@@ -51,21 +60,34 @@ namespace GBG.AnimationGraph.Editor.GraphView
         }
 
 
-        #region View Change Event
+        #region Graph View Change Events
 
-        public bool SuppressGraphViewChangedEvent { get; set; }
+        public event Action OnGraphViewChanged;
 
-        public event Action OnGraphChanged;
+        public event Action<IReadOnlyList<ISelectable>> OnSelectionChanged;
 
 
-        private GraphViewChange OnGraphViewChanged(GraphViewChange graphViewChange)
+        protected void RaiseGraphViewChangedEvent()
         {
-            if (!SuppressGraphViewChangedEvent)
-            {
-                OnGraphChanged?.Invoke();
-            }
+            OnGraphViewChanged?.Invoke();
+        }
 
-            return graphViewChange;
+        public override void AddToSelection(ISelectable selectable)
+        {
+            base.AddToSelection(selectable);
+            OnSelectionChanged?.Invoke(selection);
+        }
+
+        public override void RemoveFromSelection(ISelectable selectable)
+        {
+            base.RemoveFromSelection(selectable);
+            OnSelectionChanged?.Invoke(selection);
+        }
+
+        public override void ClearSelection()
+        {
+            base.ClearSelection();
+            OnSelectionChanged?.Invoke(selection);
         }
 
         #endregion

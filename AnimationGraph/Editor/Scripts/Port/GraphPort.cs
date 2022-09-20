@@ -5,6 +5,7 @@ using GBG.AnimationGraph.Editor.Node;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
 using UPort = UnityEditor.Experimental.GraphView.Port;
+using UEdge = UnityEditor.Experimental.GraphView.Edge;
 
 namespace GBG.AnimationGraph.Editor.Port
 {
@@ -24,32 +25,32 @@ namespace GBG.AnimationGraph.Editor.Port
             }
         }
 
-        public event Action<GraphPort> OnConnected;
+        public event Action<UEdge> OnConnected;
 
-        public event Action<GraphPort> OnDisconnected;
+        public event Action<UEdge> OnDisconnected;
 
 
         protected GraphPort(Direction portDirection, Type portType, Capacity portCapacity = Capacity.Single)
             : base(Orientation.Horizontal, portDirection, portCapacity, portType)
         {
-            this.AddOnConnectListener(OnPortConnected);
-            this.AddOnDisconnectListener(OnPortDisconnected);
         }
 
 
-        protected virtual void OnPortConnected(UPort otherPort)
+        public override void Connect(UEdge edge)
         {
-            OnConnected?.Invoke(otherPort as GraphPort);
+            base.Connect(edge);
+            OnConnected?.Invoke(edge);
         }
 
-        protected virtual void OnPortDisconnected(UPort otherPort)
+        public override void Disconnect(Edge edge)
         {
-            OnDisconnected?.Invoke(otherPort as GraphPort);
+            base.Disconnect(edge);
+            OnDisconnected?.Invoke(edge);
         }
 
 
         public static GraphPort Create<TEdge>(Direction direction, Type portType,
-            Capacity capacity = Capacity.Single) where TEdge : Edge, new()
+            Capacity capacity = Capacity.Single) where TEdge : UEdge, new()
         {
             var connectorListener = new EdgeConnectorListener();
             var port = new GraphPort(direction, portType, capacity)

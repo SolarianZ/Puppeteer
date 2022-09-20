@@ -14,26 +14,20 @@ namespace GBG.AnimationGraph.Editor.Node
         {
             title = "State Machine Entry";
 
+            // Capabilities
+            capabilities &= ~Capabilities.Movable;
+            capabilities &= ~Capabilities.Deletable;
+            capabilities &= ~Capabilities.Copiable;
+
+            // Destination state
             var outputPort = InstantiatePort(Direction.Output, typeof(bool));
             outputPort.portName = "Dest State";
             // outputPort.portColor = ColorTool.GetColor(typeof(bool));
-            outputPort.OnConnected += OnPortConnected;
-            outputPort.OnDisconnected += OnPortDisconnected;
             outputContainer.Add(outputPort);
 
             RefreshPorts();
             RefreshExpandedState();
         }
 
-
-        private void OnPortConnected(GraphPort otherPort)
-        {
-            DestStateNodeGuid = otherPort.OwnerNode.Guid;
-        }
-
-        private void OnPortDisconnected(GraphPort otherPort)
-        {
-            DestStateNodeGuid = null;
-        }
     }
 }

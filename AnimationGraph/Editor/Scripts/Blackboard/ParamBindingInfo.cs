@@ -31,9 +31,9 @@ namespace GBG.AnimationGraph.Editor.Blackboard
         }
 
 
-        public ParamBindingNameOrValue CreateParamBindingNameOrValue()
+        public ParamBindingGuidOrValue CreateParamBindingNameOrValue()
         {
-            return new ParamBindingNameOrValue(Name, BindToName, RawValue);
+            return new ParamBindingGuidOrValue(Name, BindToName, RawValue);
         }
 
 

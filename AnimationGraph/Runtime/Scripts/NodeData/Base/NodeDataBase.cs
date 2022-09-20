@@ -11,15 +11,7 @@ namespace GBG.AnimationGraph.NodeData
         [SerializeField]
         private string _guid;
 
-        public string Name
-        {
-            get => _name;
-            internal set => _name = value;
-        }
-
-        [SerializeField]
-        private string _name;
-
+        
 #if UNITY_EDITOR
         public Vector2 EditorPosition
         {

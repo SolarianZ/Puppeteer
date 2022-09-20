@@ -9,17 +9,12 @@ namespace GBG.AnimationGraph.GraphData
     {
         StateMachine = 0,
 
-        Blending = 1
+        Mixer = 1
     }
 
     [Serializable]
     public class GraphData
     {
-        public string Guid => _guid;
-
-        [SerializeField]
-        private string _guid;
-
         public string Name
         {
             get => _name;
@@ -28,6 +23,13 @@ namespace GBG.AnimationGraph.GraphData
 
         [SerializeField]
         private string _name;
+
+
+        public string Guid => _guid;
+
+        [SerializeField]
+        private string _guid;
+
 
         public GraphType GraphType
         {
@@ -38,10 +40,22 @@ namespace GBG.AnimationGraph.GraphData
         [SerializeField]
         private GraphType _graphType = GraphType.StateMachine;
 
+
+        public string RootNodeGuid
+        {
+            get => _rootNodeGuid;
+            internal set => _rootNodeGuid = value;
+        }
+
+        [SerializeField]
+        private string _rootNodeGuid;
+
+
         public List<NodeDataBase> Nodes => _nodes;
 
         [SerializeReference]
         private List<NodeDataBase> _nodes = new List<NodeDataBase>();
+
 
         // TODO: Transition[]
 

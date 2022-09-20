@@ -1,7 +1,9 @@
-﻿using GBG.AnimationGraph.Editor.Port;
+﻿using GBG.AnimationGraph.Editor.GraphEdge;
+using GBG.AnimationGraph.Editor.Port;
 using GBG.AnimationGraph.Editor.Utility;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.Playables;
+using UEdge = UnityEditor.Experimental.GraphView.Edge;
 
 namespace GBG.AnimationGraph.Editor.Node
 {
@@ -9,33 +11,50 @@ namespace GBG.AnimationGraph.Editor.Node
     {
         public override string Guid => "PoseOutputNode";
 
-        public string InputPlayableNodeGuid { get; private set; }
+        public GraphPort PoseInputPort { get; }
+
+        public string RootPlayableNodeGuid => _graphData.RootNodeGuid;
+
+        private readonly GraphData.GraphData _graphData;
 
 
-        public PoseOutputNode(AnimationGraphAsset graphAsset) : base(graphAsset)
+        public PoseOutputNode(AnimationGraphAsset graphAsset, GraphData.GraphData graphData) : base(graphAsset)
         {
+            _graphData = graphData;
+
             title = "Pose Output";
 
-            var inputPort = InstantiatePort(Direction.Input, typeof(Playable));
-            inputPort.portName = "Input Pose";
-            inputPort.portColor = ColorTool.GetColor(typeof(Playable));
-            inputPort.OnConnected += OnPortConnected;
-            inputPort.OnDisconnected += OnPortDisconnected;
-            inputContainer.Add(inputPort);
+            // Capabilities
+            capabilities &= ~Capabilities.Movable;
+            capabilities &= ~Capabilities.Deletable;
+            capabilities &= ~Capabilities.Copiable;
+
+            // Input port
+            PoseInputPort = InstantiatePort(Direction.Input, typeof(Playable));
+            PoseInputPort.portName = "Input Pose";
+            PoseInputPort.portColor = ColorTool.GetColor(typeof(Playable));
+            PoseInputPort.OnConnected += OnPortConnected;
+            PoseInputPort.OnDisconnected += OnPortDisconnected;
+            inputContainer.Add(PoseInputPort);
 
             RefreshPorts();
             RefreshExpandedState();
         }
 
 
-        private void OnPortConnected(GraphPort otherPort)
+        protected override void OnPortConnected(UEdge edge)
         {
-            InputPlayableNodeGuid = otherPort.OwnerNode.Guid;
+            var graphEdge = (FlowingGraphEdge)edge;
+            _graphData.RootNodeGuid = graphEdge.OutputPort.OwnerNode.Guid;
+
+            base.OnPortConnected(edge);
         }
 
-        private void OnPortDisconnected(GraphPort otherPort)
+        protected override void OnPortDisconnected(UEdge edge)
         {
-            InputPlayableNodeGuid = null;
+            _graphData.RootNodeGuid = null;
+
+            base.OnPortDisconnected(edge);
         }
     }
 }

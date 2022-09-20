@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using GBG.AnimationGraph.Editor.Utility;
 using GBG.AnimationGraph.Editor.ViewElement;
 using GBG.AnimationGraph.GraphData;
@@ -13,9 +14,6 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
     {
         #region Global
 
-        private static readonly List<AnimationGraphEditorWindow> _openedWindows
-            = new List<AnimationGraphEditorWindow>();
-
         private static AnimationGraphEditorWindow _focusedWindow;
 
         [OnOpenAsset]
@@ -24,7 +22,9 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             var asset = EditorUtility.InstanceIDToObject(instanceId);
             if (asset is AnimationGraphAsset animGraphAsset)
             {
-                var editor = _openedWindows.Find(window => window._graphAsset == animGraphAsset);
+                var editor = Resources.FindObjectsOfTypeAll<AnimationGraphEditorWindow>()
+                    .FirstOrDefault(window => window._graphAsset == animGraphAsset);
+                // var editor = windows.Find();
                 if (!editor)
                 {
                     editor = CreateInstance<AnimationGraphEditorWindow>();
@@ -110,8 +110,6 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
 
         private void OnEnable()
         {
-            _openedWindows.Add(this);
-
             // Toolbar
             CreateToolbar();
 
@@ -130,8 +128,6 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
 
         private void OnDisable()
         {
-            _openedWindows.Remove(this);
-
             DestroyImmediate(_graphAssetSnapshot);
         }
 

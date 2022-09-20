@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using GBG.AnimationGraph.Editor.Blackboard;
 using GBG.AnimationGraph.Editor.Utility;
 using GBG.AnimationGraph.Editor.ViewElement;
@@ -54,7 +55,7 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
                 fixedItemHeight = 24,
                 makeItem = MakeParamListItem,
                 bindItem = BindParamListItem,
-                selectionType = SelectionType.None,
+                selectionType = SelectionType.Single,
             };
             _paramListView.itemIndexChanged += OnParamIndexChanged;
             blackboardSplitter.UpPane.Add(_paramListView);
@@ -105,7 +106,8 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
         private VisualElement MakeParamListItem()
         {
             var paramField = new ParamField();
-            paramField.OnParamChanged += OnParamChanged;
+            paramField.OnParamValueChanged += OnParamValueChanged;
+            paramField.OnWantsToRenameParam += OnWantsToRenameParam;
 
             return paramField;
         }
@@ -122,9 +124,25 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             hasUnsavedChanges = true;
         }
 
-        private void OnParamChanged(ParamInfo _)
+        private void OnParamValueChanged(ParamInfo _)
         {
             hasUnsavedChanges = true;
+        }
+
+        private void OnWantsToRenameParam(ParamInfo paramInfo)
+        {
+            var conflictingNames = from param in _graphAsset.Parameters
+                where !param.Name.Equals(paramInfo.Name)
+                select param.Name;
+            RenameWindow.Open(paramInfo.Name, conflictingNames, (oldName, newName) =>
+            {
+                if (oldName.Equals(newName)) return;
+                paramInfo.EditorSetName(newName);
+
+                _paramListView.RefreshItems();
+
+                hasUnsavedChanges = true;
+            });
         }
 
         #endregion
@@ -170,11 +188,11 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
         private void OnAddGraphButtonClicked(EventBase evt)
         {
             var menu = new GenericDropdownMenu();
-            menu.AddItem("Blend Graph", false, () =>
+            menu.AddItem("Mixer Graph", false, () =>
             {
                 Graphs.Add(new GraphData.GraphData(GuidTool.NewGuid(),
                     $"BlendGraph_{GuidTool.NewUniqueSuffix()}",
-                    GraphType.Blending));
+                    GraphType.Mixer));
                 _graphListView.RefreshItems();
                 hasUnsavedChanges = true;
             });
@@ -208,7 +226,8 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
         private VisualElement MakeGraphListItem()
         {
             var graphField = new GraphField();
-            graphField.OnGraphChanged += OnGraphChanged;
+            graphField.OnWantsToRenameGraph += OnWantsToRenameGraph;
+            graphField.OnWantsToOpenGraph += OnWantsToOpenGraph;
 
             return graphField;
         }
@@ -227,9 +246,27 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             hasUnsavedChanges = true;
         }
 
-        private void OnGraphChanged(GraphData.GraphData _)
+        private void OnWantsToRenameGraph(GraphData.GraphData graphData)
         {
-            hasUnsavedChanges = true;
+            var conflictingNames = from graph in _graphAsset.Graphs
+                where !graph.Name.Equals(graphData.Name)
+                select graph.Name;
+            RenameWindow.Open(graphData.Name, conflictingNames, (oldName, newName) =>
+            {
+                if (oldName.Equals(newName)) return;
+                graphData.Name = newName;
+
+                _graphListView.RefreshItems();
+
+                RefreshGraphViewBreadcrumbLabel(graphData.Guid, graphData.Name);
+
+                hasUnsavedChanges = true;
+            });
+        }
+
+        private void OnWantsToOpenGraph(GraphData.GraphData graphData)
+        {
+            OpenGraphView(graphData.Guid, true);
         }
 
         #endregion
