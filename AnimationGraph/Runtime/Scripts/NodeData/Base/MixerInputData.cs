@@ -24,6 +24,6 @@ namespace GBG.AnimationGraph.NodeData
         }
 
         [SerializeField]
-        private ParamGuidOrValue _inputWeightParam;
+        private ParamGuidOrValue _inputWeightParam = new ParamGuidOrValue(null, 0);
     }
 }

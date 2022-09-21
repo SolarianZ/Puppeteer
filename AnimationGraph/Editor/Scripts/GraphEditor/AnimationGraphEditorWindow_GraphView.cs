@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using GBG.AnimationGraph.Editor.GraphView;
 using GBG.AnimationGraph.GraphData;
-using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
 using UnityEngine.Assertions;
 using UnityEngine.UIElements;
@@ -61,6 +59,7 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             _openedGraphViews.Push(graphView);
             _openedGraphGuids.Add(graphData.Guid);
             _graphViewBreadcrumbs.PushItem(graphData.Name, () => { CloseGraphViews(graphData.Guid); });
+            _graphViewBreadcrumbs[_graphViewBreadcrumbs.childCount - 1].style.overflow = Overflow.Hidden;
             _graphListView.SetSelection(_graphAsset.Graphs.IndexOf(graphData));
 
             SetInspectTarget(null);

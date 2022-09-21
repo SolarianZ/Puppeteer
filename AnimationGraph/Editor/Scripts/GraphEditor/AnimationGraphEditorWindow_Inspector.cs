@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using GBG.AnimationGraph.Editor.Inspector;
 using GBG.AnimationGraph.Editor.Node;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;

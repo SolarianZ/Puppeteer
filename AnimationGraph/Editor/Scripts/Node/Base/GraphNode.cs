@@ -1,8 +1,10 @@
 ﻿using System;
 using GBG.AnimationGraph.Editor.GraphEdge;
+using GBG.AnimationGraph.Editor.Inspector;
 using GBG.AnimationGraph.Editor.Port;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
+using UGraphView = UnityEditor.Experimental.GraphView.GraphView;
 using UNode = UnityEditor.Experimental.GraphView.Node;
 using UEdge = UnityEditor.Experimental.GraphView.Edge;
 using UPort = UnityEditor.Experimental.GraphView.Port;
@@ -25,6 +27,21 @@ namespace GBG.AnimationGraph.Editor.Node
 
         public event Action OnNodeChanged;
 
+        public UGraphView GraphView
+        {
+            get
+            {
+                if (_graphView == null)
+                {
+                    _graphView = GetFirstAncestorOfType<UGraphView>();
+                }
+
+                return _graphView;
+            }
+        }
+
+        private UGraphView _graphView;
+
 
         protected GraphNode(AnimationGraphAsset graphAsset)
         {
@@ -46,17 +63,16 @@ namespace GBG.AnimationGraph.Editor.Node
         public override UPort InstantiatePort(Orientation orientation,
             Direction direction, UPort.Capacity capacity, Type type)
         {
-            var port = GraphPort.Create<FlowingGraphEdge>(direction, type, capacity);
+            var port = GraphPort.Create<FlowingGraphEdge>(direction, type);
             port.OnConnected += OnPortConnected;
             port.OnDisconnected += OnPortDisconnected;
 
             return port;
         }
 
-        protected GraphPort InstantiatePort(Direction direction, Type type,
-            UPort.Capacity capacity = UPort.Capacity.Single)
+        protected GraphPort InstantiatePort(Direction direction, Type type)
         {
-            return (GraphPort)InstantiatePort(Orientation.Horizontal, direction, capacity, type);
+            return (GraphPort)InstantiatePort(Orientation.Horizontal, direction, UPort.Capacity.Single, type);
         }
 
         protected virtual void OnPortConnected(UEdge edge)

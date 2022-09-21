@@ -1,7 +1,8 @@
 ﻿using System;
+using GBG.AnimationGraph.Editor.Node;
 using UnityEngine.UIElements;
 
-namespace GBG.AnimationGraph.Editor.Node
+namespace GBG.AnimationGraph.Editor.Inspector
 {
     public class GraphNodeInspector : VisualElement
     {

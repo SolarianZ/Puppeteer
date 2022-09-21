@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using GBG.AnimationGraph.Editor.GraphEdge;
 using GBG.AnimationGraph.Editor.Node;
 using UnityEditor.Experimental.GraphView;
@@ -13,25 +12,25 @@ namespace GBG.AnimationGraph.Editor.Port
     {
         public GraphNode OwnerNode => (GraphNode)node;
 
-        public GraphNode ConnectedNode
-        {
-            get
-            {
-                if (!connected) return null;
-
-                return (GraphNode)(direction == Direction.Input
-                    ? connections.First().output.node
-                    : connections.First().input.node);
-            }
-        }
+        // public GraphNode ConnectedNode
+        // {
+        //     get
+        //     {
+        //         if (!connected) return null;
+        //
+        //         return (GraphNode)(direction == Direction.Input
+        //             ? connections.First().output.node
+        //             : connections.First().input.node);
+        //     }
+        // }
 
         public event Action<UEdge> OnConnected;
 
         public event Action<UEdge> OnDisconnected;
 
 
-        protected GraphPort(Direction portDirection, Type portType, Capacity portCapacity = Capacity.Single)
-            : base(Orientation.Horizontal, portDirection, portCapacity, portType)
+        protected GraphPort(Direction portDirection, Type portType)
+            : base(Orientation.Horizontal, portDirection, Capacity.Single, portType)
         {
         }
 
@@ -49,11 +48,11 @@ namespace GBG.AnimationGraph.Editor.Port
         }
 
 
-        public static GraphPort Create<TEdge>(Direction direction, Type portType,
-            Capacity capacity = Capacity.Single) where TEdge : UEdge, new()
+        public static GraphPort Create<TEdge>(Direction direction, Type portType)
+            where TEdge : UEdge, new()
         {
             var connectorListener = new EdgeConnectorListener();
-            var port = new GraphPort(direction, portType, capacity)
+            var port = new GraphPort(direction, portType)
             {
                 m_EdgeConnector = new EdgeConnector<TEdge>(connectorListener),
             };

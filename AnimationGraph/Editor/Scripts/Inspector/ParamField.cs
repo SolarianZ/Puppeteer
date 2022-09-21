@@ -49,6 +49,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
         {
             // Styles
             style.flexDirection = FlexDirection.Row;
+            style.flexShrink = 0;
             style.marginLeft = 3;
             style.marginRight = 3;
 
@@ -59,6 +60,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
                 {
                     width = nameLabelWidth,
                     marginRight = 2,
+                    overflow = Overflow.Hidden,
                     unityTextAlign = TextAnchor.MiddleLeft,
                 }
             };
@@ -181,6 +183,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
                             ? new Slider(_valueRange.Value.x, _valueRange.Value.y)
                             {
                                 value = floatValue,
+                                showInputField = true,
                             }
                             : _floatField = new FloatField
                             {
@@ -202,6 +205,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
                             ? new SliderInt((int)_valueRange.Value.x, (int)_valueRange.Value.y)
                             {
                                 value = intValue,
+                                showInputField = true,
                             }
                             : _intField = new IntegerField
                             {

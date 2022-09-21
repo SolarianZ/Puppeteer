@@ -9,7 +9,7 @@ namespace GBG.Puppeteer.Editor.BlendSpace
 {
     public class BlendSpace2DPreviewWindow : EditorWindow
     {
-        [MenuItem("Puppeteer/Test/BlendSpace2D Previewer Test")]
+        [MenuItem("Window/Puppeteer/Tests/BlendSpace2D Previewer")]
         private static void TestOpen()
         {
             var vertices = new Vector2[] // Test

@@ -1,7 +1,7 @@
-﻿using GBG.AnimationGraph.Editor.Inspector;
+﻿using GBG.AnimationGraph.Editor.Node;
 using GBG.AnimationGraph.Parameter;
 
-namespace GBG.AnimationGraph.Editor.Node
+namespace GBG.AnimationGraph.Editor.Inspector
 {
     public class PlayableNodeInspector : GraphNodeInspector
     {

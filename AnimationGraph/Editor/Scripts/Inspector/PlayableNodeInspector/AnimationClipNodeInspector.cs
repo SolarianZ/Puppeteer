@@ -1,11 +1,11 @@
-﻿using GBG.AnimationGraph.Editor.Inspector;
+﻿using GBG.AnimationGraph.Editor.Node;
 using GBG.AnimationGraph.NodeData;
 using GBG.AnimationGraph.Parameter;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace GBG.AnimationGraph.Editor.Node
+namespace GBG.AnimationGraph.Editor.Inspector
 {
     public class AnimationClipNodeInspector : PlayableNodeInspector
     {

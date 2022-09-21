@@ -25,11 +25,11 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
                 _isEnableFlow = value;
                 if (_isEnableFlow)
                 {
-                    Add(_flowImg);
+                    Add(FlowImage);
                 }
                 else
                 {
-                    Remove(_flowImg);
+                    Remove(FlowImage);
                 }
             }
         }
@@ -42,8 +42,8 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
             set
             {
                 _flowSize = value;
-                _flowImg.style.width = new Length(_flowSize, LengthUnit.Pixel);
-                _flowImg.style.height = new Length(_flowSize, LengthUnit.Pixel);
+                FlowImage.style.width = new Length(_flowSize, LengthUnit.Pixel);
+                FlowImage.style.height = new Length(_flowSize, LengthUnit.Pixel);
             }
         }
 
@@ -51,12 +51,12 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
 
         public float FlowSpeed { get; set; } = 150f;
 
-        private readonly Image _flowImg;
+        protected Image FlowImage { get; }
 
 
         public FlowingGraphEdge()
         {
-            _flowImg = new Image
+            FlowImage = new Image
             {
                 name = "flow-image",
                 style =
@@ -115,14 +115,17 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
             var flowStartPoint = edgeControl.controlPoints[_flowPhaseIndex];
             var flowEndPoint = edgeControl.controlPoints[_flowPhaseIndex + 1];
             var flowPos = Vector2.Lerp(flowStartPoint, flowEndPoint, (float)posProgress);
-            _flowImg.transform.position = flowPos - Vector2.one * FlowSize / 2;
+            FlowImage.transform.position = flowPos - Vector2.one * FlowSize / 2;
 
+            // TODO: Direction
+            
+            
             // Color
             var colorProgress = (_passedEdgeLength + _currentPhaseLength * posProgress) / _totalEdgeLength;
             var startColor = edgeControl.outputColor;
             var endColor = edgeControl.inputColor;
             var flowColor = Color.Lerp(startColor, endColor, (float)colorProgress);
-            _flowImg.style.backgroundColor = flowColor;
+            FlowImage.style.backgroundColor = flowColor;
 
             // Enter next phase
             if (posProgress >= 0.99999f)

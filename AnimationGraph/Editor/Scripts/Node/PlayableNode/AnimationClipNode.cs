@@ -1,4 +1,5 @@
-﻿using GBG.AnimationGraph.NodeData;
+﻿using GBG.AnimationGraph.Editor.Inspector;
+using GBG.AnimationGraph.NodeData;
 
 namespace GBG.AnimationGraph.Editor.Node
 {

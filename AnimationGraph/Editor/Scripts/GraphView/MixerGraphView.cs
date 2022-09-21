@@ -95,13 +95,17 @@ namespace GBG.AnimationGraph.Editor.GraphView
 
         private void ConnectNodeChildren(PlayableNode parentNode, Dictionary<string, PlayableNode> nodeTable)
         {
-            // TODO
-            return;
             Assert.AreEqual(parentNode.NodeData.MixerInputs.Count, parentNode.InputPorts.Count);
 
             for (var i = 0; i < parentNode.InputPorts.Count; i++)
             {
                 var inputPort = parentNode.InputPorts[i];
+                var childNodeGuid = parentNode.NodeData.MixerInputs[i].InputNodeGuid;
+                if (string.IsNullOrEmpty(childNodeGuid))
+                {
+                    continue;
+                }
+
                 var childNode = nodeTable[parentNode.NodeData.MixerInputs[i].InputNodeGuid];
                 var edge = inputPort.ConnectTo<FlowingGraphEdge>(childNode.OutputPort);
                 AddElement(edge);
