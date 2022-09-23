@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using GBG.AnimationGraph.Editor.Port;
+using GBG.AnimationGraph.Editor.GraphEdge;
 using GBG.AnimationGraph.NodeData;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -10,15 +10,15 @@ namespace GBG.AnimationGraph.Editor.Node
 {
     public class StateNode : GraphNode
     {
-        private const float _CONNECTION_HANDLER_WIDTH = 8;
-
-
         public override string Guid => NodeData.Guid;
 
-        // internal
-        public List<StateTransitionPortPair> Transitions { get; } = new List<StateTransitionPortPair>();
-
         internal StateNodeData NodeData { get; }
+
+        internal List<StateTransitionEdge> OutputTransitions { get; } = new List<StateTransitionEdge>();
+
+        private readonly List<StateTransitionEdge> _inputTransitions = new List<StateTransitionEdge>();
+
+        private const float _CONNECTION_HANDLER_WIDTH = 8;
 
 
         public StateNode(AnimationGraphAsset graphAsset, StateNodeData nodeData) : base(graphAsset)
@@ -32,24 +32,35 @@ namespace GBG.AnimationGraph.Editor.Node
             mainContainer.style.borderBottomWidth = _CONNECTION_HANDLER_WIDTH;
             mainContainer.style.borderLeftWidth = _CONNECTION_HANDLER_WIDTH;
             mainContainer.style.borderRightWidth = _CONNECTION_HANDLER_WIDTH;
-
-            // Transitions
-            // InputPort = (StateTransitionPort)InstantiatePort(Orientation.Horizontal, Direction.Input,
-            //     UPort.Capacity.Multi, typeof(Playable));
-            // InputPort.portName = null;
-            // InputPort.portColor = ColorTool.GetColor(typeof(Playable));
-            // InputPort.AddToClassList(STATE_INPUT_PORT_CLASS_NAME);
-            // InputPort.StretchToParentSize();
-            // mainContainer.Insert(0, InputPort);
+            var titleLabel = titleContainer.Q<Label>(name: "title-label");
+            titleLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
 
             SetPosition(new Rect(NodeData.EditorPosition, Vector2.zero));
             RefreshPorts();
             RefreshExpandedState();
 
-            // Events
-            // mainContainer.AddManipulator(OutputPort.edgeConnector);
+            // Callbacks
+            mainContainer.AddManipulator(new StateTransitionEdgeConnector());
         }
 
+
+        protected override void ExecuteDefaultActionAtTarget(EventBase evt)
+        {
+            base.ExecuteDefaultActionAtTarget(evt);
+
+            if (evt is GeometryChangedEvent)
+            {
+                foreach (var edge in OutputTransitions)
+                {
+                    edge.UpdateEdgeControl();
+                }
+
+                foreach (var edge in _inputTransitions)
+                {
+                    edge.UpdateEdgeControl();
+                }
+            }
+        }
 
         public sealed override void SetPosition(Rect newPos)
         {
@@ -57,25 +68,63 @@ namespace GBG.AnimationGraph.Editor.Node
             NodeData.EditorPosition = newPos.position;
         }
 
-        public StateTransitionPortPair GetOrCreatePortPair(StateNode destNode)
+        public StateTransitionEdge AddTransition(StateNode destNode, StateTransitionEdge newEdge = null)
         {
-            StateTransitionPortPair pair;
-            if (destNode == null)
+            var edge = OutputTransitions.FirstOrDefault(e => e.IsConnection(this, destNode));
+
+            // Transition already exists
+            if (edge != null)
             {
-                pair = Transitions.FirstOrDefault(p => p.ConnectedNode == null);
+                return edge;
+            }
+
+            // Reversed transition already exists
+            edge = destNode.OutputTransitions.FirstOrDefault(e => e.IsConnection(this, destNode));
+            if (edge != null)
+            {
+                OutputTransitions.Add(edge);
+                destNode._inputTransitions.Add(edge);
+                return edge;
+            }
+
+            // New transition
+            if (newEdge != null)
+            {
+                newEdge.SetConnection(0, this);
+                newEdge.SetConnection(1, destNode);
+                edge = newEdge;
             }
             else
             {
-                pair = Transitions.FirstOrDefault(p => p.ConnectedNode == destNode);
+                edge = new StateTransitionEdge(this, destNode);
             }
 
-            if (pair == null)
+            OutputTransitions.Add(edge);
+            destNode._inputTransitions.Add(edge);
+
+            return edge;
+        }
+
+        public StateTransitionEdge RemoveTransition(StateNode destNode)
+        {
+            StateTransitionEdge removedEdge = null;
+            for (int i = 0; i < OutputTransitions.Count; i++)
             {
-                pair = new StateTransitionPortPair(this);
-                Transitions.Add(pair);
+                var edge = OutputTransitions[i];
+                if (edge.IsConnection(this, destNode))
+                {
+                    OutputTransitions.RemoveAt(i);
+                    removedEdge = edge;
+                    break;
+                }
             }
 
-            return pair;
+            if (removedEdge != null)
+            {
+                destNode._inputTransitions.Remove(removedEdge);
+            }
+
+            return removedEdge;
         }
     }
 }
