@@ -9,7 +9,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
 {
     public class AnimationClipNodeInspector : PlayableNodeInspector
     {
-        private AnimationClipNodeData NodeData => (AnimationClipNodeData)TargetNode.NodeData;
+        private AnimationClipNodeData NodeData => (AnimationClipNodeData)Target.NodeData;
 
         private readonly ObjectField _clipField;
 
@@ -64,13 +64,13 @@ namespace GBG.AnimationGraph.Editor.Inspector
             Add(_playableIKField);
         }
 
-        public override void SetTargetNode(GraphNode node)
+        public override void SetTarget(GraphNode node)
         {
-            base.SetTargetNode(node);
+            base.SetTarget(node);
 
             // Motion Time
             _motionTimeParamField.SetParamTarget("Motion Time", NodeData.MotionTimeParam, ParamType.Float,
-                TargetNode.GraphAsset.Parameters, true, NodeData.MotionTimeParamActive, null);
+                Target.GraphAsset.Parameters, true, NodeData.MotionTimeParamActive, null);
 
             // Cycle Offset
             // _cycleOffsetParamField.SetParamTarget("Cycle Offset", ClipNodeData.CycleOffsetParam, ParamType.Float,

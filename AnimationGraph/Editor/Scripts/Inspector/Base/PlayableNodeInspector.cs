@@ -3,13 +3,13 @@ using GBG.AnimationGraph.Parameter;
 
 namespace GBG.AnimationGraph.Editor.Inspector
 {
-    public class PlayableNodeInspector : GraphNodeInspector
+    public class PlayableNodeInspector : GraphElementInspector<GraphNode>
     {
-        protected new PlayableNode TargetNode => (PlayableNode)base.TargetNode;
+        protected new PlayableNode Target => (PlayableNode)base.Target;
 
         protected ParamField SpeedParamField { get; }
 
-        
+
         protected PlayableNodeInspector()
         {
             // Speed
@@ -19,14 +19,14 @@ namespace GBG.AnimationGraph.Editor.Inspector
             Add(SpeedParamField);
         }
 
-        
-        public override void SetTargetNode(GraphNode node)
+
+        public override void SetTarget(GraphNode target)
         {
-            base.SetTargetNode(node);
+            base.SetTarget(target);
 
             // Speed
-            SpeedParamField.SetParamTarget("Speed", TargetNode.NodeData.SpeedParam, ParamType.Float,
-                TargetNode.GraphAsset.Parameters, true, TargetNode.NodeData.SpeedParamActive, null);
+            SpeedParamField.SetParamTarget("Speed", Target.NodeData.SpeedParam, ParamType.Float,
+                Target.GraphAsset.Parameters, true, Target.NodeData.SpeedParamActive, null);
         }
 
 
@@ -37,7 +37,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
 
         private void OnSpeedActiveChanged(bool isActive)
         {
-            TargetNode.NodeData.SpeedParamActive = isActive;
+            Target.NodeData.SpeedParamActive = isActive;
             RaiseParamChangedEvent();
         }
     }

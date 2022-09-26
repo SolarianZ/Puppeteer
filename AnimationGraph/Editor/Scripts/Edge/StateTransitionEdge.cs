@@ -1,13 +1,22 @@
 ﻿using System;
+using GBG.AnimationGraph.Editor.GraphView;
+using GBG.AnimationGraph.Editor.Inspector;
 using GBG.AnimationGraph.Editor.Node;
+using GBG.AnimationGraph.NodeData;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace GBG.AnimationGraph.Editor.GraphEdge
 {
-    public sealed class StateTransitionEdge : GraphElement
+    public sealed class StateTransitionEdge : GraphElement, IInspectable<StateTransitionEdge>
     {
+        public string Guid => null;
+
+        public bool IsEntryEdge { get; internal set; }
+
+        internal AnimationGraphAsset GraphAsset { get; }
+
         public int ConnectionCount
         {
             get
@@ -23,8 +32,6 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
 
         public StateNode ConnectedNode1 { get; internal set; }
 
-        // TODO: Transition data
-
         public StateTransitionEdgeControl EdgeControl { get; }
 
 
@@ -37,8 +44,9 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
         private static readonly Color _edgeSelectedColor = new Color(68 / 255f, 192 / 255f, 255 / 255f);
 
 
-        public StateTransitionEdge(StateNode node0, StateNode node1)
+        public StateTransitionEdge(AnimationGraphAsset graphAsset, StateNode node0, StateNode node1)
         {
+            GraphAsset = graphAsset;
             ConnectedNode0 = node0;
             ConnectedNode1 = node1;
             _dragPoint = ConnectedNode0.worldBound.center;
@@ -82,22 +90,16 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
             return EdgeControl.Overlaps(this.ChangeCoordinatesTo(EdgeControl, rectangle));
         }
 
-        // TODO: Start inspecting transition
         public override void OnSelected()
         {
             EdgeControl.EdgeColor = _edgeSelectedColor;
             UpdateEdgeControl();
-
-            Debug.LogError("TODO: Edge OnSelected");
         }
 
-        // TODO: Stop inspecting transition
         public override void OnUnselected()
         {
             EdgeControl.EdgeColor = _edgeNormalColor;
             UpdateEdgeControl();
-
-            Debug.LogError("TODO: Edge OnUnselected");
         }
 
         public void Drag(Vector2 mousePosition)
@@ -133,6 +135,24 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
         public bool IsConnection(StateNode a, StateNode b)
         {
             return (ConnectedNode0 == a && ConnectedNode1 == b) || (ConnectedNode0 == b && ConnectedNode1 == a);
+        }
+
+        public bool TryGetConnectedNode(StateNode node, out StateNode connectedNode)
+        {
+            if (node == ConnectedNode0)
+            {
+                connectedNode = ConnectedNode1;
+            }
+            else if (node == ConnectedNode1)
+            {
+                connectedNode = ConnectedNode0;
+            }
+            else
+            {
+                connectedNode = null;
+            }
+
+            return connectedNode != null;
         }
 
         public void UpdateEdgeControl()
@@ -173,5 +193,41 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
         {
             Debug.LogError("TODO: Edge BuildContextualMenu");
         }
+
+
+        #region Inspector
+
+        public IInspector<StateTransitionEdge> GetInspector()
+        {
+            var inspector = new StateTransitionEdgeInspector(GraphAsset.Parameters,
+                AddConditionElement, RemoveConditionElement, DeleteTransition);
+            inspector.SetTarget(this);
+
+            return inspector;
+        }
+
+
+        private void AddConditionElement(int index)
+        {
+            // TODO: AddConditionElement
+            Debug.LogError("TODO: AddConditionElement");
+        }
+
+        private void RemoveConditionElement(int index)
+        {
+            // TODO: RemoveConditionElement
+            Debug.LogError("TODO: RemoveConditionElement");
+        }
+
+        private void DeleteTransition(StateNode fromNode, StateNode destNode)
+        {
+            var edge = fromNode.RemoveTransition(destNode);
+            if (!edge.IsConnection(fromNode, destNode))
+            {
+                GetFirstAncestorOfType<StateMachineGraphView>().RemoveElement(edge);
+            }
+        }
+
+        #endregion
     }
 }

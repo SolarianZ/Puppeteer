@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using GBG.AnimationGraph.Editor.GraphEdge;
 using GBG.AnimationGraph.Editor.Inspector;
 using GBG.AnimationGraph.Editor.Node;
 using UnityEditor.Experimental.GraphView;
@@ -9,7 +10,7 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
 {
     public partial class AnimationGraphEditorWindow
     {
-        private GraphNodeInspector _graphNodeInspector;
+        private IInspector _inspector;
 
 
         private void CreateInspectorPanel()
@@ -22,33 +23,40 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
 
         private void SetInspectTarget(IReadOnlyList<ISelectable> selection)
         {
-            GraphNodeInspector newInspector = null;
-            if (selection != null && selection.Count == 1 && selection[0] is GraphNode graphNode)
+            IInspector newInspector = null;
+            if (selection != null && selection.Count == 1)
             {
-                newInspector = graphNode.GetInspector();
+                if (selection[0] is GraphNode graphNode)
+                {
+                    newInspector = graphNode.GetInspector();
+                }
+                else if (selection[0] is StateTransitionEdge transitionEdge)
+                {
+                    newInspector = transitionEdge.GetInspector();
+                }
             }
 
-            if (newInspector == _graphNodeInspector)
+            if (newInspector == _inspector)
             {
                 return;
             }
 
-            if (_graphNodeInspector != null)
+            if (_inspector != null)
             {
-                _layoutContainer.RightPane.Remove(_graphNodeInspector);
-                _graphNodeInspector.OnParamChanged -= OnNodeParamChanged;
-                _graphNodeInspector = null;
+                _layoutContainer.RightPane.Remove((VisualElement)_inspector);
+                _inspector.OnParamChanged -= OnParamChanged;
+                _inspector = null;
             }
 
             if (newInspector != null)
             {
-                _graphNodeInspector = newInspector;
-                _graphNodeInspector.OnParamChanged += OnNodeParamChanged;
-                _layoutContainer.RightPane.Add(_graphNodeInspector);
+                _inspector = newInspector;
+                _inspector.OnParamChanged += OnParamChanged;
+                _layoutContainer.RightPane.Add((VisualElement)_inspector);
             }
         }
 
-        private void OnNodeParamChanged()
+        private void OnParamChanged()
         {
             hasUnsavedChanges = true;
         }

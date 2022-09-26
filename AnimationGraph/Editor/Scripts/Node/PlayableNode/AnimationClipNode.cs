@@ -14,10 +14,10 @@ namespace GBG.AnimationGraph.Editor.Node
             RefreshExpandedState();
         }
 
-        public override GraphNodeInspector GetInspector()
+        public override IInspector<GraphNode> GetInspector()
         {
             var inspector = new AnimationClipNodeInspector();
-            inspector.SetTargetNode(this);
+            inspector.SetTarget(this);
 
             return inspector;
         }

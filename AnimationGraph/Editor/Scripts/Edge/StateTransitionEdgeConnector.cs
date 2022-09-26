@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using GBG.AnimationGraph.Editor.GraphView;
+﻿using GBG.AnimationGraph.Editor.GraphView;
 using GBG.AnimationGraph.Editor.Node;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -8,15 +7,20 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
 {
     public class StateTransitionEdgeConnector : MouseManipulator
     {
+        private readonly AnimationGraphAsset _graphAsset;
+
         private bool _active;
 
-        private StateTransitionEdge _edgeCandidate;
+        private StateNode _fromNode;
+
+        private StateTransitionEdge _dragEdge;
 
         private StateMachineGraphView _graphView;
 
 
-        public StateTransitionEdgeConnector()
+        public StateTransitionEdgeConnector(AnimationGraphAsset graphAsset)
         {
+            _graphAsset = graphAsset;
             activators.Add(new ManipulatorActivationFilter { button = MouseButton.LeftMouse });
         }
 
@@ -62,19 +66,19 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
                 }
             }
 
-            var node0 = target as StateNode;
-            if (node0 == null)
+            _fromNode = target as StateNode;
+            if (_fromNode == null)
             {
-                node0 = target.GetFirstAncestorOfType<StateNode>();
-                if (node0 == null)
+                _fromNode = target.GetFirstAncestorOfType<StateNode>();
+                if (_fromNode == null)
                 {
                     return;
                 }
             }
 
-            _edgeCandidate = new StateTransitionEdge(node0, null);
-            _edgeCandidate.SetEnabled(false);
-            _graphView.AddElement(_edgeCandidate);
+            _dragEdge = new StateTransitionEdge(_graphAsset, _fromNode, null);
+            _dragEdge.SetEnabled(false);
+            _graphView.AddElement(_dragEdge);
 
             _active = true;
             target.CaptureMouse();
@@ -89,7 +93,7 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
                 return;
             }
 
-            _edgeCandidate.Drag(e.mousePosition);
+            _dragEdge.Drag(e.mousePosition);
             e.StopPropagation();
         }
 
@@ -100,29 +104,27 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
                 return;
             }
 
-            var compatibleNodes = _graphView.GetCompatibleStateNodes(_edgeCandidate.ConnectedNode0);
-            StateNode node1 = null;
+            var compatibleNodes = _graphView.GetCompatibleStateNodes(_dragEdge.ConnectedNode0);
+            StateNode destNode = null;
             foreach (var node in compatibleNodes)
             {
                 if (node.worldBound.Contains(e.mousePosition))
                 {
-                    node1 = node;
+                    destNode = node;
                     break;
                 }
             }
 
-            if (node1 != null)
+            if (destNode != null)
             {
-                ConnectNode1(node1);
-            }
-            else
-            {
-                Abort();
+                var edge = _fromNode.AddTransition(destNode);
+                if (!_graphView.Contains(edge))
+                {
+                    _graphView.Add(edge);
+                }
             }
 
-            _active = false;
-            _edgeCandidate = null;
-            target.ReleaseMouse();
+            Abort();
             e.StopPropagation();
         }
 
@@ -130,7 +132,7 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
         {
             _active = false;
 
-            if (_edgeCandidate != null)
+            if (_dragEdge != null)
             {
                 Abort();
             }
@@ -145,45 +147,19 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
 
             Abort();
 
-            _active = false;
-            target.ReleaseMouse();
             e.StopPropagation();
         }
 
         private void Abort()
         {
-            _graphView.RemoveElement(_edgeCandidate);
-            _edgeCandidate.ConnectedNode0 = null;
-            _edgeCandidate.ConnectedNode1 = null;
-            _edgeCandidate = null;
-        }
+            _graphView.RemoveElement(_dragEdge);
+            _dragEdge.ConnectedNode0 = null;
+            _dragEdge.ConnectedNode1 = null;
+            _dragEdge = null;
+            _fromNode = null;
 
-        private void ConnectNode1(StateNode node1)
-        {
-            var edge = _edgeCandidate.ConnectedNode0.OutputTransitions.FirstOrDefault(e =>
-                e.IsConnection(_edgeCandidate.ConnectedNode0, node1));
-
-            // Transition already exists
-            if (edge != null)
-            {
-                Abort();
-                return;
-            }
-
-            // Reversed transition already exists
-            edge = node1.OutputTransitions.FirstOrDefault(e =>
-                e.IsConnection(_edgeCandidate.ConnectedNode0, node1));
-            if (edge != null)
-            {
-                _edgeCandidate.ConnectedNode0.OutputTransitions.Add(edge);
-                Abort();
-                return;
-            }
-
-            // New transition
-            _edgeCandidate.SetConnection(1, node1);
-            _edgeCandidate.ConnectedNode0.AddTransition(node1, _edgeCandidate);
-            _edgeCandidate.SetEnabled(true);
+            _active = false;
+            target.ReleaseMouse();
         }
     }
 }

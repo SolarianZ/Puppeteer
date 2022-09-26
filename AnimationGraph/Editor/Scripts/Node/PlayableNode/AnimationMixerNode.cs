@@ -22,11 +22,11 @@ namespace GBG.AnimationGraph.Editor.Node
         }
 
 
-        public override GraphNodeInspector GetInspector()
+        public override IInspector<GraphNode> GetInspector()
         {
             _inspector ??= new AnimationMixerNodeInspector(GraphAsset.Parameters,
                 AddInputPortElement, RemoveInputPortElement, ReorderInputPortElement);
-            _inspector.SetTargetNode(this);
+            _inspector.SetTarget(this);
 
             return _inspector;
         }

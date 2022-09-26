@@ -109,11 +109,11 @@ namespace GBG.AnimationGraph.Editor.Inspector
             Add(_inputListView);
         }
 
-        public override void SetTargetNode(GraphNode node)
+        public override void SetTarget(GraphNode node)
         {
-            base.SetTargetNode(node);
+            base.SetTarget(node);
 
-            _mixerInputs = ((PlayableNode)node).NodeData.MixerInputs;
+            _mixerInputs = Target.NodeData.MixerInputs;
             _inputListView.itemsSource = _mixerInputs;
             _inputListView.RefreshItems();
         }

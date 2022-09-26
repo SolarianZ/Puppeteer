@@ -11,7 +11,7 @@ using UPort = UnityEditor.Experimental.GraphView.Port;
 
 namespace GBG.AnimationGraph.Editor.Node
 {
-    public abstract partial class GraphNode : UNode
+    public abstract partial class GraphNode : UNode, IInspectable<GraphNode>
     {
         public abstract string Guid { get; }
 
@@ -97,10 +97,10 @@ namespace GBG.AnimationGraph.Editor.Node
 
         #region Inspector
 
-        public virtual GraphNodeInspector GetInspector()
+        public virtual IInspector<GraphNode> GetInspector()
         {
-            var defaultInspector = new GraphNodeInspector();
-            defaultInspector.SetTargetNode(this);
+            var defaultInspector = new GraphElementInspector<GraphNode>();
+            defaultInspector.SetTarget(this);
 
             return defaultInspector;
         }

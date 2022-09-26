@@ -1,24 +1,25 @@
 ﻿using System;
-using GBG.AnimationGraph.Editor.Node;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
 
 namespace GBG.AnimationGraph.Editor.Inspector
 {
-    public class GraphNodeInspector : VisualElement
+    public class GraphElementInspector<TTarget> : VisualElement, IInspector<TTarget>
+        where TTarget : GraphElement, IInspectable<TTarget>
     {
         public event Action OnParamChanged;
 
 
         protected Length FieldLabelWidth { get; set; } = Length.Percent(35);
 
-        protected GraphNode TargetNode { get; private set; }
+        protected IInspectable<TTarget> Target { get; private set; }
 
         protected TextField NodeType { get; }
 
         protected TextField NodeGuid { get; }
 
 
-        public GraphNodeInspector()
+        public GraphElementInspector()
         {
             NodeType = new TextField("Type");
             NodeType.labelElement.style.minWidth = StyleKeyword.Auto;
@@ -36,15 +37,15 @@ namespace GBG.AnimationGraph.Editor.Inspector
         }
 
 
-        public virtual void SetTargetNode(GraphNode node)
+        public virtual void SetTarget(TTarget target)
         {
-            TargetNode = node;
+            Target = target;
 
             NodeType.labelElement.style.width = FieldLabelWidth;
-            NodeType.SetValueWithoutNotify(TargetNode.GetType().Name);
+            NodeType.SetValueWithoutNotify(Target.GetType().Name);
 
             NodeGuid.labelElement.style.width = FieldLabelWidth;
-            NodeGuid.SetValueWithoutNotify(TargetNode.Guid);
+            NodeGuid.SetValueWithoutNotify(Target.Guid);
         }
 
 
