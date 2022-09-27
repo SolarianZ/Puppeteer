@@ -49,7 +49,9 @@ namespace GBG.AnimationGraph.Editor.Inspector
             _inputNodeField.SetValueWithoutNotify(mixerInputData.InputNodeGuid);
 
             _inputWeightParamField.SetParamTarget($"Input Weight {mixerInputDataIndex.ToString()}",
-                mixerInputData.InputWeightParam, ParamType.Float, _paramTable, true, null, new Vector2(0, 1));
+                mixerInputData.InputWeightParam, ParamType.Float, _paramTable,
+                mixerInputData.InputWeightParam.IsValue ? ParamLinkState.Unlinked : ParamLinkState.Linked,
+                ParamActiveState.InactiveLocked, new Vector2(0, 1));
         }
 
 
@@ -82,6 +84,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
             _removeInputPortElement = removeInputPortElement;
             _reorderInputPortElement = reorderInputPortElement;
 
+            // Mixer inputs
             var inputListViewLabel = new Label("Mixer Inputs")
             {
                 style =

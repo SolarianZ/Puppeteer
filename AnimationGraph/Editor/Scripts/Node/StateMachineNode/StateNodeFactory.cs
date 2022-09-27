@@ -35,12 +35,12 @@ namespace GBG.AnimationGraph.Editor.Node
             var nodeType = _dataToNodeType[nodeData.GetType()];
             var node = (StateNode)Activator.CreateInstance(nodeType, graphAsset, nodeData);
 
-            if (string.IsNullOrEmpty(nodeData.Name))
+            if (string.IsNullOrEmpty(nodeData.StateName))
             {
-                nodeData.Name = "State_" + GuidTool.NewUniqueSuffix();
+                nodeData.StateName = "State_" + GuidTool.NewUniqueSuffix();
             }
 
-            node.title = nodeData.Name;
+            node.title = nodeData.StateName;
 
             return node;
         }

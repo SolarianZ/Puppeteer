@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using GBG.AnimationGraph.Editor.GraphEdge;
-using GBG.AnimationGraph.Editor.Utility;
+using GBG.AnimationGraph.Editor.Inspector;
 using GBG.AnimationGraph.NodeData;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -13,7 +13,15 @@ namespace GBG.AnimationGraph.Editor.Node
     {
         public override string Guid => NodeData.Guid;
 
-        public string Name => NodeData.Name;
+        public virtual string StateName
+        {
+            get => NodeData.StateName;
+            internal set
+            {
+                NodeData.StateName = value;
+                title = NodeData.StateName;
+            }
+        }
 
         internal StateNodeData NodeData { get; }
 
@@ -36,7 +44,9 @@ namespace GBG.AnimationGraph.Editor.Node
             mainContainer.style.borderLeftWidth = _CONNECTION_HANDLER_WIDTH;
             mainContainer.style.borderRightWidth = _CONNECTION_HANDLER_WIDTH;
             var titleLabel = titleContainer.Q<Label>(name: "title-label");
+            titleLabel.style.maxWidth = 150;
             titleLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
+            titleLabel.style.whiteSpace = WhiteSpace.Normal;
 
             SetPosition(new Rect(NodeData.EditorPosition, Vector2.zero));
             RefreshPorts();
@@ -46,29 +56,18 @@ namespace GBG.AnimationGraph.Editor.Node
             mainContainer.AddManipulator(new StateTransitionEdgeConnector(GraphAsset));
         }
 
-
-        protected override void ExecuteDefaultActionAtTarget(EventBase evt)
-        {
-            base.ExecuteDefaultActionAtTarget(evt);
-
-            if (evt is GeometryChangedEvent)
-            {
-                foreach (var edge in OutputTransitions)
-                {
-                    edge.UpdateEdgeControl();
-                }
-
-                foreach (var edge in _inputTransitions)
-                {
-                    edge.UpdateEdgeControl();
-                }
-            }
-        }
-
         public sealed override void SetPosition(Rect newPos)
         {
             base.SetPosition(newPos);
             NodeData.EditorPosition = newPos.position;
+        }
+
+        public override IInspector<GraphNode> GetInspector()
+        {
+            var inspector = new StateNodeInspector();
+            inspector.SetTarget(this);
+
+            return inspector;
         }
 
         public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
@@ -78,7 +77,7 @@ namespace GBG.AnimationGraph.Editor.Node
 
         #region Transitions
 
-        public virtual StateTransitionEdge AddTransition(StateNode destNode)
+        public virtual StateTransitionEdge AddTransition(StateNode destNode, out bool dataDirty)
         {
             var edge = ViewOnlyConnect(destNode);
 
@@ -88,6 +87,11 @@ namespace GBG.AnimationGraph.Editor.Node
             {
                 transitionData = new Transition(destNode.Guid);
                 NodeData.Transitions.Add(transitionData);
+                dataDirty = true;
+            }
+            else
+            {
+                dataDirty = false;
             }
 
             return edge;
@@ -139,6 +143,7 @@ namespace GBG.AnimationGraph.Editor.Node
             edge = destNode.OutputTransitions.FirstOrDefault(e => e.IsConnection(this, destNode));
             if (edge != null)
             {
+                edge.AddDirection(StateTransitionEdgeDirections.Bidirectional);
                 OutputTransitions.Add(edge);
                 destNode._inputTransitions.Add(edge);
                 return edge;
@@ -146,6 +151,7 @@ namespace GBG.AnimationGraph.Editor.Node
 
             // New transition
             edge = new StateTransitionEdge(GraphAsset, this, destNode);
+            edge.AddDirection(StateTransitionEdgeDirections.Dir_0_1);
             edge.IsEntryEdge = false;
 
             OutputTransitions.Add(edge);
@@ -171,6 +177,24 @@ namespace GBG.AnimationGraph.Editor.Node
             if (removedEdge != null)
             {
                 destNode._inputTransitions.Remove(removedEdge);
+
+                if (destNode.OutputTransitions.Contains(removedEdge))
+                {
+                    if (removedEdge.ConnectedNode1 == destNode)
+                    {
+                        removedEdge.RemoveDirection(StateTransitionEdgeDirections.Dir_0_1);
+                    }
+                    else
+                    {
+                        removedEdge.RemoveDirection(StateTransitionEdgeDirections.Dir_1_0);
+                    }
+                }
+                else
+                {
+                    removedEdge.SetConnection(0, null);
+                    removedEdge.SetConnection(1, null);
+                    removedEdge.RemoveDirection(StateTransitionEdgeDirections.Bidirectional);
+                }
             }
 
             return removedEdge;
@@ -182,6 +206,7 @@ namespace GBG.AnimationGraph.Editor.Node
             for (int i = 0; i < OutputTransitions.Count; i++)
             {
                 var edge = OutputTransitions[i];
+                edge.RemoveDirection(StateTransitionEdgeDirections.Bidirectional);
                 edgesToRemove.Add(edge);
                 if (edge.TryGetConnectedNode(this, out var destNode))
                 {
@@ -194,6 +219,7 @@ namespace GBG.AnimationGraph.Editor.Node
             for (int i = 0; i < _inputTransitions.Count; i++)
             {
                 var edge = _inputTransitions[i];
+                edge.RemoveDirection(StateTransitionEdgeDirections.Bidirectional);
                 if (!edgesToRemove.Contains(edge))
                 {
                     edgesToRemove.Add(edge);

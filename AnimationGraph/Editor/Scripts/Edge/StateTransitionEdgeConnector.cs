@@ -117,11 +117,8 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
 
             if (destNode != null)
             {
-                var edge = _fromNode.AddTransition(destNode);
-                if (!_graphView.Contains(edge))
-                {
-                    _graphView.Add(edge);
-                }
+                var edge = _fromNode.AddTransition(destNode, out var dataDirty);
+                _graphView.AddStateTransitionEdge(edge, dataDirty);
             }
 
             Abort();

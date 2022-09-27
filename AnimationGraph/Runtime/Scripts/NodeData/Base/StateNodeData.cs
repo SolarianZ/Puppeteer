@@ -7,14 +7,14 @@ namespace GBG.AnimationGraph.NodeData
     [Serializable]
     public class StateNodeData : NodeDataBase
     {
-        public string Name
+        public string StateName
         {
-            get => _name;
-            internal set => _name = value;
+            get => _stateName;
+            internal set => _stateName = value;
         }
 
         [SerializeField]
-        private string _name;
+        private string _stateName;
 
         public List<Transition> Transitions => _transitions;
 

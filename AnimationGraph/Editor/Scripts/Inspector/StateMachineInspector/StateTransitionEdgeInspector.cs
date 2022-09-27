@@ -22,7 +22,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
 
         private readonly ParamField _leftParam;
 
-        private readonly Operator _operator;
+        private readonly OperatorDrawer _operatorDrawer;
 
         private readonly ParamField _rightParam;
 
@@ -37,9 +37,9 @@ namespace GBG.AnimationGraph.Editor.Inspector
             _leftParam.OnParamChanged += _ => OnConditionChanged?.Invoke(_condition);
             Add(_leftParam);
 
-            _operator = new Operator(nameLabelWidth);
-            _operator.Button.clickable.clickedWithEventInfo += ShowOperatorPopupList;
-            Add(_operator);
+            _operatorDrawer = new OperatorDrawer(nameLabelWidth);
+            _operatorDrawer.Button.clickable.clickedWithEventInfo += ShowOperatorPopupList;
+            Add(_operatorDrawer);
 
             _rightParam = new ParamField(nameLabelWidth);
             _leftParam.OnParamChanged += _ => OnConditionChanged?.Invoke(_condition);
@@ -47,17 +47,20 @@ namespace GBG.AnimationGraph.Editor.Inspector
         }
 
 
+        // TODO: Limit right param type & validate conditions
         public void SetCondition(TransitionCondition condition)
         {
             _condition = condition;
 
             _leftParam.SetParamTarget("Left Operand", _condition.LeftParam, _condition.ParamType,
-                _paramTable, true, null, null);
+                _paramTable, ParamLinkState.LinkedLocked, ParamActiveState.ActiveLocked, null);
 
-            _operator.Button.text = _condition.Operator.ToString();
+            _operatorDrawer.Button.text = _condition.Operator.ToString();
 
-            _rightParam.SetParamTarget("Right Operand", _condition.RightParam, _condition.ParamType,
-                _paramTable, true, null, null);
+            _rightParam.SetParamTarget("Right Operand", _condition.RightParam,
+                _condition.ParamType, _paramTable,
+                _condition.RightParam.IsValue ? ParamLinkState.Unlinked : ParamLinkState.Linked,
+                ParamActiveState.ActiveLocked, null);
         }
 
 
@@ -88,23 +91,23 @@ namespace GBG.AnimationGraph.Editor.Inspector
                 }
             }
 
-            menu.DropDown(new Rect(evt.originalMousePosition, Vector2.zero), _operator.Button);
+            menu.DropDown(new Rect(evt.originalMousePosition, Vector2.zero), _operatorDrawer.Button);
         }
 
         private void ChangeOperator(object opObj)
         {
             _condition.Operator = (ConditionOperator)opObj;
-            _operator.Button.text = _condition.Operator.ToString();
-            
+            _operatorDrawer.Button.text = _condition.Operator.ToString();
+
             OnConditionChanged?.Invoke(_condition);
         }
 
 
-        private class Operator : VisualElement
+        private class OperatorDrawer : VisualElement
         {
             public Button Button { get; }
 
-            public Operator(Length nameLabelWidth)
+            public OperatorDrawer(Length nameLabelWidth)
             {
                 style.flexDirection = FlexDirection.Row;
                 style.flexShrink = 0;
@@ -279,7 +282,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
             _destNode = destNode;
             _transition = transition;
 
-            _foldout.text = $"{fromNode.Name} -> {destNode.Name}";
+            _foldout.text = $"{fromNode.StateName} -> {destNode.StateName}";
 
             _destNodeGuid.SetValueWithoutNotify(_transition.DestStateGuid);
 
@@ -393,7 +396,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
         {
             base.SetTarget(target);
 
-            if (Target.IsEntryEdge)
+            if (Target == null || Target.IsEntryEdge)
             {
                 // Entry node
                 _transition0.visible = false;
@@ -445,7 +448,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
         {
             _onWantsToDeleteTransition(fromNode, destNode);
 
-            SetTarget(Target);
+            SetTarget(Target.IsConnection(fromNode, destNode) ? Target : null);
             RaiseParamChangedEvent();
         }
 

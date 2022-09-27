@@ -129,6 +129,8 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
         private void OnGraphViewContentChanged()
         {
             hasUnsavedChanges = true;
+
+            SetInspectTarget(ActiveGraphView.selection);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using GBG.AnimationGraph.Parameter;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -9,6 +10,28 @@ using UnityEngine.UIElements;
 
 namespace GBG.AnimationGraph.Editor.Inspector
 {
+    public enum ParamLinkState
+    {
+        Unlinked = 0,
+
+        Linked = 1,
+
+        UnlinkedLocked = 2,
+
+        LinkedLocked = 4,
+    }
+
+    public enum ParamActiveState
+    {
+        Active = 0,
+
+        Inactive = 1,
+
+        ActiveLocked = 2,
+
+        InactiveLocked = 4,
+    }
+
     public class ParamField : VisualElement
     {
         public event Action<ParamGuidOrValue> OnParamChanged;
@@ -40,7 +63,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
 
         private Toggle _activeToggle;
 
-        private bool _isLinked;
+        private ParamLinkState _linkState;
 
         private ParamInfo _linkedParam;
 
@@ -79,18 +102,17 @@ namespace GBG.AnimationGraph.Editor.Inspector
         }
 
         public void SetParamTarget(string nameLabel, ParamGuidOrValue serializedTarget, ParamType targetType,
-            List<ParamInfo> paramTable, bool linkable, bool? active, Vector2? valueRange)
+            List<ParamInfo> paramTable, ParamLinkState linkState, ParamActiveState activeState, Vector2? valueRange)
         {
             // Source data
             _serializedTarget = serializedTarget;
             _paramType = targetType;
             _paramTable = paramTable;
+            _linkState = linkState;
             _valueRange = valueRange;
-            _isLinked = !_serializedTarget.IsValue;
-            _linkedParam = _isLinked
-                ? _paramTable.Find(p => p.Guid.Equals(_serializedTarget.Guid))
+            _linkedParam = IsLinked()
+                ? _paramTable.FirstOrDefault(p => p.Guid.Equals(_serializedTarget.Guid))
                 : null;
-            Assert.IsTrue(_serializedTarget.IsValue || (_linkedParam != null && _linkedParam.Type == targetType));
             Assert.IsTrue(valueRange == null || valueRange.Value.x <= valueRange.Value.y);
 
             if (_linkedParam != null)
@@ -104,72 +126,98 @@ namespace GBG.AnimationGraph.Editor.Inspector
             if (Contains(_linkIcon)) Remove(_linkIcon);
             if (Contains(_activeToggle)) Remove(_activeToggle);
 
-            // Raw value
-            if (!_isLinked)
-            {
-                var valueField = GetOrCreateValueField(true);
-                _paramContainer.Add(valueField);
-            }
             // Link to param
-            else
+            if (IsLinked())
             {
                 var paramButton = GetOrCreateParamButton();
                 _paramContainer.Add(paramButton);
             }
+            // Raw value
+            else
+            {
+                var valueField = GetOrCreateValueField(true);
+                _paramContainer.Add(valueField);
+            }
 
             // Link icon
-            if (linkable)
+            switch (_linkState)
             {
-                if (_linkIcon == null)
-                {
-                    _linkIcon = new Image
+                case ParamLinkState.Unlinked:
+                case ParamLinkState.Linked:
+                    if (_linkIcon == null)
                     {
-                        name = "param-link-icon",
-                        image = GetParamLinkIcon(_isLinked),
-                        style =
+                        _linkIcon = new Image
                         {
-                            width = 16,
-                            marginLeft = 3,
-                            marginRight = 3,
-                        }
-                    };
-                    _linkIcon.RegisterCallback<MouseDownEvent>(OnParamLinkIconClicked);
-                }
+                            name = "param-link-icon",
+                            image = GetParamLinkIcon(IsLinked()),
+                            style =
+                            {
+                                width = 16,
+                                marginLeft = 3,
+                                marginRight = 3,
+                            }
+                        };
+                        _linkIcon.RegisterCallback<MouseDownEvent>(OnParamLinkIconClicked);
+                    }
 
-                Add(_linkIcon);
+                    Add(_linkIcon);
+                    break;
+
+                case ParamLinkState.UnlinkedLocked:
+                case ParamLinkState.LinkedLocked:
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(_linkState), _linkState, null);
             }
 
             // Active toggle
-            if (active != null)
+            switch (activeState)
             {
-                if (_activeToggle == null)
-                {
-                    _activeToggle = new Toggle
+                case ParamActiveState.Active:
+                case ParamActiveState.Inactive:
+                    if (_activeToggle == null)
                     {
-                        value = active.Value,
-                        style =
+                        _activeToggle = new Toggle
                         {
-                            marginLeft = 0,
-                            marginRight = 0,
-                            marginTop = 0,
-                            marginBottom = 0,
-                        }
-                    };
-                    _activeToggle.RegisterValueChangedCallback(OnActiveChanged);
-                }
+                            value = activeState == ParamActiveState.Active,
+                            style =
+                            {
+                                marginLeft = 0,
+                                marginRight = 0,
+                                marginTop = 0,
+                                marginBottom = 0,
+                            }
+                        };
+                        _activeToggle.RegisterValueChangedCallback(OnActiveChanged);
+                    }
 
-                Add(_activeToggle);
+                    Add(_activeToggle);
 
-                _paramContainer.SetEnabled(active.Value);
-                _linkIcon?.SetEnabled(active.Value);
-            }
-            else
-            {
-                _paramContainer.SetEnabled(true);
-                _linkIcon?.SetEnabled(true);
+                    _paramContainer.SetEnabled(activeState == ParamActiveState.Active);
+                    _linkIcon?.SetEnabled(activeState == ParamActiveState.Active);
+                    break;
+
+                case ParamActiveState.ActiveLocked:
+                    _paramContainer.SetEnabled(true);
+                    _linkIcon?.SetEnabled(true);
+                    break;
+
+                case ParamActiveState.InactiveLocked:
+                    _paramContainer.SetEnabled(false);
+                    _linkIcon?.SetEnabled(false);
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(activeState), activeState, null);
             }
         }
 
+
+        private bool IsLinked()
+        {
+            return _linkState == ParamLinkState.Linked || _linkState == ParamLinkState.LinkedLocked;
+        }
 
         private VisualElement GetOrCreateValueField(bool forceCreateNew)
         {
@@ -325,10 +373,25 @@ namespace GBG.AnimationGraph.Editor.Inspector
 
         private void OnParamLinkIconClicked(MouseDownEvent _)
         {
-            _isLinked = !_isLinked;
-            _linkIcon.image = GetParamLinkIcon(_isLinked);
+            switch (_linkState)
+            {
+                case ParamLinkState.Unlinked:
+                    _linkState = ParamLinkState.Linked;
+                    break;
+                case ParamLinkState.Linked:
+                    _linkState = ParamLinkState.Unlinked;
+                    break;
 
-            if (_isLinked)
+                case ParamLinkState.UnlinkedLocked:
+                case ParamLinkState.LinkedLocked:
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            var isLinked = IsLinked();
+            _linkIcon.image = GetParamLinkIcon(isLinked);
+
+            if (isLinked)
             {
                 if (_linkedParam != null)
                 {
@@ -352,7 +415,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
             }
 
             _linkButton.text = _linkedParam?.Name;
-            _serializedTarget.Guid = _isLinked ? _linkedParam?.Guid : null;
+            _serializedTarget.Guid = isLinked ? _linkedParam?.Guid : null;
 
             OnParamChanged?.Invoke(_serializedTarget);
         }

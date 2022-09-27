@@ -1,4 +1,6 @@
-﻿using GBG.AnimationGraph.Editor.GraphEdge;
+﻿using System;
+using GBG.AnimationGraph.Editor.GraphEdge;
+using GBG.AnimationGraph.Editor.Inspector;
 using GBG.AnimationGraph.NodeData;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
@@ -10,6 +12,12 @@ namespace GBG.AnimationGraph.Editor.Node
         public const string NODE_GUID = "StateMachineEntryNode";
 
         public override string Guid => NODE_GUID;
+
+        public override string StateName
+        {
+            get => nameof(StateMachineEntryNode);
+            internal set => throw new InvalidOperationException();
+        }
 
         public string DestStateNodeGuid => _graphData.RootNodeGuid;
 
@@ -33,19 +41,19 @@ namespace GBG.AnimationGraph.Editor.Node
             RefreshExpandedState();
         }
 
-        // TODO: Only allow one transition!
-
-        public override StateTransitionEdge AddTransition(StateNode destNode)
+        public override StateTransitionEdge AddTransition(StateNode destNode, out bool dataDirty)
         {
+            // Only allow one transition
             if (OutputTransitions.Count > 0)
             {
                 if (OutputTransitions[0].IsConnection(this, destNode))
                 {
+                    dataDirty = false;
                     return OutputTransitions[0];
                 }
 
-                GraphView.RemoveElement(OutputTransitions[0]);
-                RemoveTransition(OutputTransitions[0]);
+                var edgesToRemove = ViewOnlyDisconnectAll();
+                GraphView.DeleteElements(edgesToRemove);
             }
 
             var edge = ViewOnlyConnect(destNode);
@@ -53,8 +61,17 @@ namespace GBG.AnimationGraph.Editor.Node
 
             // Transition data
             _graphData.RootNodeGuid = destNode.Guid;
+            dataDirty = true;
 
             return edge;
+        }
+
+        public override IInspector<GraphNode> GetInspector()
+        {
+            var inspector = new StateMachineEntryNodeInspector();
+            inspector.SetTarget(this);
+
+            return inspector;
         }
     }
 }

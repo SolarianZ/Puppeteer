@@ -96,6 +96,19 @@ namespace GBG.AnimationGraph.Editor.GraphView
             }
         }
 
+        public void AddStateTransitionEdge(StateTransitionEdge edge, bool forceRaiseGraphViewChangedEvent)
+        {
+            if (!Contains(edge))
+            {
+                AddElement(edge);
+                RaiseGraphViewChangedEvent();
+            }
+            else if (forceRaiseGraphViewChangedEvent)
+            {
+                RaiseGraphViewChangedEvent();
+            }
+        }
+
 
         private new GraphViewChange OnGraphViewChanged(GraphViewChange graphViewChange)
         {

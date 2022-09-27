@@ -42,10 +42,10 @@ namespace GBG.AnimationGraph.Editor.Inspector
             Target = target;
 
             NodeType.labelElement.style.width = FieldLabelWidth;
-            NodeType.SetValueWithoutNotify(Target.GetType().Name);
+            NodeType.SetValueWithoutNotify(Target?.GetType().Name);
 
             NodeGuid.labelElement.style.width = FieldLabelWidth;
-            NodeGuid.SetValueWithoutNotify(Target.Guid);
+            NodeGuid.SetValueWithoutNotify(Target?.Guid);
         }
 
 

@@ -69,8 +69,10 @@ namespace GBG.AnimationGraph.Editor.Inspector
             base.SetTarget(node);
 
             // Motion Time
-            _motionTimeParamField.SetParamTarget("Motion Time", NodeData.MotionTimeParam, ParamType.Float,
-                Target.GraphAsset.Parameters, true, NodeData.MotionTimeParamActive, null);
+            _motionTimeParamField.SetParamTarget("Motion Time", NodeData.MotionTimeParam,
+                ParamType.Float, Target.GraphAsset.Parameters,
+                NodeData.MotionTimeParam.IsValue ? ParamLinkState.Unlinked : ParamLinkState.Linked,
+                NodeData.MotionTimeParamActive ? ParamActiveState.Active : ParamActiveState.Inactive, null);
 
             // Cycle Offset
             // _cycleOffsetParamField.SetParamTarget("Cycle Offset", ClipNodeData.CycleOffsetParam, ParamType.Float,

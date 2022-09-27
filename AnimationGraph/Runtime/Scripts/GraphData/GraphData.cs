@@ -57,9 +57,6 @@ namespace GBG.AnimationGraph.GraphData
         private List<NodeDataBase> _nodes = new List<NodeDataBase>();
 
 
-        // TODO: Transition[]
-
-
         public GraphData(string guid, string name, GraphType type)
         {
             _guid = guid;

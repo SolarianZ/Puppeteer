@@ -117,7 +117,7 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
             var flowPos = Vector2.Lerp(flowStartPoint, flowEndPoint, (float)posProgress);
             FlowImage.transform.position = flowPos - Vector2.one * FlowSize / 2;
 
-            // TODO: Direction
+            // TODO: Flow direction
             
             
             // Color

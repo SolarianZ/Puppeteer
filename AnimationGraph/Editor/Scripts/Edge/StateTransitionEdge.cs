@@ -2,16 +2,17 @@
 using GBG.AnimationGraph.Editor.GraphView;
 using GBG.AnimationGraph.Editor.Inspector;
 using GBG.AnimationGraph.Editor.Node;
-using GBG.AnimationGraph.NodeData;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace GBG.AnimationGraph.Editor.GraphEdge
 {
-    public sealed class StateTransitionEdge : GraphElement, IInspectable<StateTransitionEdge>
+    public sealed class StateTransitionEdge : GraphElement, IInspectable<StateTransitionEdge>, IEdgePointProvider
     {
         public string Guid => null;
+
+        public StateTransitionEdgeDirections EdgeDirections => EdgeControl.EdgeDirections;
 
         public bool IsEntryEdge { get; internal set; }
 
@@ -37,12 +38,6 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
 
         private Vector2 _dragPoint;
 
-        private static readonly Color _edgeNormalColor = Color.white;
-
-        private static readonly Color _edgeHoverColor = new Color(68 / 255f, 192 / 255f, 255 / 255f);
-
-        private static readonly Color _edgeSelectedColor = new Color(68 / 255f, 192 / 255f, 255 / 255f);
-
 
         public StateTransitionEdge(AnimationGraphAsset graphAsset, StateNode node0, StateNode node1)
         {
@@ -62,7 +57,7 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
             var edgeStyleSheet = Resources.Load<StyleSheet>("AnimationGraph/StateTransitionEdge");
             styleSheets.Add(edgeStyleSheet);
 
-            EdgeControl = new StateTransitionEdgeControl(GetPoint0(), GetPoint1());
+            EdgeControl = new StateTransitionEdgeControl(this);
             Add(EdgeControl);
 
             if (ConnectionCount == 2)
@@ -72,12 +67,10 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
 
             capabilities |= Capabilities.Selectable | Capabilities.Deletable;
 
-            this.AddManipulator(new ContextualMenuManipulator(BuildContextualMenu));
+            // TODO FIXME: Can't receive the following callbacks, why?
             RegisterCallback<MouseEnterEvent>(OnMouseEnter);
             RegisterCallback<MouseLeaveEvent>(OnMouseLeave);
-
-            // TODO FIXME: Fix edge position
-            RegisterCallback<CustomStyleResolvedEvent>(_ => schedule.Execute(UpdateEdgeControl));
+            this.AddManipulator(new ContextualMenuManipulator(BuildContextualMenu));
         }
 
         public override bool ContainsPoint(Vector2 localPoint)
@@ -92,20 +85,27 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
 
         public override void OnSelected()
         {
-            EdgeControl.EdgeColor = _edgeSelectedColor;
-            UpdateEdgeControl();
+            EdgeControl.Highlight = true;
         }
 
         public override void OnUnselected()
         {
-            EdgeControl.EdgeColor = _edgeNormalColor;
-            UpdateEdgeControl();
+            EdgeControl.Highlight = false;
+        }
+
+        public void AddDirection(StateTransitionEdgeDirections direction)
+        {
+            EdgeControl.AddDirection(direction);
+        }
+
+        public void RemoveDirection(StateTransitionEdgeDirections direction)
+        {
+            EdgeControl.RemoveDirection(direction);
         }
 
         public void Drag(Vector2 mousePosition)
         {
             _dragPoint = mousePosition;
-            UpdateEdgeControl();
         }
 
         public void SetConnection(int index, StateNode node)
@@ -128,8 +128,6 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
             {
                 ResetLayer();
             }
-
-            UpdateEdgeControl();
         }
 
         public bool IsConnection(StateNode a, StateNode b)
@@ -155,38 +153,34 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
             return connectedNode != null;
         }
 
-        public void UpdateEdgeControl()
+
+        Vector2 IEdgePointProvider.GetEdgePoint0()
         {
-            EdgeControl.EdgePoint0 = EdgeControl.WorldToLocal(GetPoint0());
-            EdgeControl.EdgePoint1 = EdgeControl.WorldToLocal(GetPoint1());
-            EdgeControl.UpdateView();
+            var worldPoint = ConnectedNode0?.worldBound.center ?? default;
+            var edgeControlSpacePoint = EdgeControl.WorldToLocal(worldPoint);
+            return edgeControlSpacePoint;
         }
 
-
-        private Vector2 GetPoint0()
+        Vector2 IEdgePointProvider.GetEdgePoint1()
         {
-            return ConnectedNode0?.worldBound.center ?? default;
+            var worldPoint = ConnectedNode1?.worldBound.center ?? _dragPoint;
+            var edgeControlSpacePoint = EdgeControl.WorldToLocal(worldPoint);
+            return edgeControlSpacePoint;
         }
 
-        private Vector2 GetPoint1()
-        {
-            return ConnectedNode1?.worldBound.center ?? _dragPoint;
-        }
 
         private void OnMouseEnter(MouseEnterEvent evt)
         {
             if (!enabledInHierarchy || selected) return;
 
-            EdgeControl.EdgeColor = _edgeHoverColor;
-            UpdateEdgeControl();
+            EdgeControl.Highlight = true;
         }
 
         private void OnMouseLeave(MouseLeaveEvent evt)
         {
             if (!enabledInHierarchy || selected) return;
 
-            EdgeControl.EdgeColor = _edgeNormalColor;
-            UpdateEdgeControl();
+            EdgeControl.Highlight = false;
         }
 
         private void BuildContextualMenu(ContextualMenuPopulateEvent evt)
@@ -224,7 +218,8 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
             var edge = fromNode.RemoveTransition(destNode);
             if (!edge.IsConnection(fromNode, destNode))
             {
-                GetFirstAncestorOfType<StateMachineGraphView>().RemoveElement(edge);
+                var graph = GetFirstAncestorOfType<StateMachineGraphView>();
+                graph.RemoveElement(edge);
             }
         }
 
