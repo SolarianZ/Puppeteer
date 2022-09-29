@@ -15,26 +15,23 @@ namespace GBG.Puppeteer
     {
         public TransformStreamHandle BoneHandle { get; }
 
+        public float BoneWeight { get; }
+
         public int BoneNameHash { get; }
 
         public int ParentIndex { get; }
 
+        public bool IsValid { get; }
 
-        private readonly bool _isValid;
 
-
-        public BoneInfo(TransformStreamHandle boneHandle, int boneNameHash, int parentIndex)
+        public BoneInfo(TransformStreamHandle boneHandle, float boneWeight, int boneNameHash, int parentIndex)
         {
             BoneHandle = boneHandle;
+            BoneWeight = boneWeight;
             BoneNameHash = boneNameHash;
             ParentIndex = parentIndex;
 
-            _isValid = BoneNameHash != 0;
-        }
-
-        public bool IsValid()
-        {
-            return _isValid;
+            IsValid = BoneNameHash != 0;
         }
 
         /// <summary>
@@ -58,8 +55,8 @@ namespace GBG.Puppeteer
 
                 if (bones[i])
                 {
-                    boneInfos[i] = new BoneInfo(
-                        animator.BindStreamTransform(bones[i]),
+                    // TODO: BoneWeight is always 1
+                    boneInfos[i] = new BoneInfo(animator.BindStreamTransform(bones[i]), 1,
                         nameToHash?.Invoke(bones[i].name) ?? Animator.StringToHash(bones[i].name),
                         FindParentIndex(bones, bones[i].parent, i));
                 }

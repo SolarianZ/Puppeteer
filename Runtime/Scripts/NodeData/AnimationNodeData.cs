@@ -79,13 +79,15 @@ namespace GBG.Puppeteer.NodeData
             return clone;
         }
 
-        
+
         protected abstract AnimationNodeData CreateCloneInstance();
 
         protected virtual void CloneMembers(AnimationNodeData clone)
         {
+#if UNITY_EDITOR
             clone.EditorName = _editorName;
             clone._editorPosition = _editorPosition;
+#endif
             clone._playbackSpeed = (ParamNameOrValue)_playbackSpeed.Clone();
         }
 
