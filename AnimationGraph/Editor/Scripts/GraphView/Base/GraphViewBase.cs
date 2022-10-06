@@ -42,6 +42,7 @@ namespace GBG.AnimationGraph.Editor.GraphView
 
             // Callbacks
             RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+            RegisterCallback<KeyDownEvent>(_ => OnWantsToSave?.Invoke());
         }
 
         public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
@@ -60,11 +61,13 @@ namespace GBG.AnimationGraph.Editor.GraphView
         }
 
 
-        #region Graph View Change Events
+        #region Graph View Events
 
         public event Action OnGraphViewChanged;
 
         public event Action<IReadOnlyList<ISelectable>> OnSelectionChanged;
+
+        public event Action OnWantsToSave;
 
 
         protected void RaiseGraphViewChangedEvent()

@@ -126,6 +126,16 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             TryRestoreEditor();
         }
 
+        private void OnGUI()
+        {
+            // Shortcuts
+            var evt = Event.current;
+            if (evt.control && evt.keyCode == KeyCode.S)
+            {
+                SaveChanges();
+            }
+        }
+
         private void OnDisable()
         {
             DestroyImmediate(_graphAssetSnapshot);

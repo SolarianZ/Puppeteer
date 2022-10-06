@@ -55,6 +55,7 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
                 : new MixerGraphView(_graphAsset, graphData);
             graphView.OnGraphViewChanged += OnGraphViewContentChanged;
             graphView.OnSelectionChanged += SetInspectTarget;
+            graphView.OnWantsToSave += SaveChanges;
             _layoutContainer.MiddlePane.Add(graphView);
             _openedGraphViews.Push(graphView);
             _openedGraphGuids.Add(graphData.Guid);
