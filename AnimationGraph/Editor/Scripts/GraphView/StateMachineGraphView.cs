@@ -25,7 +25,9 @@ namespace GBG.AnimationGraph.Editor.GraphView
             var nodeTable = new Dictionary<string, StateNode>(GraphData.Nodes.Count + 1);
             foreach (var nodeData in GraphData.Nodes)
             {
-                var node = StateNodeFactory.CreateNode(GraphAsset, (StateNodeData)nodeData);
+                var stateNodeData = (StateNodeData)nodeData;
+                stateNodeData.GraphData = GraphAsset.Graphs.Find(g => g.Guid.Equals(stateNodeData.Guid));
+                var node = StateNodeFactory.CreateNode(GraphAsset, stateNodeData);
                 AddElement(node);
                 nodeTable.Add(node.Guid, node);
             }
@@ -80,11 +82,15 @@ namespace GBG.AnimationGraph.Editor.GraphView
                 var localMousePos = contentViewContainer.WorldToLocal(evt.mousePosition);
                 foreach (var nodeType in StateNodeFactory.GetStateNodeTypes())
                 {
+                    // New State
                     evt.menu.AppendAction($"Create {nodeType.Name}", _ =>
                     {
                         var node = StateNodeFactory.CreateNode(GraphAsset, nodeType, localMousePos);
                         if (node != null)
                         {
+                            GraphAsset.Graphs.Add(node.NodeData.GraphData);
+                            // TODO: Refresh graph list view
+
                             GraphData.Nodes.Add(node.NodeData);
                             AddElement(node);
                             RaiseGraphViewChangedEvent();

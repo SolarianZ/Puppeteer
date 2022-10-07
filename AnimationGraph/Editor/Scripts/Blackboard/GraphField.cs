@@ -10,8 +10,6 @@ namespace GBG.AnimationGraph.Editor.Blackboard
     {
         // public const string PARAM_NAME_MATCH_REGEX = "^[a-zA-Z_][a-zA-Z0-9_]*$";
 
-        public event Action<GraphData.GraphData> OnGraphTypeChanged;
-
         public event Action<GraphData.GraphData> OnWantsToRenameGraph;
 
         public event Action<GraphData.GraphData> OnWantsToOpenGraph;
@@ -88,57 +86,12 @@ namespace GBG.AnimationGraph.Editor.Blackboard
                 // Rename
                 menu.AddItem("Rename", false, () => { OnWantsToRenameGraph?.Invoke(_graphData); });
 
-                // Change type
-                menu.AddItem("Change Type", false, () => { ShowChangeTypeMenu(menuPos); });
-
                 // Delete
                 if (_deletable) menu.AddItem("Delete", false, () => { OnWantsToDeleteGraph?.Invoke(_graphData); });
                 else menu.AddDisabledItem("Delete", false);
 
                 menu.DropDown(new Rect(menuPos, Vector2.zero), this);
             }
-        }
-
-        private void ShowChangeTypeMenu(Vector2 mousePosition)
-        {
-            var menu = new GenericDropdownMenu();
-
-            // State machine graph
-            menu.AddItem("Change to State Machine Graph", false, () => { ChangeGraphType(GraphType.StateMachine); });
-
-            // Blending graph
-            menu.AddItem("Change to Blending Graph", false, () => { ChangeGraphType(GraphType.Mixer); });
-
-            menu.DropDown(new Rect(mousePosition, Vector2.zero), this);
-        }
-
-        private void ChangeGraphType(GraphType targetType)
-        {
-            var message =
-                "Covert graph type will clear all contents in the graph and this operation cannot be undone." +
-                $"Are you sure to convert '{_graphData.Name}' to '{targetType.ToString()}' type?";
-            if (!EditorUtility.DisplayDialog("Warning", message, "Yes", "No"))
-            {
-                return;
-            }
-
-            _graphData.Nodes.Clear();
-
-            switch (targetType)
-            {
-                case GraphType.StateMachine:
-                    _graphData.GraphType = GraphType.StateMachine;
-                    break;
-
-                case GraphType.Mixer:
-                    _graphData.GraphType = GraphType.Mixer;
-                    break;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(targetType));
-            }
-
-            OnGraphTypeChanged?.Invoke(_graphData);
         }
     }
 }

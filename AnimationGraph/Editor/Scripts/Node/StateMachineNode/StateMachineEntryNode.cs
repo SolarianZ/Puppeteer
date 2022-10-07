@@ -1,6 +1,7 @@
 ﻿using System;
 using GBG.AnimationGraph.Editor.GraphEdge;
 using GBG.AnimationGraph.Editor.Inspector;
+using GBG.AnimationGraph.GraphData;
 using GBG.AnimationGraph.NodeData;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
@@ -25,7 +26,7 @@ namespace GBG.AnimationGraph.Editor.Node
 
 
         public StateMachineEntryNode(AnimationGraphAsset graphAsset, GraphData.GraphData graphData)
-            : base(graphAsset, new StateNodeData(NODE_GUID))
+            : base(graphAsset, new StateNodeData(new GraphData.GraphData(NODE_GUID, NODE_GUID, GraphType.StateMachine)))
         {
             _graphData = graphData;
 

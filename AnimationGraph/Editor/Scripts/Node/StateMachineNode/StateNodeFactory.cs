@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using GBG.AnimationGraph.Editor.Utility;
+using GBG.AnimationGraph.GraphData;
 using GBG.AnimationGraph.NodeData;
 using UnityEngine;
 
@@ -23,8 +24,11 @@ namespace GBG.AnimationGraph.Editor.Node
 
         public static StateNode CreateNode(AnimationGraphAsset graphAsset, Type nodeType, Vector2 position)
         {
+            var graphData = new GraphData.GraphData(GuidTool.NewGuid(),
+                $"StateMachineGraph_{GuidTool.NewUniqueSuffix()}",
+                GraphType.StateMachine);
             var nodeDataType = _nodeToDataType[nodeType];
-            var nodeData = (StateNodeData)Activator.CreateInstance(nodeDataType, GuidTool.NewGuid());
+            var nodeData = (StateNodeData)Activator.CreateInstance(nodeDataType, graphData);
             nodeData.EditorPosition = position;
 
             return CreateNode(graphAsset, nodeData);
@@ -34,12 +38,6 @@ namespace GBG.AnimationGraph.Editor.Node
         {
             var nodeType = _dataToNodeType[nodeData.GetType()];
             var node = (StateNode)Activator.CreateInstance(nodeType, graphAsset, nodeData);
-
-            if (string.IsNullOrEmpty(nodeData.StateName))
-            {
-                nodeData.StateName = "State_" + GuidTool.NewUniqueSuffix();
-            }
-
             node.title = nodeData.StateName;
 
             return node;

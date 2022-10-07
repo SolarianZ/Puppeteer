@@ -191,7 +191,7 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             menu.AddItem("Mixer Graph", false, () =>
             {
                 Graphs.Add(new GraphData.GraphData(GuidTool.NewGuid(),
-                    $"BlendGraph_{GuidTool.NewUniqueSuffix()}",
+                    $"MixerGraph_{GuidTool.NewUniqueSuffix()}",
                     GraphType.Mixer));
                 _graphListView.RefreshItems();
                 hasUnsavedChanges = true;
