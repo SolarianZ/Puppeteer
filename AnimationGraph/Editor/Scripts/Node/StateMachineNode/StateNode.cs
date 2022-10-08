@@ -12,8 +12,6 @@ namespace GBG.AnimationGraph.Editor.Node
 {
     public class StateNode : GraphNode
     {
-        public event Action<string> OnWantsToOpenGraph;
-
         public override string Guid => NodeData.Guid;
 
         public virtual string StateName
@@ -57,7 +55,6 @@ namespace GBG.AnimationGraph.Editor.Node
 
             // Callbacks
             mainContainer.AddManipulator(new StateTransitionEdgeConnector(GraphAsset));
-            RegisterCallback<ClickEvent>(OnClick);
         }
 
         public sealed override void SetPosition(Rect newPos)
@@ -76,12 +73,6 @@ namespace GBG.AnimationGraph.Editor.Node
 
         public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
         {
-        }
-
-
-        private void OnClick(ClickEvent _)
-        {
-            OnWantsToOpenGraph?.Invoke(Guid);
         }
 
 

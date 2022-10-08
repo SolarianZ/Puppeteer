@@ -57,6 +57,9 @@ namespace GBG.AnimationGraph.Editor.Node
 
             // Banner container
             BannerContainer = mainContainer.Q("divider");
+
+            // Callbacks
+            RegisterCallback<ClickEvent>(OnClick);
         }
 
 
@@ -103,6 +106,19 @@ namespace GBG.AnimationGraph.Editor.Node
             defaultInspector.SetTarget(this);
 
             return defaultInspector;
+        }
+
+        #endregion
+
+
+        #region Events
+
+        public event Action<GraphNode> OnDoubleClicked;
+
+
+        private void OnClick(ClickEvent _)
+        {
+            OnDoubleClicked?.Invoke(this);
         }
 
         #endregion

@@ -22,11 +22,11 @@ namespace GBG.AnimationGraph.Editor.Node
 
         public static IEnumerable<Type> GetStateNodeTypes() => _nodeToDataType.Keys;
 
-        public static StateNode CreateNode(AnimationGraphAsset graphAsset, Type nodeType, Vector2 position)
+        public static StateNode CreateNode(AnimationGraphAsset graphAsset, Type nodeType,
+            GraphType graphType, Vector2 position)
         {
             var graphData = new GraphData.GraphData(GuidTool.NewGuid(),
-                $"StateMachineGraph_{GuidTool.NewUniqueSuffix()}",
-                GraphType.StateMachine);
+                $"StateMachineGraph_{GuidTool.NewUniqueSuffix()}", graphType);
             var nodeDataType = _nodeToDataType[nodeType];
             var nodeData = (StateNodeData)Activator.CreateInstance(nodeDataType, graphData);
             nodeData.EditorPosition = position;

@@ -4,64 +4,79 @@ using System.Linq;
 using GBG.AnimationGraph.Editor.Node;
 using GBG.AnimationGraph.NodeData;
 using GBG.AnimationGraph.Parameter;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UObject = UnityEngine.Object;
 
 namespace GBG.AnimationGraph.Editor.Inspector
 {
-    public class MixerInputDataDrawer : VisualElement
+    public class LayerMixerInputDataDrawer : MixerInputDataDrawer
     {
-        public const float DRAWER_HEIGHT = 44;
+        public new const float DRAWER_HEIGHT = 90;
 
-        public event Action<ParamGuidOrValue> OnWeightChanged;
+        private readonly Toggle _isAdditiveField;
 
+        private readonly ObjectField _avatarMaskField;
 
-        private readonly List<ParamInfo> _paramTable;
-
-        private readonly TextField _inputNodeField;
-
-        private readonly ParamField _inputWeightParamField;
+        private LayerMixerInputData _layerMixerInputData;
 
 
-        public MixerInputDataDrawer(List<ParamInfo> paramTable, Length nameLabelWidth)
+        public LayerMixerInputDataDrawer(List<ParamInfo> paramTable, Length nameLabelWidth)
+            : base(paramTable, nameLabelWidth)
         {
-            _paramTable = paramTable;
-
             style.height = DRAWER_HEIGHT;
-            style.justifyContent = Justify.SpaceAround;
 
-            _inputNodeField = new TextField("Input Node");
-            _inputNodeField.labelElement.style.minWidth = StyleKeyword.Auto;
-            _inputNodeField.labelElement.style.maxWidth = StyleKeyword.Auto;
-            _inputNodeField.labelElement.style.width = nameLabelWidth;
-            _inputNodeField.labelElement.style.overflow = Overflow.Hidden;
-            _inputNodeField.SetEnabled(false);
-            Add(_inputNodeField);
+            _isAdditiveField = new Toggle("Is Additive");
+            _isAdditiveField.labelElement.style.minWidth = StyleKeyword.Auto;
+            _isAdditiveField.labelElement.style.maxWidth = StyleKeyword.Auto;
+            _isAdditiveField.labelElement.style.width = nameLabelWidth;
+            _isAdditiveField.labelElement.style.overflow = Overflow.Hidden;
+            _isAdditiveField.RegisterValueChangedCallback(OnAdditiveChanged);
+            Add(_isAdditiveField);
 
-            _inputWeightParamField = new ParamField(nameLabelWidth);
-            _inputWeightParamField.OnParamChanged += RaiseMixerInputDataChangedEvent;
-            Add(_inputWeightParamField);
+            _avatarMaskField = new ObjectField("Avatar Mask")
+            {
+                objectType = typeof(AvatarMask),
+            };
+            _avatarMaskField.labelElement.style.minWidth = StyleKeyword.Auto;
+            _avatarMaskField.labelElement.style.maxWidth = StyleKeyword.Auto;
+            _avatarMaskField.labelElement.style.width = nameLabelWidth;
+            _avatarMaskField.labelElement.style.overflow = Overflow.Hidden;
+            _avatarMaskField.RegisterValueChangedCallback(OnAvatarMaskChanged);
+            Add(_avatarMaskField);
         }
 
-        public virtual void SetMixerInputData(MixerInputData mixerInputData, int mixerInputDataIndex)
+        public override void SetMixerInputData(MixerInputData mixerInputData, int mixerInputDataIndex)
         {
-            _inputNodeField.label = $"Input Node {mixerInputDataIndex.ToString()}";
-            _inputNodeField.SetValueWithoutNotify(mixerInputData.InputNodeGuid);
+            base.SetMixerInputData(mixerInputData, mixerInputDataIndex);
 
-            _inputWeightParamField.SetParamTarget($"Input Weight {mixerInputDataIndex.ToString()}",
-                mixerInputData.InputWeightParam, ParamType.Float, _paramTable,
-                mixerInputData.InputWeightParam.IsValue ? ParamLinkState.Unlinked : ParamLinkState.Linked,
-                ParamActiveState.InactiveLocked, new Vector2(0, 1));
+            _layerMixerInputData = (LayerMixerInputData)mixerInputData;
+
+            _isAdditiveField.SetValueWithoutNotify(_layerMixerInputData.IsAdditive);
+
+            _avatarMaskField.SetValueWithoutNotify(_layerMixerInputData.AvatarMask);
         }
 
 
-        protected void RaiseMixerInputDataChangedEvent(ParamGuidOrValue param)
+        private void OnAdditiveChanged(ChangeEvent<bool> evt)
         {
-            OnWeightChanged?.Invoke(param);
+            if (_layerMixerInputData != null)
+            {
+                _layerMixerInputData.IsAdditive = evt.newValue;
+            }
+        }
+
+        private void OnAvatarMaskChanged(ChangeEvent<UObject> evt)
+        {
+            if (_layerMixerInputData != null)
+            {
+                _layerMixerInputData.AvatarMask = (AvatarMask)evt.newValue;
+            }
         }
     }
 
-    public class AnimationMixerNodeInspector : PlayableNodeInspector
+    public class AnimationLayerMixerNodeInspector : PlayableNodeInspector
     {
         private readonly Action<int> _addInputPortElement;
 
@@ -76,7 +91,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
         private List<MixerInputData> _mixerInputs;
 
 
-        public AnimationMixerNodeInspector(List<ParamInfo> paramTable, Action<int> addInputPortElement,
+        public AnimationLayerMixerNodeInspector(List<ParamInfo> paramTable, Action<int> addInputPortElement,
             Action<int> removeInputPortElement, Action<int, int> reorderInputPortElement)
         {
             _paramTable = paramTable;
@@ -100,7 +115,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
             {
                 reorderable = true,
                 reorderMode = ListViewReorderMode.Animated,
-                fixedItemHeight = MixerInputDataDrawer.DRAWER_HEIGHT,
+                fixedItemHeight = LayerMixerInputDataDrawer.DRAWER_HEIGHT,
                 makeItem = MakeInputListItem,
                 bindItem = BindInputListItem,
                 selectionType = SelectionType.Single,
@@ -129,7 +144,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
 
         private VisualElement MakeInputListItem()
         {
-            var mixerDrawer = new MixerInputDataDrawer(_paramTable, FieldLabelWidth);
+            var mixerDrawer = new LayerMixerInputDataDrawer(_paramTable, FieldLabelWidth);
             mixerDrawer.OnWeightChanged += OnMixerInputWeightChanged;
 
             return mixerDrawer;
@@ -137,7 +152,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
 
         private void BindInputListItem(VisualElement element, int index)
         {
-            var drawer = (MixerInputDataDrawer)element;
+            var drawer = (LayerMixerInputDataDrawer)element;
             drawer.SetMixerInputData(_mixerInputs[index], index);
         }
 
@@ -150,7 +165,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
         private void OnInputItemAdded(IEnumerable<int> indices)
         {
             var index = indices.First();
-            _mixerInputs[index] = new MixerInputData();
+            _mixerInputs[index] = new LayerMixerInputData();
             _addInputPortElement(index);
             RaiseParamChangedEvent();
         }

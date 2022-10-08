@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using GBG.AnimationGraph.Editor.GraphEdge;
 using GBG.AnimationGraph.Editor.Node;
+using GBG.AnimationGraph.GraphData;
 using GBG.AnimationGraph.NodeData;
 using UnityEditor.Experimental.GraphView;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace GBG.AnimationGraph.Editor.GraphView
@@ -12,6 +15,8 @@ namespace GBG.AnimationGraph.Editor.GraphView
         public override GraphNode RootNode => StateMachineEntryNode;
 
         public StateMachineEntryNode StateMachineEntryNode { get; }
+
+        public event Action<string> OnWantsToOpenGraph;
 
 
         public StateMachineGraphView(AnimationGraphAsset graphAsset, GraphData.GraphData graphData)
@@ -28,8 +33,9 @@ namespace GBG.AnimationGraph.Editor.GraphView
                 var stateNodeData = (StateNodeData)nodeData;
                 stateNodeData.GraphData = GraphAsset.Graphs.Find(g => g.Guid.Equals(stateNodeData.Guid));
                 var node = StateNodeFactory.CreateNode(GraphAsset, stateNodeData);
-                AddElement(node);
+                node.OnDoubleClicked += OnDoubleClickStateNode;
                 nodeTable.Add(node.Guid, node);
+                AddElement(node);
             }
 
             // Edges
@@ -41,6 +47,7 @@ namespace GBG.AnimationGraph.Editor.GraphView
                 AddElement(edge);
             }
 
+            // Transitions
             foreach (var stateNode in nodeTable.Values)
             {
                 foreach (var transition in stateNode.NodeData.Transitions)
@@ -82,23 +89,32 @@ namespace GBG.AnimationGraph.Editor.GraphView
                 var localMousePos = contentViewContainer.WorldToLocal(evt.mousePosition);
                 foreach (var nodeType in StateNodeFactory.GetStateNodeTypes())
                 {
-                    // New State
-                    evt.menu.AppendAction($"Create {nodeType.Name}", _ =>
-                    {
-                        var node = StateNodeFactory.CreateNode(GraphAsset, nodeType, localMousePos);
-                        if (node != null)
-                        {
-                            GraphAsset.Graphs.Add(node.NodeData.GraphData);
-                            // TODO: Refresh graph list view
+                    // New mixer state
+                    evt.menu.AppendAction($"Create Mixer {nodeType.Name}",
+                        _ => CreateNode(nodeType, GraphType.Mixer, localMousePos));
 
-                            GraphData.Nodes.Add(node.NodeData);
-                            AddElement(node);
-                            RaiseGraphViewChangedEvent();
-                        }
-                    });
+                    // New sub state machine state
+                    evt.menu.AppendAction($"Create Sub State Machine {nodeType.Name}",
+                        _ => CreateNode(nodeType, GraphType.StateMachine, localMousePos));
                 }
 
                 evt.menu.AppendSeparator();
+            }
+
+            void CreateNode(Type nodeType, GraphType graphType, Vector2 localMousePosition)
+            {
+                var node = StateNodeFactory.CreateNode(GraphAsset, nodeType, graphType, localMousePosition);
+                if (node != null)
+                {
+                    node.OnDoubleClicked += OnDoubleClickStateNode;
+
+                    GraphAsset.Graphs.Add(node.NodeData.GraphData);
+                    // TODO: Refresh graph list view
+
+                    GraphData.Nodes.Add(node.NodeData);
+                    AddElement(node);
+                    RaiseGraphViewChangedEvent();
+                }
             }
         }
 
@@ -130,6 +146,7 @@ namespace GBG.AnimationGraph.Editor.GraphView
                         edge.ConnectedNode0.RemoveTransition(edge);
                         edge.ConnectedNode1.RemoveTransition(edge);
                     }
+
                     // Delete nodes
                     else if (element is StateNode stateNode)
                     {
@@ -146,6 +163,22 @@ namespace GBG.AnimationGraph.Editor.GraphView
                         // Transitions
                         var edgesToRemove = stateNode.ViewOnlyDisconnectAll();
                         graphViewChange.elementsToRemove.AddRange(edgesToRemove);
+
+                        // State machine entry
+                        if (stateNode.Guid.Equals(StateMachineEntryNode.DestStateNodeGuid))
+                        {
+                            StateMachineEntryNode.DestStateNodeGuid = null;
+                        }
+
+                        // Graphs
+                        for (int j = 0; j < GraphAsset.Graphs.Count; j++)
+                        {
+                            if (GraphAsset.Graphs[j].Guid.Equals(stateNode.Guid))
+                            {
+                                GraphAsset.Graphs.RemoveAt(j);
+                                break;
+                            }
+                        }
                     }
                 }
             }
@@ -153,6 +186,13 @@ namespace GBG.AnimationGraph.Editor.GraphView
             RaiseGraphViewChangedEvent();
 
             return graphViewChange;
+        }
+
+        private void OnDoubleClickStateNode(GraphNode graphNode)
+        {
+            if (graphNode is StateMachineEntryNode) return;
+
+            OnWantsToOpenGraph?.Invoke(graphNode.Guid);
         }
     }
 }

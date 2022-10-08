@@ -56,6 +56,11 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             graphView.OnGraphViewChanged += OnGraphViewContentChanged;
             graphView.OnSelectionChanged += SetInspectTarget;
             graphView.OnWantsToSave += SaveChanges;
+            if (graphView is StateMachineGraphView stateMachineGraphView)
+            {
+                stateMachineGraphView.OnWantsToOpenGraph += guid => OpenGraphView(guid, false);
+            }
+
             _layoutContainer.MiddlePane.Add(graphView);
             _openedGraphViews.Push(graphView);
             _openedGraphGuids.Add(graphData.Guid);
@@ -68,12 +73,12 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
 
         private void CloseGraphViews(string stopAtGuid)
         {
-            var isActiveGraph = true;
             for (int i = _openedGraphGuids.Count - 1; i >= 0; i--)
             {
                 var graph = _openedGraphViews.Peek();
                 if (graph.Guid.Equals(stopAtGuid))
                 {
+                    _layoutContainer.MiddlePane.Add(graph);
                     return;
                 }
 
@@ -81,16 +86,10 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
                 _openedGraphGuids.RemoveAt(i);
                 _graphViewBreadcrumbs.PopItem();
 
-                if (isActiveGraph)
+                if (_layoutContainer.MiddlePane.Contains(graph))
                 {
                     _layoutContainer.MiddlePane.Remove(graph);
-                    isActiveGraph = false;
                 }
-            }
-
-            if (!isActiveGraph && ActiveGraphView != null)
-            {
-                _layoutContainer.MiddlePane.Add(ActiveGraphView);
             }
         }
 

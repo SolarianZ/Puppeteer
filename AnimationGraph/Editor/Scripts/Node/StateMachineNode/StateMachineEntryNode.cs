@@ -20,7 +20,11 @@ namespace GBG.AnimationGraph.Editor.Node
             internal set => throw new InvalidOperationException();
         }
 
-        public string DestStateNodeGuid => _graphData.RootNodeGuid;
+        public string DestStateNodeGuid
+        {
+            get => _graphData.RootNodeGuid;
+            internal set => _graphData.RootNodeGuid = value;
+        }
 
         private readonly GraphData.GraphData _graphData;
 
