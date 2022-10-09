@@ -1,15 +1,62 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using GBG.AnimationGraph.Editor.Utility;
 using GBG.AnimationGraph.Editor.ViewElement;
 using GBG.AnimationGraph.GraphData;
-using GBG.AnimationGraph.Parameter;
 using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEngine;
+using UnityEngine.Playables;
 
 namespace GBG.AnimationGraph.Editor.GraphEditor
 {
+    public enum AnimationGraphEditorMode
+    {
+        Editor,
+
+        LiveDebug,
+
+        Readonly,
+    }
+
+    [Flags]
+    public enum DataCategories : uint
+    {
+        None = 0,
+
+        Parameter = 1 << 0,
+
+        GraphContent = 1 << 5,
+
+        GraphList = 1 << 6,
+
+        GraphData = GraphContent | GraphList,
+
+        NodeData = 1 << 10,
+
+        TransitionData = 1 << 15,
+    }
+
+    public interface IAnimationGraphEditorWindow
+    {
+        AnimationGraphEditorMode Mode { get; }
+
+        AnimationGraphAsset GraphAsset { get; }
+
+        uint DataVersion { get; }
+
+
+        void OpenAsset(AnimationGraphAsset graphAsset, PlayableGraph liveDebugRuntimeGraph,
+            IReadOnlyDictionary<string, Playable> liveDebugPlayables);
+
+        void PingAsset();
+
+        void MarkAssetChanged();
+
+        void SaveAssetChanges();
+    }
+
     public partial class AnimationGraphEditorWindow : EditorWindow
     {
         #region Global
@@ -76,20 +123,19 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
         #endregion
 
 
-        private List<ParamInfo> Parameters => _graphAsset.Parameters;
-
-        private List<GraphData.GraphData> Graphs => _graphAsset.Graphs;
-
         private TripleSplitterRowView _layoutContainer;
 
         private AnimationGraphAsset _graphAsset;
 
         private AnimationGraphAsset _graphAssetSnapshot;
 
+        private DataCategories _changedDataCategories;
+
 
         public override void SaveChanges()
         {
             base.SaveChanges();
+            _changedDataCategories = DataCategories.None;
 
             EditorUtility.SetDirty(_graphAsset);
             AssetDatabase.SaveAssetIfDirty(_graphAsset);
@@ -101,6 +147,7 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
         public override void DiscardChanges()
         {
             base.DiscardChanges();
+            _changedDataCategories = DataCategories.None;
 
             _graphAssetSnapshot.name = _graphAsset.name;
             EditorUtility.CopySerializedIfDifferent(_graphAssetSnapshot, _graphAsset);
@@ -124,6 +171,22 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
 
             // Try restore editor(after code compiling)
             TryRestoreEditor();
+        }
+
+        private void Update()
+        {
+            _blackboardManager.Update(_changedDataCategories);
+            _graphViewManager.Update(_changedDataCategories);
+
+            // TODO: Move inspector update logics into inspector component
+            if ((_changedDataCategories & (DataCategories.NodeData | DataCategories.TransitionData)) != 0)
+            {
+                var selection = _graphViewManager.GetSelectedGraphElements();
+                SetInspectTarget(selection);
+            }
+
+
+            _changedDataCategories = DataCategories.None;
         }
 
         private void OnGUI()
@@ -169,7 +232,7 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
 
         private void SetGraphAsset(AnimationGraphAsset graphAsset)
         {
-            CloseGraphViews(null);
+            _graphViewManager.CloseGraphViews(null);
 
             _graphAsset = graphAsset;
             _graphAssetSnapshot = Instantiate(_graphAsset);
@@ -177,22 +240,19 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             // Window
             titleContent.text = _graphAsset.name;
 
-            // Parameter
-            _paramListView.itemsSource = Parameters;
-
-            // Graph
-            _graphListView.itemsSource = Graphs;
+            // Blackboard
+            _blackboardManager.Initialize(_graphAsset);
 
             // GraphView
-            if (Graphs.Count == 0)
+            if (_graphAsset.Graphs.Count == 0)
             {
                 // Add a default node
                 var rootGraph = new GraphData.GraphData(GuidTool.NewGuid(), "RootGraph", GraphType.StateMachine);
                 _graphAsset.RootGraphGuid = rootGraph.Guid;
-                Graphs.Add(rootGraph);
+                _graphAsset.Graphs.Add(rootGraph);
             }
 
-            OpenGraphView(_graphAsset.RootGraphGuid, true);
+            OpenGraphFromGraphList(_graphAsset.RootGraphGuid);
         }
 
         private void TryRestoreEditor()
@@ -200,14 +260,17 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             if (!_graphAsset) return;
             _graphAssetSnapshot = Instantiate(_graphAsset);
 
-            // Parameter
-            _paramListView.itemsSource = Parameters;
-
-            // Graph
-            _graphListView.itemsSource = Graphs;
+            // Blackboard
+            _blackboardManager.Initialize(_graphAsset);
 
             // GraphView
-            RestoreGraphViews();
+            _graphViewManager.RestoreGraphViews();
+        }
+
+        private void OnDataChanged(DataCategories changedDataCategories)
+        {
+            _changedDataCategories |= changedDataCategories;
+            hasUnsavedChanges |= _changedDataCategories != DataCategories.None;
         }
     }
 }

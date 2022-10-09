@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using GBG.AnimationGraph.Editor.GraphEditor;
 using GBG.AnimationGraph.Editor.Node;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
@@ -13,6 +14,8 @@ namespace GBG.AnimationGraph.Editor.GraphView
         private const string _GRID_BACKGROUND_STYLE_PATH = "AnimationGraph/GridBackground";
 
         public string Guid => GraphData.Guid;
+
+        public string Name => GraphData.Name;
 
         public abstract GraphNode RootNode { get; }
 
@@ -42,7 +45,7 @@ namespace GBG.AnimationGraph.Editor.GraphView
 
             // Callbacks
             RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
-            RegisterCallback<KeyDownEvent>(_ => OnWantsToSave?.Invoke());
+            RegisterCallback<KeyDownEvent>(_ => OnWantsToSaveChanges?.Invoke());
         }
 
         public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
@@ -63,17 +66,25 @@ namespace GBG.AnimationGraph.Editor.GraphView
 
         #region Graph View Events
 
-        public event Action OnGraphViewChanged;
+        public event Action<DataCategories> OnContentChanged;
 
         public event Action<IReadOnlyList<ISelectable>> OnSelectionChanged;
 
-        public event Action OnWantsToSave;
+        public event Action OnWantsToSaveChanges;
+
+        public event Action<string> OnWantsToOpenGraph;
 
 
-        protected void RaiseGraphViewChangedEvent()
+        protected void RaiseContentChangedEvent(DataCategories dataCategories)
         {
-            OnGraphViewChanged?.Invoke();
+            OnContentChanged?.Invoke(dataCategories);
         }
+
+        protected void RaiseWantsToOpenGraphEvent(string graphGuid)
+        {
+            OnWantsToOpenGraph?.Invoke(graphGuid);
+        }
+
 
         public override void AddToSelection(ISelectable selectable)
         {

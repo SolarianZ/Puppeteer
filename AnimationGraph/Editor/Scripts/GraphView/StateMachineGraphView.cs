@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using GBG.AnimationGraph.Editor.GraphEdge;
+using GBG.AnimationGraph.Editor.GraphEditor;
 using GBG.AnimationGraph.Editor.Node;
 using GBG.AnimationGraph.GraphData;
 using GBG.AnimationGraph.NodeData;
@@ -15,8 +16,6 @@ namespace GBG.AnimationGraph.Editor.GraphView
         public override GraphNode RootNode => StateMachineEntryNode;
 
         public StateMachineEntryNode StateMachineEntryNode { get; }
-
-        public event Action<string> OnWantsToOpenGraph;
 
 
         public StateMachineGraphView(AnimationGraphAsset graphAsset, GraphData.GraphData graphData)
@@ -33,7 +32,7 @@ namespace GBG.AnimationGraph.Editor.GraphView
                 var stateNodeData = (StateNodeData)nodeData;
                 stateNodeData.GraphData = GraphAsset.Graphs.Find(g => g.Guid.Equals(stateNodeData.Guid));
                 var node = StateNodeFactory.CreateNode(GraphAsset, stateNodeData);
-                node.OnDoubleClicked += OnDoubleClickStateNode;
+                node.OnDoubleClicked += OnDoubleClickNode;
                 nodeTable.Add(node.Guid, node);
                 AddElement(node);
             }
@@ -106,14 +105,14 @@ namespace GBG.AnimationGraph.Editor.GraphView
                 var node = StateNodeFactory.CreateNode(GraphAsset, nodeType, graphType, localMousePosition);
                 if (node != null)
                 {
-                    node.OnDoubleClicked += OnDoubleClickStateNode;
+                    node.OnDoubleClicked += OnDoubleClickNode;
 
                     GraphAsset.Graphs.Add(node.NodeData.GraphData);
                     // TODO: Refresh graph list view
 
                     GraphData.Nodes.Add(node.NodeData);
                     AddElement(node);
-                    RaiseGraphViewChangedEvent();
+                    RaiseContentChangedEvent(DataCategories.GraphData);
                 }
             }
         }
@@ -123,17 +122,18 @@ namespace GBG.AnimationGraph.Editor.GraphView
             if (!Contains(edge))
             {
                 AddElement(edge);
-                RaiseGraphViewChangedEvent();
+                RaiseContentChangedEvent(DataCategories.TransitionData);
             }
             else if (forceRaiseGraphViewChangedEvent)
             {
-                RaiseGraphViewChangedEvent();
+                RaiseContentChangedEvent(DataCategories.TransitionData);
             }
         }
 
 
-        private new GraphViewChange OnGraphViewChanged(GraphViewChange graphViewChange)
+        private GraphViewChange OnGraphViewChanged(GraphViewChange graphViewChange)
         {
+            var changedDataCategories = DataCategories.None;
             if (graphViewChange.elementsToRemove != null)
             {
                 for (int i = graphViewChange.elementsToRemove.Count - 1; i >= 0; i--)
@@ -145,8 +145,8 @@ namespace GBG.AnimationGraph.Editor.GraphView
                     {
                         edge.ConnectedNode0.RemoveTransition(edge);
                         edge.ConnectedNode1.RemoveTransition(edge);
+                        changedDataCategories |= DataCategories.TransitionData;
                     }
-
                     // Delete nodes
                     else if (element is StateNode stateNode)
                     {
@@ -179,20 +179,23 @@ namespace GBG.AnimationGraph.Editor.GraphView
                                 break;
                             }
                         }
+
+                        changedDataCategories |= DataCategories.NodeData;
                     }
                 }
             }
 
-            RaiseGraphViewChangedEvent();
+            RaiseContentChangedEvent(changedDataCategories);
 
             return graphViewChange;
         }
 
-        private void OnDoubleClickStateNode(GraphNode graphNode)
+        private void OnDoubleClickNode(GraphNode graphNode)
         {
             if (graphNode is StateMachineEntryNode) return;
 
-            OnWantsToOpenGraph?.Invoke(graphNode.Guid);
+            RaiseWantsToOpenGraphEvent(graphNode.Guid);
+            // OnWantsToOpenGraph?.Invoke(graphNode.Guid);
         }
     }
 }

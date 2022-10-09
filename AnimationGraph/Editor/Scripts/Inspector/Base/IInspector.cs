@@ -5,6 +5,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
 {
     public interface IInspector
     {
+        // TODO: Add DataCategories parameter
         public event Action OnParamChanged;
     }
 

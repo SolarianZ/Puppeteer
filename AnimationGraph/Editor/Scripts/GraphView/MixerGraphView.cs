@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using GBG.AnimationGraph.Editor.GraphEdge;
+using GBG.AnimationGraph.Editor.GraphEditor;
 using GBG.AnimationGraph.Editor.Node;
 using GBG.AnimationGraph.NodeData;
 using UnityEditor.Experimental.GraphView;
+using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.UIElements;
 using UPort = UnityEditor.Experimental.GraphView.Port;
@@ -28,6 +30,7 @@ namespace GBG.AnimationGraph.Editor.GraphView
             foreach (var nodeData in GraphData.Nodes)
             {
                 var node = PlayableNodeFactory.CreateNode(GraphAsset, (PlayableNodeData)nodeData);
+                node.OnDoubleClicked += OnDoubleClickNode;
                 AddElement(node);
                 nodeTable.Add(node.Guid, node);
             }
@@ -65,9 +68,11 @@ namespace GBG.AnimationGraph.Editor.GraphView
                         var node = PlayableNodeFactory.CreateNode(GraphAsset, nodeType, localMousePos);
                         if (node != null)
                         {
+                            node.OnDoubleClicked += OnDoubleClickNode;
+
                             GraphData.Nodes.Add(node.NodeData);
                             AddElement(node);
-                            RaiseGraphViewChangedEvent();
+                            RaiseContentChangedEvent(DataCategories.GraphData);
                         }
                     });
                 }
@@ -112,7 +117,7 @@ namespace GBG.AnimationGraph.Editor.GraphView
             }
         }
 
-        private new GraphViewChange OnGraphViewChanged(GraphViewChange graphViewChange)
+        private GraphViewChange OnGraphViewChanged(GraphViewChange graphViewChange)
         {
             graphViewChange.elementsToRemove?.ForEach(element =>
             {
@@ -129,9 +134,18 @@ namespace GBG.AnimationGraph.Editor.GraphView
                 }
             });
 
-            RaiseGraphViewChangedEvent();
+            RaiseContentChangedEvent(DataCategories.GraphContent);
 
             return graphViewChange;
+        }
+
+        private void OnDoubleClickNode(GraphNode graphNode)
+        {
+            if (graphNode is PoseOutputNode) return;
+
+            // TODO: Open StateNode
+            Debug.LogError($"Double click node: {graphNode.GetType().Name}.");
+            // RaiseWantsToOpenGraphEvent(graphNode.Guid);
         }
     }
 }

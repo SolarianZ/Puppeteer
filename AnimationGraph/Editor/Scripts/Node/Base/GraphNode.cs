@@ -116,9 +116,12 @@ namespace GBG.AnimationGraph.Editor.Node
         public event Action<GraphNode> OnDoubleClicked;
 
 
-        private void OnClick(ClickEvent _)
+        private void OnClick(ClickEvent evt)
         {
-            OnDoubleClicked?.Invoke(this);
+            if (evt.clickCount == 2)
+            {
+                OnDoubleClicked?.Invoke(this);
+            }
         }
 
         #endregion
