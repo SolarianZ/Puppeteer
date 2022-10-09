@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using GBG.AnimationGraph.Editor.GraphEdge;
+using GBG.AnimationGraph.Editor.GraphEditor;
 using GBG.AnimationGraph.Editor.Node;
 using GBG.AnimationGraph.NodeData;
 using GBG.AnimationGraph.Parameter;
@@ -449,12 +450,12 @@ namespace GBG.AnimationGraph.Editor.Inspector
             _onWantsToDeleteTransition(fromNode, destNode);
 
             SetTarget(Target.IsConnection(fromNode, destNode) ? Target : null);
-            RaiseParamChangedEvent();
+            RaiseDataChangedEvent(DataCategories.TransitionData);
         }
 
         private void OnTransitionParamChanged()
         {
-            RaiseParamChangedEvent();
+            RaiseDataChangedEvent(DataCategories.TransitionData);
         }
     }
 }

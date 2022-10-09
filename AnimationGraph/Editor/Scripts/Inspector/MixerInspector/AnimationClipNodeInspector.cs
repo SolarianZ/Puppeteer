@@ -1,4 +1,5 @@
-﻿using GBG.AnimationGraph.Editor.Node;
+﻿using GBG.AnimationGraph.Editor.GraphEditor;
+using GBG.AnimationGraph.Editor.Node;
 using GBG.AnimationGraph.NodeData;
 using GBG.AnimationGraph.Parameter;
 using UnityEditor.UIElements;
@@ -91,45 +92,45 @@ namespace GBG.AnimationGraph.Editor.Inspector
 
         private void OnMotionTimeChanged(ParamGuidOrValue _)
         {
-            RaiseParamChangedEvent();
+            RaiseDataChangedEvent(DataCategories.NodeData);
         }
 
         private void OnMotionTimeActiveChanged(bool isActive)
         {
             NodeData.MotionTimeParamActive = isActive;
-            RaiseParamChangedEvent();
+            RaiseDataChangedEvent(DataCategories.NodeData);
         }
 
         // ReSharper disable once UnusedMember.Local
         // ReSharper disable once UnusedParameter.Local
         private void OnCycleOffsetChanged(ParamGuidOrValue _)
         {
-            RaiseParamChangedEvent();
+            RaiseDataChangedEvent(DataCategories.NodeData);
         }
 
         // ReSharper disable once UnusedMember.Local
         private void OnCycleOffsetActiveChanged(bool isActive)
         {
             NodeData.CycleOffsetParamActive = isActive;
-            RaiseParamChangedEvent();
+            RaiseDataChangedEvent(DataCategories.NodeData);
         }
 
         private void OnClipChanged(ChangeEvent<Object> evt)
         {
             NodeData.Clip = (AnimationClip)evt.newValue;
-            RaiseParamChangedEvent();
+            RaiseDataChangedEvent(DataCategories.NodeData);
         }
 
         private void OnFootIKParamChanged(ChangeEvent<bool> evt)
         {
             NodeData.ApplyFootIK = evt.newValue;
-            RaiseParamChangedEvent();
+            RaiseDataChangedEvent(DataCategories.NodeData);
         }
 
         private void OnPlayableIKParamChanged(ChangeEvent<bool> evt)
         {
             NodeData.ApplyPlayableIK = evt.newValue;
-            RaiseParamChangedEvent();
+            RaiseDataChangedEvent(DataCategories.NodeData);
         }
     }
 }

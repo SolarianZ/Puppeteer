@@ -1,4 +1,5 @@
-﻿using GBG.AnimationGraph.Editor.Node;
+﻿using GBG.AnimationGraph.Editor.GraphEditor;
+using GBG.AnimationGraph.Editor.Node;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -66,7 +67,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
         private void OnStateNameChanged(ChangeEvent<string> evt)
         {
             Target.StateName = evt.newValue;
-            RaiseParamChangedEvent();
+            RaiseDataChangedEvent(DataCategories.NodeData);
         }
 
 

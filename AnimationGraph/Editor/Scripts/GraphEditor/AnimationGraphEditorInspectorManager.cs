@@ -19,7 +19,7 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
         private IInspector _inspector;
 
 
-        public AnimationGraphEditorInspectorManager(VisualElement viewContainer)
+        public AnimationGraphEditorInspectorManager(AnimationGraphEditorMode mode, VisualElement viewContainer)
         {
             _viewContainer = viewContainer;
 
@@ -52,21 +52,21 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             if (_inspector != null)
             {
                 _viewContainer.Remove((VisualElement)_inspector);
-                _inspector.OnParamChanged -= OnParamChanged;
+                _inspector.OnDataChanged -= OnDataChanged;
                 _inspector = null;
             }
 
             if (newInspector != null)
             {
                 _inspector = newInspector;
-                _inspector.OnParamChanged += OnParamChanged;
+                _inspector.OnDataChanged += OnDataChanged;
                 _viewContainer.Add((VisualElement)_inspector);
             }
         }
 
-        private void OnParamChanged()
+        // TODO: Update inspector
+        public void Update(DataCategories changedDataCategories)
         {
-            OnDataChanged?.Invoke(DataCategories.NodeData | DataCategories.TransitionData);
         }
     }
 }

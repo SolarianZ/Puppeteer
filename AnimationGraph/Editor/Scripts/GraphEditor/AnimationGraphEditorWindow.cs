@@ -75,7 +75,7 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
                 if (!editor)
                 {
                     editor = CreateInstance<AnimationGraphEditorWindow>();
-                    editor.SetGraphAsset(animGraphAsset);
+                    editor.OpenGraphAsset(animGraphAsset);
                 }
 
                 editor.Show();
@@ -122,6 +122,7 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
 
         #endregion
 
+        private AnimationGraphEditorMode _editorMode = AnimationGraphEditorMode.Editor;
 
         private TripleSplitterRowView _layoutContainer;
 
@@ -175,16 +176,16 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
 
         private void Update()
         {
+            // Update sub components
             _blackboardManager.Update(_changedDataCategories);
             _graphViewManager.Update(_changedDataCategories);
+            _inspectorManager.Update(_changedDataCategories);
 
-            // TODO: Move inspector update logics into inspector component
+            // Update inspect target
             if ((_changedDataCategories & (DataCategories.NodeData | DataCategories.TransitionData)) != 0)
             {
-                var selection = _graphViewManager.GetSelectedGraphElements();
-                SetInspectTarget(selection);
+                SetInspectTarget(_graphViewManager.GetSelectedGraphElements());
             }
-
 
             _changedDataCategories = DataCategories.None;
         }
@@ -229,8 +230,18 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             titleContent.text = _graphAsset.name;
         }
 
+        private void OnDataChanged(DataCategories changedDataCategories)
+        {
+            _changedDataCategories |= changedDataCategories;
+            hasUnsavedChanges |= _changedDataCategories != DataCategories.None;
+        }
 
-        private void SetGraphAsset(AnimationGraphAsset graphAsset)
+        // TODO: SetLiveDebugContext
+        private void SetLiveDebugContext(Animator targetAnimator, IReadOnlyDictionary<string, Playable> playables)
+        {
+        }
+
+        private void OpenGraphAsset(AnimationGraphAsset graphAsset)
         {
             _graphViewManager.CloseGraphViews(null);
 
@@ -265,12 +276,6 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
 
             // GraphView
             _graphViewManager.RestoreGraphViews();
-        }
-
-        private void OnDataChanged(DataCategories changedDataCategories)
-        {
-            _changedDataCategories |= changedDataCategories;
-            hasUnsavedChanges |= _changedDataCategories != DataCategories.None;
         }
     }
 }

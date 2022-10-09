@@ -12,7 +12,7 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
 
         private void CreateGraphViewPanel()
         {
-            _graphViewManager = new AnimationGraphEditorGraphViewManager(_layoutContainer.MiddlePane);
+            _graphViewManager = new AnimationGraphEditorGraphViewManager(_editorMode, _layoutContainer.MiddlePane);
             _graphViewManager.OnActiveGraphChanged += SetActiveGraph;
             _graphViewManager.OnGraphViewSelectionChanged += SetInspectTarget;
             _graphViewManager.OnDataChanged += OnDataChanged;

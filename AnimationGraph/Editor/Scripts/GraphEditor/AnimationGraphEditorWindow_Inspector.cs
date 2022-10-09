@@ -10,7 +10,7 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
 
         private void CreateInspectorPanel()
         {
-            _inspectorManager = new AnimationGraphEditorInspectorManager(_layoutContainer.RightPane);
+            _inspectorManager = new AnimationGraphEditorInspectorManager(_editorMode, _layoutContainer.RightPane);
             _inspectorManager.OnDataChanged += OnDataChanged;
         }
 

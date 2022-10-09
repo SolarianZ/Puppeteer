@@ -38,7 +38,7 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
         private List<string> _openedGraphGuids = new List<string>();
 
 
-        public AnimationGraphEditorGraphViewManager(VisualElement viewContainer)
+        public AnimationGraphEditorGraphViewManager(AnimationGraphEditorMode mode, VisualElement viewContainer)
         {
             _viewContainer = viewContainer;
 

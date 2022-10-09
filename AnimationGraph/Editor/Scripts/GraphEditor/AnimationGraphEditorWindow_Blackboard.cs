@@ -7,7 +7,7 @@
 
         private void CreateBlackboardPanel()
         {
-            _blackboardManager = new AnimationGraphEditorBlackboardManager(_layoutContainer.LeftPane);
+            _blackboardManager = new AnimationGraphEditorBlackboardManager(_editorMode, _layoutContainer.LeftPane);
             _blackboardManager.OnDataChanged += OnDataChanged;
             _blackboardManager.OnWantsOpenGraph += OpenGraphFromGraphList;
         }

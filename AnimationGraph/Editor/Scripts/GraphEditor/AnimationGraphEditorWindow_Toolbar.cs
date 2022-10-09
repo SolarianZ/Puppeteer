@@ -1,15 +1,12 @@
 ﻿using UnityEditor;
-using UnityEditor.UIElements;
 
 namespace GBG.AnimationGraph.Editor.GraphEditor
 {
     public partial class AnimationGraphEditorWindow
     {
-        private Toolbar _toolbar;
-
         private void CreateToolbar()
         {
-            var toolbarMgr = new AnimationGraphEditorToolbarManager(AnimationGraphEditorMode.Editor, rootVisualElement);
+            var toolbarMgr = new AnimationGraphEditorToolbarManager(_editorMode, rootVisualElement);
             toolbarMgr.OnWantsToPingAsset += PingGraphAsset;
             toolbarMgr.OnWantsToSaveChanges += SaveChanges;
             toolbarMgr.OnWantsToFrameAll += FrameAll;

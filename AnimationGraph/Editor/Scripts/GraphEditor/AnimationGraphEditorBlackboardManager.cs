@@ -21,7 +21,7 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
         private AnimationGraphAsset _graphAsset;
 
 
-        public AnimationGraphEditorBlackboardManager(VisualElement viewContainer)
+        public AnimationGraphEditorBlackboardManager(AnimationGraphEditorMode mode, VisualElement viewContainer)
         {
             var splitter = new DoubleSplitterColumnView(new Vector2(20, 80));
             viewContainer.Add(splitter);

@@ -16,6 +16,7 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
 
         public event Action<bool> OnWantsToToggleInspector;
 
+        // TODO: Show live debug target Animator
 
         public AnimationGraphEditorToolbarManager(AnimationGraphEditorMode mode, VisualElement parent)
         {

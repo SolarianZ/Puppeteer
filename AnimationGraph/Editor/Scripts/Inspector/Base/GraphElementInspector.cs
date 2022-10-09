@@ -1,4 +1,5 @@
 ﻿using System;
+using GBG.AnimationGraph.Editor.GraphEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
 
@@ -7,7 +8,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
     public class GraphElementInspector<TTarget> : VisualElement, IInspector<TTarget>
         where TTarget : GraphElement, IInspectable<TTarget>
     {
-        public event Action OnParamChanged;
+        public event Action<DataCategories> OnDataChanged;
 
 
         protected Length FieldLabelWidth { get; set; } = Length.Percent(35);
@@ -49,9 +50,9 @@ namespace GBG.AnimationGraph.Editor.Inspector
         }
 
 
-        protected void RaiseParamChangedEvent()
+        protected void RaiseDataChangedEvent(DataCategories changedDataCategories)
         {
-            OnParamChanged?.Invoke();
+            OnDataChanged?.Invoke(changedDataCategories);
         }
     }
 }

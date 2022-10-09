@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using GBG.AnimationGraph.Editor.GraphEditor;
 using GBG.AnimationGraph.Editor.Node;
 using GBG.AnimationGraph.NodeData;
 using GBG.AnimationGraph.Parameter;
@@ -144,7 +145,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
         private void OnInputIndexChanged(int from, int to)
         {
             _reorderInputPortElement(from, to);
-            RaiseParamChangedEvent();
+            RaiseDataChangedEvent(DataCategories.NodeData);
         }
 
         private void OnInputItemAdded(IEnumerable<int> indices)
@@ -152,18 +153,18 @@ namespace GBG.AnimationGraph.Editor.Inspector
             var index = indices.First();
             _mixerInputs[index] = new MixerInputData();
             _addInputPortElement(index);
-            RaiseParamChangedEvent();
+            RaiseDataChangedEvent(DataCategories.NodeData);
         }
 
         private void OnInputItemRemoved(IEnumerable<int> indices)
         {
             _removeInputPortElement(indices.First());
-            RaiseParamChangedEvent();
+            RaiseDataChangedEvent(DataCategories.NodeData);
         }
 
         private void OnMixerInputWeightChanged(ParamGuidOrValue param)
         {
-            RaiseParamChangedEvent();
+            RaiseDataChangedEvent(DataCategories.NodeData);
         }
     }
 }

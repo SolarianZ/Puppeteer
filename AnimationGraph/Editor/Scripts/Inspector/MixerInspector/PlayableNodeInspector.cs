@@ -1,4 +1,5 @@
-﻿using GBG.AnimationGraph.Editor.Node;
+﻿using GBG.AnimationGraph.Editor.GraphEditor;
+using GBG.AnimationGraph.Editor.Node;
 using GBG.AnimationGraph.Parameter;
 
 namespace GBG.AnimationGraph.Editor.Inspector
@@ -34,13 +35,13 @@ namespace GBG.AnimationGraph.Editor.Inspector
 
         private void OnSpeedChanged(ParamGuidOrValue _)
         {
-            RaiseParamChangedEvent();
+            RaiseDataChangedEvent(DataCategories.NodeData);
         }
 
         private void OnSpeedActiveChanged(bool isActive)
         {
             Target.NodeData.SpeedParamActive = isActive;
-            RaiseParamChangedEvent();
+            RaiseDataChangedEvent(DataCategories.NodeData);
         }
     }
 }
