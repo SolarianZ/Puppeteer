@@ -4,6 +4,7 @@ using GBG.AnimationGraph.Editor.GraphEdge;
 using GBG.AnimationGraph.Editor.Inspector;
 using GBG.AnimationGraph.NodeData;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.UIElements;
 using UPort = UnityEditor.Experimental.GraphView.Port;
 
@@ -15,23 +16,29 @@ namespace GBG.AnimationGraph.Editor.Node
 
         public virtual string StateName
         {
-            get => NodeData.StateName;
+            get => GraphData.Name;
             internal set
             {
-                NodeData.StateName = value;
-                title = NodeData.StateName;
+                GraphData.Name = value;
+                title = GraphData.Name;
             }
         }
 
         internal StateNodeData NodeData { get; }
 
+        internal GraphData.GraphData GraphData { get; }
+
 
         private const float _CONNECTION_HANDLER_WIDTH = 12;
 
 
-        public StateNode(AnimationGraphAsset graphAsset, StateNodeData nodeData) : base(graphAsset)
+        public StateNode(AnimationGraphAsset graphAsset, StateNodeData nodeData,
+            GraphData.GraphData graphData) : base(graphAsset)
         {
+            Assert.AreEqual(nodeData.GraphGuid, graphData.Guid);
+
             NodeData = nodeData;
+            GraphData = graphData;
 
             // Styles
             mainContainer.style.backgroundColor = new Color(45 / 255f, 45 / 255f, 45 / 255f, 1.0f);

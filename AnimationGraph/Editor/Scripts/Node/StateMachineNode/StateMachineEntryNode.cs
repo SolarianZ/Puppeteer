@@ -30,7 +30,9 @@ namespace GBG.AnimationGraph.Editor.Node
 
 
         public StateMachineEntryNode(AnimationGraphAsset graphAsset, GraphData.GraphData graphData)
-            : base(graphAsset, new StateNodeData(new GraphData.GraphData(NODE_GUID, NODE_GUID, GraphType.StateMachine)))
+            : base(graphAsset, 
+                new StateNodeData(NODE_GUID),
+                new GraphData.GraphData(NODE_GUID, NODE_GUID, GraphType.StateMachine))
         {
             _graphData = graphData;
 

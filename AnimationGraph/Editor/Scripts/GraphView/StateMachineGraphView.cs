@@ -30,8 +30,8 @@ namespace GBG.AnimationGraph.Editor.GraphView
             foreach (var nodeData in GraphData.Nodes)
             {
                 var stateNodeData = (StateNodeData)nodeData;
-                stateNodeData.GraphData = GraphAsset.Graphs.Find(g => g.Guid.Equals(stateNodeData.Guid));
-                var node = StateNodeFactory.CreateNode(GraphAsset, stateNodeData);
+                var stateNodeGraphData = GraphAsset.Graphs.Find(data => data.Guid.Equals(stateNodeData.GraphGuid));
+                var node = StateNodeFactory.CreateNode(GraphAsset, stateNodeData, stateNodeGraphData);
                 node.OnDoubleClicked += OnDoubleClickNode;
                 nodeTable.Add(node.Guid, node);
                 AddElement(node);
@@ -93,6 +93,7 @@ namespace GBG.AnimationGraph.Editor.GraphView
                         _ => CreateNode(nodeType, GraphType.Mixer, localMousePos));
 
                     // New sub state machine state
+                    // TODO: Give sub state machine a different color
                     evt.menu.AppendAction($"Create Sub State Machine {nodeType.Name}",
                         _ => CreateNode(nodeType, GraphType.StateMachine, localMousePos));
                 }
@@ -102,14 +103,15 @@ namespace GBG.AnimationGraph.Editor.GraphView
 
             void CreateNode(Type nodeType, GraphType graphType, Vector2 localMousePosition)
             {
-                var node = StateNodeFactory.CreateNode(GraphAsset, nodeType, graphType, localMousePosition);
-                if (node != null)
+                var stateNode = StateNodeFactory.CreateNode(GraphAsset, nodeType, graphType,
+                    localMousePosition, out var stateNodeGraphData);
+                if (stateNode != null)
                 {
-                    node.OnDoubleClicked += OnDoubleClickNode;
+                    stateNode.OnDoubleClicked += OnDoubleClickNode;
 
-                    GraphAsset.Graphs.Add(node.NodeData.GraphData);
-                    GraphData.Nodes.Add(node.NodeData);
-                    AddElement(node);
+                    GraphAsset.Graphs.Add(stateNodeGraphData);
+                    GraphData.Nodes.Add(stateNode.NodeData);
+                    AddElement(stateNode);
                     RaiseContentChangedEvent(DataCategories.GraphData);
                 }
             }
