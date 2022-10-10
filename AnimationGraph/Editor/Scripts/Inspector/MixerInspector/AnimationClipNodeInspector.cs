@@ -5,6 +5,7 @@ using GBG.AnimationGraph.Parameter;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UObject = UnityEngine.Object;
 
 namespace GBG.AnimationGraph.Editor.Inspector
 {
@@ -65,9 +66,9 @@ namespace GBG.AnimationGraph.Editor.Inspector
             Add(_playableIKField);
         }
 
-        public override void SetTarget(GraphNode node)
+        public override void SetTarget(GraphNode target)
         {
-            base.SetTarget(node);
+            base.SetTarget(target);
 
             // Motion Time
             _motionTimeParamField.SetParamTarget("Motion Time", NodeData.MotionTimeParam,
@@ -105,14 +106,14 @@ namespace GBG.AnimationGraph.Editor.Inspector
         // {
         //     RaiseDataChangedEvent(DataCategories.NodeData);
         // }
-
+        //
         // private void OnCycleOffsetActivityChanged(bool isActive)
         // {
         //     NodeData.CycleOffsetParamActive = isActive;
         //     RaiseDataChangedEvent(DataCategories.NodeData);
         // }
 
-        private void OnClipChanged(ChangeEvent<Object> evt)
+        private void OnClipChanged(ChangeEvent<UObject> evt)
         {
             NodeData.Clip = (AnimationClip)evt.newValue;
             RaiseDataChangedEvent(DataCategories.NodeData);

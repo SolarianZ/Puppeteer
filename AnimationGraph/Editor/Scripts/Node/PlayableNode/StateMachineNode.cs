@@ -2,7 +2,6 @@
 
 namespace GBG.AnimationGraph.Editor.Node
 {
-    // TODO: StateMachineNode
     public sealed class StateMachineNode : PlayableNode
     {
         public override string Guid => NodeData.Guid;
@@ -19,6 +18,6 @@ namespace GBG.AnimationGraph.Editor.Node
             RefreshExpandedState();
         }
 
-        // TODO: Inspector
+        // Use default inspector
     }
 }

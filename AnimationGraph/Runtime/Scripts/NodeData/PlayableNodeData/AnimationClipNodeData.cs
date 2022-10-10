@@ -25,7 +25,7 @@ namespace GBG.AnimationGraph.NodeData
         }
 
         [SerializeField]
-        private bool _motionTimeParamActive = false;
+        private bool _motionTimeParamActive;
 
 
         public ParamGuidOrValue MotionTimeParam
@@ -38,24 +38,24 @@ namespace GBG.AnimationGraph.NodeData
         private ParamGuidOrValue _motionTimeParam = new ParamGuidOrValue(null, 0f);
 
 
-        public bool CycleOffsetParamActive
-        {
-            get => _cycleOffsetParamActive;
-            internal set => _cycleOffsetParamActive = value;
-        }
-
-        [SerializeField]
-        private bool _cycleOffsetParamActive = false;
-
-
-        public ParamGuidOrValue CycleOffsetParam
-        {
-            get => _cycleOffsetParam;
-            internal set => _cycleOffsetParam = value;
-        }
-
-        [SerializeField]
-        private ParamGuidOrValue _cycleOffsetParam = new ParamGuidOrValue(null, 0f);
+        // public bool CycleOffsetParamActive
+        // {
+        //     get => _cycleOffsetParamActive;
+        //     internal set => _cycleOffsetParamActive = value;
+        // }
+        //
+        // [SerializeField]
+        // private bool _cycleOffsetParamActive = false;
+        //
+        //
+        // public ParamGuidOrValue CycleOffsetParam
+        // {
+        //     get => _cycleOffsetParam;
+        //     internal set => _cycleOffsetParam = value;
+        // }
+        //
+        // [SerializeField]
+        // private ParamGuidOrValue _cycleOffsetParam = new ParamGuidOrValue(null, 0f);
 
 
         public bool ApplyFootIK
@@ -65,7 +65,7 @@ namespace GBG.AnimationGraph.NodeData
         }
 
         [SerializeField]
-        private bool _applyFootIK = false;
+        private bool _applyFootIK;
 
 
         public bool ApplyPlayableIK
@@ -75,7 +75,7 @@ namespace GBG.AnimationGraph.NodeData
         }
 
         [SerializeField]
-        private bool _applyPlayableIK = false;
+        private bool _applyPlayableIK;
 
 
         public AnimationClipNodeData(string guid) : base(guid)

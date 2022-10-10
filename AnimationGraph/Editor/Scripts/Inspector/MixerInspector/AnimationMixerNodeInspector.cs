@@ -62,9 +62,9 @@ namespace GBG.AnimationGraph.Editor.Inspector
             Add(_inputListView);
         }
 
-        public override void SetTarget(GraphNode node)
+        public override void SetTarget(GraphNode target)
         {
-            base.SetTarget(node);
+            base.SetTarget(target);
 
             _mixerInputs = Target.NodeData.MixerInputs;
             _inputListView.itemsSource = _mixerInputs;
