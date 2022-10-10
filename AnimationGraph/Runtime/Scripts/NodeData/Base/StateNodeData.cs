@@ -9,22 +9,6 @@ namespace GBG.AnimationGraph.NodeData
     {
         public string GraphGuid => Guid;
 
-        // TODO: Use graph data guid?
-        // public GraphData.GraphData GraphData
-        // {
-        //     get => _graphData;
-        //     internal set => _graphData = value;
-        // }
-        //
-        // [SerializeField]
-        // private GraphData.GraphData _graphData;
-
-        // public string StateName
-        // {
-        //     get => GraphData.Name;
-        //     internal set => GraphData.Name = value;
-        // }
-
         public List<Transition> Transitions => _transitions;
 
         [SerializeField]
@@ -34,10 +18,5 @@ namespace GBG.AnimationGraph.NodeData
         public StateNodeData(string graphGuid) : base(graphGuid)
         {
         }
-
-        // public StateNodeData(GraphData.GraphData graphData) : base(graphData.Guid)
-        // {
-        //     GraphData = graphData;
-        // }
     }
 }
