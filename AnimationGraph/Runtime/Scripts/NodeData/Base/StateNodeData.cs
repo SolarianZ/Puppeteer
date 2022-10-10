@@ -7,7 +7,7 @@ namespace GBG.AnimationGraph.NodeData
     [Serializable]
     public class StateNodeData : NodeDataBase
     {
-        public string GraphGuid => Guid;
+        public string MixerGraphGuid => Guid;
 
         public List<Transition> Transitions => _transitions;
 

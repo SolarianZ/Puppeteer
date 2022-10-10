@@ -2,6 +2,8 @@
 using GBG.AnimationGraph.Editor.GraphEdge;
 using GBG.AnimationGraph.Editor.GraphEditor;
 using GBG.AnimationGraph.Editor.Node;
+using GBG.AnimationGraph.Editor.Utility;
+using GBG.AnimationGraph.GraphData;
 using GBG.AnimationGraph.NodeData;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.Assertions;
@@ -70,6 +72,12 @@ namespace GBG.AnimationGraph.Editor.GraphView
                             node.OnDoubleClicked += OnDoubleClickNode;
 
                             GraphData.Nodes.Add(node.NodeData);
+                            if (node is StateMachineNode stateMachineNode)
+                            {
+                                GraphAsset.Graphs.Add(new GraphData.GraphData(stateMachineNode.StateMachineGraphGuid,
+                                    $"SubGraph_{GuidTool.NewUniqueSuffix()}", GraphType.StateMachine));
+                            }
+
                             AddElement(node);
                             RaiseContentChangedEvent(DataCategories.GraphData);
                         }
@@ -140,9 +148,9 @@ namespace GBG.AnimationGraph.Editor.GraphView
 
         private void OnDoubleClickNode(GraphNode graphNode)
         {
-            if (graphNode is StateMachineNode)
+            if (graphNode is StateMachineNode stateMachineNode)
             {
-                RaiseWantsToOpenGraphEvent(graphNode.Guid);
+                RaiseWantsToOpenGraphEvent(stateMachineNode.StateMachineGraphGuid);
             }
         }
     }

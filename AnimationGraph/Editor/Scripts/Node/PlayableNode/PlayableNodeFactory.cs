@@ -13,6 +13,7 @@ namespace GBG.AnimationGraph.Editor.Node
             { typeof(AnimationClipNode), typeof(AnimationClipNodeData) },
             { typeof(AnimationMixerNode), typeof(AnimationMixerNodeData) },
             { typeof(AnimationLayerMixerNode), typeof(AnimationLayerMixerNodeData) },
+            { typeof(StateMachineNode), typeof(StateMachineNodeData) },
         };
 
         private static readonly IReadOnlyDictionary<Type, Type> _dataToNodeType = new Dictionary<Type, Type>
@@ -20,6 +21,7 @@ namespace GBG.AnimationGraph.Editor.Node
             { typeof(AnimationClipNodeData), typeof(AnimationClipNode) },
             { typeof(AnimationMixerNodeData), typeof(AnimationMixerNode) },
             { typeof(AnimationLayerMixerNodeData), typeof(AnimationLayerMixerNode) },
+            { typeof(StateMachineNodeData), typeof(StateMachineNode) },
         };
 
 

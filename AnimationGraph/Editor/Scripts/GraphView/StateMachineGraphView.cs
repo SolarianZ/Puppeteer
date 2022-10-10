@@ -30,7 +30,7 @@ namespace GBG.AnimationGraph.Editor.GraphView
             foreach (var nodeData in GraphData.Nodes)
             {
                 var stateNodeData = (StateNodeData)nodeData;
-                var stateNodeGraphData = GraphAsset.Graphs.Find(data => data.Guid.Equals(stateNodeData.GraphGuid));
+                var stateNodeGraphData = GraphAsset.Graphs.Find(data => data.Guid.Equals(stateNodeData.MixerGraphGuid));
                 var node = StateNodeFactory.CreateNode(GraphAsset, stateNodeData, stateNodeGraphData);
                 node.OnDoubleClicked += OnDoubleClickNode;
                 nodeTable.Add(node.Guid, node);
@@ -199,7 +199,8 @@ namespace GBG.AnimationGraph.Editor.GraphView
         {
             if (graphNode is StateMachineEntryNode) return;
 
-            RaiseWantsToOpenGraphEvent(graphNode.Guid);
+            var graphGuid = ((StateNode)graphNode).MixerGraphGuid;
+            RaiseWantsToOpenGraphEvent(graphGuid);
         }
     }
 }

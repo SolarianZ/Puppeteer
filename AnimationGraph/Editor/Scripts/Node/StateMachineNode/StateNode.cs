@@ -14,6 +14,8 @@ namespace GBG.AnimationGraph.Editor.Node
     {
         public override string Guid => NodeData.Guid;
 
+        public string MixerGraphGuid => NodeData.MixerGraphGuid;
+
         public virtual string StateName
         {
             get => GraphData.Name;
@@ -35,7 +37,7 @@ namespace GBG.AnimationGraph.Editor.Node
         public StateNode(AnimationGraphAsset graphAsset, StateNodeData nodeData,
             GraphData.GraphData graphData) : base(graphAsset)
         {
-            Assert.AreEqual(nodeData.GraphGuid, graphData.Guid);
+            Assert.AreEqual(nodeData.MixerGraphGuid, graphData.Guid);
 
             NodeData = nodeData;
             GraphData = graphData;

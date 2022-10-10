@@ -1,8 +1,10 @@
 ﻿namespace GBG.AnimationGraph.NodeData
 {
-    // TODO: StateMachineNodeData
     public class StateMachineNodeData : PlayableNodeData
     {
+        public string StateMachineGraphGuid => Guid;
+
+
         public StateMachineNodeData(string guid) : base(guid)
         {
         }
