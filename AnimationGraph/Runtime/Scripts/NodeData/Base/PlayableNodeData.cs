@@ -8,6 +8,8 @@ namespace GBG.AnimationGraph.NodeData
     [Serializable]
     public class PlayableNodeData : NodeDataBase
     {
+        #region Speed
+
         public bool SpeedParamActive
         {
             get => _speedParamActive;
@@ -26,6 +28,11 @@ namespace GBG.AnimationGraph.NodeData
         [SerializeField]
         private ParamGuidOrValue _speedParam = new ParamGuidOrValue(null, 1.0f);
 
+        #endregion
+
+        
+        #region Mixer Inputs
+
         public List<MixerInputData> MixerInputs
         {
             get => _mixerInputs;
@@ -34,6 +41,8 @@ namespace GBG.AnimationGraph.NodeData
 
         [SerializeReference]
         private List<MixerInputData> _mixerInputs = new List<MixerInputData>();
+
+        #endregion
 
 
         public PlayableNodeData(string guid) : base(guid)

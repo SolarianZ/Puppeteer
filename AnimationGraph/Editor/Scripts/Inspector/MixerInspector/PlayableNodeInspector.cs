@@ -16,7 +16,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
             // Speed
             SpeedParamField = new ParamField(FieldLabelWidth);
             SpeedParamField.OnParamChanged += OnSpeedChanged;
-            SpeedParamField.OnToggleActive += OnSpeedActiveChanged;
+            SpeedParamField.OnActivityChanged += OnSpeedActiveChanged;
             Add(SpeedParamField);
         }
 

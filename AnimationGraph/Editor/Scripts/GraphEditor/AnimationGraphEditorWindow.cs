@@ -182,7 +182,7 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             _inspectorManager.Update(_changedDataCategories);
 
             // Update inspect target
-            if ((_changedDataCategories & (DataCategories.NodeData | DataCategories.TransitionData)) != 0)
+            if ((_changedDataCategories & DataCategories.GraphContent) != 0)
             {
                 SetInspectTarget(_graphViewManager.GetSelectedGraphElements());
             }
@@ -258,7 +258,7 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             if (_graphAsset.Graphs.Count == 0)
             {
                 // Add a default node
-                var rootGraph = new GraphData.GraphData(GuidTool.NewGuid(), "RootGraph", GraphType.StateMachine);
+                var rootGraph = new GraphData.GraphData(GuidTool.NewGuid(), "RootGraph", GraphType.Mixer);
                 _graphAsset.RootGraphGuid = rootGraph.Guid;
                 _graphAsset.Graphs.Add(rootGraph);
             }

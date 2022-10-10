@@ -4,7 +4,6 @@ using GBG.AnimationGraph.Editor.GraphEditor;
 using GBG.AnimationGraph.Editor.Node;
 using GBG.AnimationGraph.NodeData;
 using UnityEditor.Experimental.GraphView;
-using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.UIElements;
 using UPort = UnityEditor.Experimental.GraphView.Port;
@@ -141,11 +140,10 @@ namespace GBG.AnimationGraph.Editor.GraphView
 
         private void OnDoubleClickNode(GraphNode graphNode)
         {
-            if (graphNode is PoseOutputNode) return;
-
-            // TODO: Open StateNode
-            Debug.LogError($"Double click node: {graphNode.GetType().Name}.");
-            // RaiseWantsToOpenGraphEvent(graphNode.Guid);
+            if (graphNode is StateMachineNode)
+            {
+                RaiseWantsToOpenGraphEvent(graphNode.Guid);
+            }
         }
     }
 }

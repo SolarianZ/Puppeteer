@@ -28,13 +28,13 @@ namespace GBG.AnimationGraph.Editor.Inspector
             // Motion Time
             _motionTimeParamField = new ParamField(FieldLabelWidth);
             _motionTimeParamField.OnParamChanged += OnMotionTimeChanged;
-            _motionTimeParamField.OnToggleActive += OnMotionTimeActiveChanged;
+            _motionTimeParamField.OnActivityChanged += OnMotionTimeActiveChanged;
             Add(_motionTimeParamField);
 
             // Cycle Offset
             // _cycleOffsetParamField = new ParamField(FieldLabelWidth);
             // _cycleOffsetParamField.OnParamChanged += OnCycleOffsetChanged;
-            // _cycleOffsetParamField.OnToggleActive += OnCycleOffsetActiveChanged;
+            // _cycleOffsetParamField.OnActivityChanged += OnCycleOffsetActivityChanged;
             // Add(_cycleOffsetParamField);
 
             // Clip
@@ -101,19 +101,16 @@ namespace GBG.AnimationGraph.Editor.Inspector
             RaiseDataChangedEvent(DataCategories.NodeData);
         }
 
-        // ReSharper disable once UnusedMember.Local
-        // ReSharper disable once UnusedParameter.Local
-        private void OnCycleOffsetChanged(ParamGuidOrValue _)
-        {
-            RaiseDataChangedEvent(DataCategories.NodeData);
-        }
+        // private void OnCycleOffsetChanged(ParamGuidOrValue _)
+        // {
+        //     RaiseDataChangedEvent(DataCategories.NodeData);
+        // }
 
-        // ReSharper disable once UnusedMember.Local
-        private void OnCycleOffsetActiveChanged(bool isActive)
-        {
-            NodeData.CycleOffsetParamActive = isActive;
-            RaiseDataChangedEvent(DataCategories.NodeData);
-        }
+        // private void OnCycleOffsetActivityChanged(bool isActive)
+        // {
+        //     NodeData.CycleOffsetParamActive = isActive;
+        //     RaiseDataChangedEvent(DataCategories.NodeData);
+        // }
 
         private void OnClipChanged(ChangeEvent<Object> evt)
         {

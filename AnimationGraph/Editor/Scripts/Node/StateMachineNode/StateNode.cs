@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using GBG.AnimationGraph.Editor.GraphEdge;
 using GBG.AnimationGraph.Editor.Inspector;
@@ -26,9 +25,6 @@ namespace GBG.AnimationGraph.Editor.Node
 
         internal StateNodeData NodeData { get; }
 
-        internal List<StateTransitionEdge> OutputTransitions { get; } = new List<StateTransitionEdge>();
-
-        private readonly List<StateTransitionEdge> _inputTransitions = new List<StateTransitionEdge>();
 
         private const float _CONNECTION_HANDLER_WIDTH = 12;
 
@@ -76,7 +72,13 @@ namespace GBG.AnimationGraph.Editor.Node
         }
 
 
-        #region Transitions
+        #region Transitions // TODO OPTIMIZABLE
+
+        internal List<StateTransitionEdge> OutputTransitions { get; } = new List<StateTransitionEdge>();
+
+
+        private readonly List<StateTransitionEdge> _inputTransitions = new List<StateTransitionEdge>();
+
 
         public virtual StateTransitionEdge AddTransition(StateNode destNode, out bool dataDirty)
         {

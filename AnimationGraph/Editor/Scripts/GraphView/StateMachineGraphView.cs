@@ -108,8 +108,6 @@ namespace GBG.AnimationGraph.Editor.GraphView
                     node.OnDoubleClicked += OnDoubleClickNode;
 
                     GraphAsset.Graphs.Add(node.NodeData.GraphData);
-                    // TODO: Refresh graph list view
-
                     GraphData.Nodes.Add(node.NodeData);
                     AddElement(node);
                     RaiseContentChangedEvent(DataCategories.GraphData);
@@ -185,6 +183,11 @@ namespace GBG.AnimationGraph.Editor.GraphView
                 }
             }
 
+            if (graphViewChange.moveDelta.sqrMagnitude > Mathf.Epsilon)
+            {
+                changedDataCategories |= DataCategories.NodeData;
+            }
+
             RaiseContentChangedEvent(changedDataCategories);
 
             return graphViewChange;
@@ -195,7 +198,6 @@ namespace GBG.AnimationGraph.Editor.GraphView
             if (graphNode is StateMachineEntryNode) return;
 
             RaiseWantsToOpenGraphEvent(graphNode.Guid);
-            // OnWantsToOpenGraph?.Invoke(graphNode.Guid);
         }
     }
 }

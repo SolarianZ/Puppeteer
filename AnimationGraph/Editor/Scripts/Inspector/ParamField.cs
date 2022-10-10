@@ -36,11 +36,14 @@ namespace GBG.AnimationGraph.Editor.Inspector
     {
         public event Action<ParamGuidOrValue> OnParamChanged;
 
-        public event Action<bool> OnToggleActive;
+        public event Action<bool> OnActivityChanged;
 
 
         private ParamGuidOrValue _serializedTarget;
 
+        /// <summary>
+        /// Parameters that the serialized target can bind to.
+        /// </summary>
         private List<ParamInfo> _paramTable;
 
         private ParamType _paramType;
@@ -57,8 +60,14 @@ namespace GBG.AnimationGraph.Editor.Inspector
 
         private Toggle _boolField;
 
-        private Button _linkButton;
+        /// <summary>
+        /// Click this button to select bind target parameter.
+        /// </summary>
+        private Button _linkedParamButton;
 
+        /// <summary>
+        /// Used for indicate and toggle link state.
+        /// </summary>
         private Image _linkIcon;
 
         private Toggle _activeToggle;
@@ -92,6 +101,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
             // Value field
             _paramContainer = new VisualElement
             {
+                name = "param-container",
                 style =
                 {
                     flexDirection = FlexDirection.Row,
@@ -129,14 +139,14 @@ namespace GBG.AnimationGraph.Editor.Inspector
             // Link to param
             if (IsLinked())
             {
-                var paramButton = GetOrCreateParamButton();
-                _paramContainer.Add(paramButton);
+                PrepareLinkedParamButton();
+                _linkedParamButton.text =  GetLinkedParamButtonText();
+                _paramContainer.Add(_linkedParamButton);
             }
             // Raw value
             else
             {
-                var valueField = GetOrCreateValueField(true);
-                _paramContainer.Add(valueField);
+                _paramContainer.Add(PrepareValueField(true));
             }
 
             // Link icon
@@ -189,7 +199,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
                                 marginBottom = 0,
                             }
                         };
-                        _activeToggle.RegisterValueChangedCallback(OnActiveChanged);
+                        _activeToggle.RegisterValueChangedCallback(OnActivityChangedInternal);
                     }
 
                     Add(_activeToggle);
@@ -219,7 +229,12 @@ namespace GBG.AnimationGraph.Editor.Inspector
             return _linkState == ParamLinkState.Linked || _linkState == ParamLinkState.LinkedLocked;
         }
 
-        private VisualElement GetOrCreateValueField(bool forceCreateNew)
+        private string GetLinkedParamButtonText()
+        {
+            return _linkedParam?.Name ?? "<Select a Parameter>";
+        }
+
+        private VisualElement PrepareValueField(bool forceCreateNew)
         {
             switch (_paramType)
             {
@@ -287,11 +302,15 @@ namespace GBG.AnimationGraph.Editor.Inspector
             }
         }
 
-        private Button GetOrCreateParamButton()
+        /// <summary>
+        /// Make sure linked param button exist.
+        /// </summary>
+        /// <returns></returns>
+        private Button PrepareLinkedParamButton()
         {
-            if (_linkButton == null)
+            if (_linkedParamButton == null)
             {
-                _linkButton = new Button
+                _linkedParamButton = new Button
                 {
                     text = _linkedParam?.Name,
                     style =
@@ -301,11 +320,10 @@ namespace GBG.AnimationGraph.Editor.Inspector
                         marginRight = 0,
                     }
                 };
-                _linkButton.clickable.clickedWithEventInfo += ShowParamPopupList;
-                _paramContainer.Add(_linkButton);
+                _linkedParamButton.clickable.clickedWithEventInfo += ShowParamPopupList;
             }
 
-            return _linkButton;
+            return _linkedParamButton;
         }
 
         private void ShowParamPopupList(EventBase evt)
@@ -324,7 +342,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
                 }
             }
 
-            menu.DropDown(new Rect(evt.originalMousePosition, Vector2.zero), _linkButton);
+            menu.DropDown(new Rect(evt.originalMousePosition, Vector2.zero), _linkedParamButton);
         }
 
 
@@ -348,7 +366,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
 
         private void OnLinkedParamNameChanged(ParamInfo _)
         {
-            _linkButton.text = _linkedParam.Name;
+            _linkedParamButton.text = _linkedParam.Name;
         }
 
         private void ChangeLinkedParam(object linkedParamObj)
@@ -356,7 +374,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
             if (_linkedParam != null)
             {
                 _linkedParam.EditorOnNameChanged -= OnLinkedParamNameChanged;
-                _linkButton.text = null;
+                _linkedParamButton.text = null;
             }
 
             var linkedParam = (ParamInfo)linkedParamObj;
@@ -364,7 +382,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
             if (_linkedParam != null)
             {
                 _linkedParam.EditorOnNameChanged += OnLinkedParamNameChanged;
-                _linkButton.text = _linkedParam.Name;
+                _linkedParamButton.text = _linkedParam.Name;
             }
 
             _serializedTarget.Guid = _linkedParam?.Guid;
@@ -398,10 +416,10 @@ namespace GBG.AnimationGraph.Editor.Inspector
                     _linkedParam.EditorOnNameChanged += OnLinkedParamNameChanged;
                 }
 
-                var linkButton = GetOrCreateParamButton();
-                linkButton.text = _linkedParam?.Name;
+                PrepareLinkedParamButton();
+                _linkedParamButton.text =  GetLinkedParamButtonText();
                 _paramContainer.Clear();
-                _paramContainer.Add(linkButton);
+                _paramContainer.Add(_linkedParamButton);
             }
             else
             {
@@ -411,22 +429,21 @@ namespace GBG.AnimationGraph.Editor.Inspector
                 }
 
                 _paramContainer.Clear();
-                _paramContainer.Add(GetOrCreateValueField(false));
+                _paramContainer.Add(PrepareValueField(false));
             }
 
-            _linkButton.text = _linkedParam?.Name;
             _serializedTarget.Guid = isLinked ? _linkedParam?.Guid : null;
 
             OnParamChanged?.Invoke(_serializedTarget);
         }
 
-        private void OnActiveChanged(ChangeEvent<bool> evt)
+        private void OnActivityChangedInternal(ChangeEvent<bool> evt)
         {
             var isActive = evt.newValue;
             _paramContainer.SetEnabled(isActive);
             _linkIcon?.SetEnabled(isActive);
 
-            OnToggleActive?.Invoke(isActive);
+            OnActivityChanged?.Invoke(isActive);
         }
 
 

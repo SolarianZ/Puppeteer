@@ -226,7 +226,7 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             menu.AddItem("Mixer Graph", false, () =>
             {
                 _graphAsset.Graphs.Add(new GraphData.GraphData(GuidTool.NewGuid(),
-                    $"MixerGraph_{GuidTool.NewUniqueSuffix()}",
+                    $"SubGraph_{GuidTool.NewUniqueSuffix()}",
                     GraphType.Mixer));
                 _graphListView.RefreshItems();
                 OnDataChanged?.Invoke(DataCategories.GraphList);
@@ -234,7 +234,7 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             menu.AddItem("State Machine Graph", false, () =>
             {
                 _graphAsset.Graphs.Add(new GraphData.GraphData(GuidTool.NewGuid(),
-                    $"StateMachineGraph_{GuidTool.NewUniqueSuffix()}",
+                    $"SubGraph_{GuidTool.NewUniqueSuffix()}",
                     GraphType.StateMachine));
                 _graphListView.RefreshItems();
                 OnDataChanged?.Invoke(DataCategories.GraphList);
@@ -263,6 +263,7 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             var graphField = new GraphField();
             graphField.OnWantsToRenameGraph += OnWantsToRenameGraph;
             graphField.OnWantsToOpenGraph += OnWantsToOpenGraph;
+            graphField.OnWantsToDeleteGraph += OnWantsToDeleteGraph;
 
             return graphField;
         }
@@ -302,6 +303,11 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             OnWantsOpenGraph?.Invoke(graphData.Guid);
         }
 
+        private void OnWantsToDeleteGraph(GraphData.GraphData graphData)
+        {
+            Debug.LogError("TODO: OnWantsToDeleteGraph");
+        }
+        
         #endregion
     }
 }

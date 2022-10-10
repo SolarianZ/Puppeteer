@@ -201,16 +201,14 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
         }
 
 
+        // TODO: Can be deleted
         private void AddConditionElement(int index)
         {
-            // TODO: AddConditionElement
-            Debug.LogError("TODO: AddConditionElement");
         }
 
+        // TODO: Can be deleted
         private void RemoveConditionElement(int index)
         {
-            // TODO: RemoveConditionElement
-            Debug.LogError("TODO: RemoveConditionElement");
         }
 
         private void DeleteTransition(StateNode fromNode, StateNode destNode)

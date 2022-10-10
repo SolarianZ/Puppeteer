@@ -51,8 +51,8 @@ namespace GBG.AnimationGraph.Editor.Node
             var inputPort = InstantiatePort(Direction.Input, typeof(Playable));
             inputPort.portColor = ColorTool.GetColor(typeof(Playable));
 
-            base.inputContainer.Insert(index, inputPort);
             InputPorts.Insert(index, inputPort);
+            base.inputContainer.Insert(index, inputPort);
 
             UpdatePortName(index, InputPorts.Count - 1);
             RefreshPorts();
@@ -69,8 +69,8 @@ namespace GBG.AnimationGraph.Editor.Node
                 GraphView.DeleteElements(connections);
             }
 
-            base.inputContainer.RemoveAt(index);
             InputPorts.RemoveAt(index);
+            base.inputContainer.RemoveAt(index);
 
             UpdatePortName(index, InputPorts.Count - 1);
             RaiseNodeChangedEvent();

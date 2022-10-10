@@ -45,7 +45,7 @@ namespace GBG.AnimationGraph.Editor.GraphView
 
             // Callbacks
             RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
-            RegisterCallback<KeyDownEvent>(_ => OnWantsToSaveChanges?.Invoke());
+            RegisterCallback<KeyDownEvent>(OnKeyDown);
         }
 
         public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
@@ -61,6 +61,14 @@ namespace GBG.AnimationGraph.Editor.GraphView
         {
             UnregisterCallback<GeometryChangedEvent>(OnGeometryChanged);
             FrameAll();
+        }
+
+        private void OnKeyDown(KeyDownEvent evt)
+        {
+            if (evt.ctrlKey && evt.keyCode == KeyCode.S)
+            {
+                OnWantsToSaveChanges?.Invoke();
+            }
         }
 
 

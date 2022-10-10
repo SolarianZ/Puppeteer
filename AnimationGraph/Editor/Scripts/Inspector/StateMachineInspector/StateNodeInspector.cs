@@ -1,6 +1,6 @@
 ﻿using GBG.AnimationGraph.Editor.GraphEditor;
 using GBG.AnimationGraph.Editor.Node;
-using UnityEngine;
+using GBG.AnimationGraph.Editor.Utility;
 using UnityEngine.UIElements;
 
 namespace GBG.AnimationGraph.Editor.Inspector
@@ -17,7 +17,10 @@ namespace GBG.AnimationGraph.Editor.Inspector
         public StateNodeInspector()
         {
             // State name
-            StateName = new TextField("Name");
+            StateName = new TextField("Name")
+            {
+                isDelayed = true,
+            };
             StateName.labelElement.style.minWidth = StyleKeyword.Auto;
             StateName.labelElement.style.maxWidth = StyleKeyword.Auto;
             StateName.labelElement.style.width = FieldLabelWidth;
@@ -55,7 +58,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
                         {
                             flexGrow = 1,
                             height = 1,
-                            backgroundColor = new Color(35 / 255f, 35 / 255f, 35 / 255f),
+                            backgroundColor = ColorTool.GetSeparatorColor(),
                         },
                     };
                     _destFoldout.Add(separator);
@@ -67,7 +70,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
         private void OnStateNameChanged(ChangeEvent<string> evt)
         {
             Target.StateName = evt.newValue;
-            RaiseDataChangedEvent(DataCategories.NodeData);
+            RaiseDataChangedEvent(DataCategories.NodeData | DataCategories.GraphList);
         }
 
 
@@ -82,15 +85,15 @@ namespace GBG.AnimationGraph.Editor.Inspector
                 {
                     value = destNode?.StateName,
                 };
-                nodeName.SetEnabled(false);
                 Add(nodeName);
 
                 var nodeGuid = new TextField("Node Guid")
                 {
                     value = destNode?.Guid,
                 };
-                nodeGuid.SetEnabled(false);
                 Add(nodeGuid);
+
+                SetEnabled(false);
             }
         }
     }

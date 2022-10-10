@@ -10,67 +10,15 @@ using UnityEngine.UIElements;
 
 namespace GBG.AnimationGraph.Editor.Inspector
 {
-    public class MixerInputDataDrawer : VisualElement
-    {
-        public const float DRAWER_HEIGHT = 44;
-
-        public event Action<ParamGuidOrValue> OnWeightChanged;
-
-
-        private readonly List<ParamInfo> _paramTable;
-
-        private readonly TextField _inputNodeField;
-
-        private readonly ParamField _inputWeightParamField;
-
-
-        public MixerInputDataDrawer(List<ParamInfo> paramTable, Length nameLabelWidth)
-        {
-            _paramTable = paramTable;
-
-            style.height = DRAWER_HEIGHT;
-            style.justifyContent = Justify.SpaceAround;
-
-            _inputNodeField = new TextField("Input Node");
-            _inputNodeField.labelElement.style.minWidth = StyleKeyword.Auto;
-            _inputNodeField.labelElement.style.maxWidth = StyleKeyword.Auto;
-            _inputNodeField.labelElement.style.width = nameLabelWidth;
-            _inputNodeField.labelElement.style.overflow = Overflow.Hidden;
-            _inputNodeField.SetEnabled(false);
-            Add(_inputNodeField);
-
-            _inputWeightParamField = new ParamField(nameLabelWidth);
-            _inputWeightParamField.OnParamChanged += RaiseMixerInputDataChangedEvent;
-            Add(_inputWeightParamField);
-        }
-
-        public virtual void SetMixerInputData(MixerInputData mixerInputData, int mixerInputDataIndex)
-        {
-            _inputNodeField.label = $"Input Node {mixerInputDataIndex.ToString()}";
-            _inputNodeField.SetValueWithoutNotify(mixerInputData.InputNodeGuid);
-
-            _inputWeightParamField.SetParamTarget($"Input Weight {mixerInputDataIndex.ToString()}",
-                mixerInputData.InputWeightParam, ParamType.Float, _paramTable,
-                mixerInputData.InputWeightParam.IsValue ? ParamLinkState.Unlinked : ParamLinkState.Linked,
-                ParamActiveState.InactiveLocked, new Vector2(0, 1));
-        }
-
-
-        protected void RaiseMixerInputDataChangedEvent(ParamGuidOrValue param)
-        {
-            OnWeightChanged?.Invoke(param);
-        }
-    }
-
     public class AnimationMixerNodeInspector : PlayableNodeInspector
     {
+        protected List<ParamInfo> ParamTable { get; }
+
         private readonly Action<int> _addInputPortElement;
 
         private readonly Action<int> _removeInputPortElement;
 
         private readonly Action<int, int> _reorderInputPortElement;
-
-        private readonly List<ParamInfo> _paramTable;
 
         private readonly ListView _inputListView;
 
@@ -78,9 +26,10 @@ namespace GBG.AnimationGraph.Editor.Inspector
 
 
         public AnimationMixerNodeInspector(List<ParamInfo> paramTable, Action<int> addInputPortElement,
-            Action<int> removeInputPortElement, Action<int, int> reorderInputPortElement)
+            Action<int> removeInputPortElement, Action<int, int> reorderInputPortElement,
+            float inputDrawerHeight = MixerInputDataDrawer.DRAWER_HEIGHT)
         {
-            _paramTable = paramTable;
+            ParamTable = paramTable;
             _addInputPortElement = addInputPortElement;
             _removeInputPortElement = removeInputPortElement;
             _reorderInputPortElement = reorderInputPortElement;
@@ -101,7 +50,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
             {
                 reorderable = true,
                 reorderMode = ListViewReorderMode.Animated,
-                fixedItemHeight = MixerInputDataDrawer.DRAWER_HEIGHT,
+                fixedItemHeight = inputDrawerHeight,
                 makeItem = MakeInputListItem,
                 bindItem = BindInputListItem,
                 selectionType = SelectionType.Single,
@@ -128,10 +77,21 @@ namespace GBG.AnimationGraph.Editor.Inspector
         }
 
 
+        protected virtual MixerInputDataDrawer CreateMixerInputDataDrawer()
+        {
+            return new MixerInputDataDrawer(ParamTable, FieldLabelWidth);
+        }
+
+        protected virtual MixerInputData CreateMixerInputData()
+        {
+            return new MixerInputData();
+        }
+
+
         private VisualElement MakeInputListItem()
         {
-            var mixerDrawer = new MixerInputDataDrawer(_paramTable, FieldLabelWidth);
-            mixerDrawer.OnWeightChanged += OnMixerInputWeightChanged;
+            var mixerDrawer = CreateMixerInputDataDrawer();
+            mixerDrawer.OnDataChanged += () => RaiseDataChangedEvent(DataCategories.NodeData);
 
             return mixerDrawer;
         }
@@ -151,7 +111,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
         private void OnInputItemAdded(IEnumerable<int> indices)
         {
             var index = indices.First();
-            _mixerInputs[index] = new MixerInputData();
+            _mixerInputs[index] = CreateMixerInputData();
             _addInputPortElement(index);
             RaiseDataChangedEvent(DataCategories.NodeData);
         }
@@ -159,11 +119,6 @@ namespace GBG.AnimationGraph.Editor.Inspector
         private void OnInputItemRemoved(IEnumerable<int> indices)
         {
             _removeInputPortElement(indices.First());
-            RaiseDataChangedEvent(DataCategories.NodeData);
-        }
-
-        private void OnMixerInputWeightChanged(ParamGuidOrValue param)
-        {
             RaiseDataChangedEvent(DataCategories.NodeData);
         }
     }

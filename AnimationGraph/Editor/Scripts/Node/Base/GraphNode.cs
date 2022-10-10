@@ -11,6 +11,36 @@ using UPort = UnityEditor.Experimental.GraphView.Port;
 
 namespace GBG.AnimationGraph.Editor.Node
 {
+    public class GraphNodeClickManipulator : MouseManipulator
+    {
+        private readonly Action<MouseDownEvent> _onClicked;
+
+
+        public GraphNodeClickManipulator(Action<MouseDownEvent> onClicked)
+        {
+            _onClicked = onClicked;
+
+            activators.Add(new ManipulatorActivationFilter { button = MouseButton.LeftMouse });
+        }
+
+
+        protected override void RegisterCallbacksOnTarget()
+        {
+            target.RegisterCallback<MouseDownEvent>(OnMouseDown);
+        }
+
+        protected override void UnregisterCallbacksFromTarget()
+        {
+            target.UnregisterCallback<MouseDownEvent>(OnMouseDown);
+        }
+
+
+        private void OnMouseDown(MouseDownEvent e)
+        {
+            _onClicked(e);
+        }
+    }
+
     public abstract partial class GraphNode : UNode, IInspectable<GraphNode>
     {
         public abstract string Guid { get; }
@@ -25,22 +55,8 @@ namespace GBG.AnimationGraph.Editor.Node
 
         public VisualElement IconContainer { get; }
 
-        public event Action OnNodeChanged;
 
-        public UGraphView GraphView
-        {
-            get
-            {
-                if (_graphView == null)
-                {
-                    _graphView = GetFirstAncestorOfType<UGraphView>();
-                }
-
-                return _graphView;
-            }
-        }
-
-        private UGraphView _graphView;
+        protected UGraphView GraphView => GetFirstAncestorOfType<UGraphView>();
 
 
         protected GraphNode(AnimationGraphAsset graphAsset)
@@ -59,7 +75,7 @@ namespace GBG.AnimationGraph.Editor.Node
             BannerContainer = mainContainer.Q("divider");
 
             // Callbacks
-            RegisterCallback<ClickEvent>(OnClick);
+            this.AddManipulator(new GraphNodeClickManipulator(OnClicked));
         }
 
 
@@ -89,15 +105,6 @@ namespace GBG.AnimationGraph.Editor.Node
         }
 
 
-        /// <summary>
-        /// Don't raise events if the event is contained in GraphView.graphViewChanged callback.
-        /// </summary>
-        protected void RaiseNodeChangedEvent()
-        {
-            OnNodeChanged?.Invoke();
-        }
-
-
         #region Inspector
 
         public virtual IInspector<GraphNode> GetInspector()
@@ -113,10 +120,20 @@ namespace GBG.AnimationGraph.Editor.Node
 
         #region Events
 
+        public event Action OnNodeChanged;
+
+        /// <summary>
+        /// Don't raise events which is contained in GraphView.graphViewChanged callback.
+        /// </summary>
+        protected void RaiseNodeChangedEvent()
+        {
+            OnNodeChanged?.Invoke();
+        }
+
+
         public event Action<GraphNode> OnDoubleClicked;
 
-
-        private void OnClick(ClickEvent evt)
+        private void OnClicked(MouseDownEvent evt)
         {
             if (evt.clickCount == 2)
             {

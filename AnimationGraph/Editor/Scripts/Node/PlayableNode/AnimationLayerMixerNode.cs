@@ -13,7 +13,7 @@ namespace GBG.AnimationGraph.Editor.Node
         public AnimationLayerMixerNode(AnimationGraphAsset graphAsset, AnimationLayerMixerNodeData nodeData)
             : base(graphAsset, nodeData)
         {
-            title = "Mixer";
+            title = "Layer Mixer";
 
             RestoreInputPortElement();
 

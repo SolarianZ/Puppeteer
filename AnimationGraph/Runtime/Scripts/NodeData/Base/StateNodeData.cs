@@ -7,6 +7,7 @@ namespace GBG.AnimationGraph.NodeData
     [Serializable]
     public class StateNodeData : NodeDataBase
     {
+        // TODO: Use graph data guid?
         public GraphData.GraphData GraphData
         {
             get => _graphData;

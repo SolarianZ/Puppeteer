@@ -1,10 +1,10 @@
 ﻿using System;
 using GBG.AnimationGraph.Editor.GraphEdge;
 using GBG.AnimationGraph.Editor.Inspector;
+using GBG.AnimationGraph.Editor.Utility;
 using GBG.AnimationGraph.GraphData;
 using GBG.AnimationGraph.NodeData;
 using UnityEditor.Experimental.GraphView;
-using UnityEngine;
 
 namespace GBG.AnimationGraph.Editor.Node
 {
@@ -35,7 +35,7 @@ namespace GBG.AnimationGraph.Editor.Node
             _graphData = graphData;
 
             title = "State Machine Entry";
-            titleContainer.style.backgroundColor = new Color(30 / 255f, 110 / 255f, 55 / 255f);
+            titleContainer.style.backgroundColor = ColorTool.GetColor<StateMachineEntryNode>();
 
             // Capabilities
             capabilities &= ~Capabilities.Movable;
@@ -44,6 +44,14 @@ namespace GBG.AnimationGraph.Editor.Node
 
             RefreshPorts();
             RefreshExpandedState();
+        }
+
+        public override IInspector<GraphNode> GetInspector()
+        {
+            var inspector = new StateMachineEntryNodeInspector();
+            inspector.SetTarget(this);
+
+            return inspector;
         }
 
         public override StateTransitionEdge AddTransition(StateNode destNode, out bool dataDirty)
@@ -69,14 +77,6 @@ namespace GBG.AnimationGraph.Editor.Node
             dataDirty = true;
 
             return edge;
-        }
-
-        public override IInspector<GraphNode> GetInspector()
-        {
-            var inspector = new StateMachineEntryNodeInspector();
-            inspector.SetTarget(this);
-
-            return inspector;
         }
     }
 }

@@ -26,7 +26,7 @@ namespace GBG.AnimationGraph.Editor.Node
             GraphType graphType, Vector2 position)
         {
             var graphData = new GraphData.GraphData(GuidTool.NewGuid(),
-                $"StateMachineGraph_{GuidTool.NewUniqueSuffix()}", graphType);
+                $"SubGraph_{GuidTool.NewUniqueSuffix()}", graphType);
             var nodeDataType = _nodeToDataType[nodeType];
             var nodeData = (StateNodeData)Activator.CreateInstance(nodeDataType, graphData);
             nodeData.EditorPosition = position;
