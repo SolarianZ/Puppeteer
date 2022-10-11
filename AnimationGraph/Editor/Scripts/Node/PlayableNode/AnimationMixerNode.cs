@@ -5,6 +5,7 @@ using UEdge = UnityEditor.Experimental.GraphView.Edge;
 
 namespace GBG.AnimationGraph.Editor.Node
 {
+    // TODO: Sync inputs
     public sealed class AnimationMixerNode : PlayableNode
     {
         private AnimationMixerNodeInspector _inspector;

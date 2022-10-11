@@ -4,8 +4,6 @@ namespace GBG.AnimationGraph.Editor.Node
 {
     public sealed class StateMachineNode : PlayableNode
     {
-        public override string Guid => NodeData.Guid;
-
         public string StateMachineGraphGuid => ((StateMachineNodeData)NodeData).StateMachineGraphGuid;
 
 

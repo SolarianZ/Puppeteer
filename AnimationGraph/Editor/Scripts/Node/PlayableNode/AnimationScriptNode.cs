@@ -1,13 +1,25 @@
-﻿using GBG.AnimationGraph.NodeData;
+﻿using GBG.AnimationGraph.Editor.Inspector;
+using GBG.AnimationGraph.NodeData;
 
 namespace GBG.AnimationGraph.Editor.Node
 {
-    // TODO: AnimationScriptNode
-    public class AnimationScriptNode : PlayableNode
+    public sealed class AnimationScriptNode : PlayableNode
     {
-        public AnimationScriptNode(AnimationGraphAsset graphAsset, PlayableNodeData nodeData)
+        public AnimationScriptNode(AnimationGraphAsset graphAsset, AnimationScriptNodeData nodeData)
             : base(graphAsset, nodeData)
         {
+            title = "Animation Script";
+
+            RefreshPorts();
+            RefreshExpandedState();
+        }
+
+        public override IInspector<GraphNode> GetInspector()
+        {
+            var inspector = new AnimationScriptNodeInspector();
+            inspector.SetTarget(this);
+
+            return inspector;
         }
     }
 }
