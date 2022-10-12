@@ -16,6 +16,8 @@ namespace GBG.AnimationGraph.Editor.Node
             { typeof(StateMachineNode), typeof(StateMachineNodeData) },
             { typeof(SubGraphNode), typeof(SubGraphNodeData) },
             { typeof(AnimationScriptNode), typeof(AnimationScriptNodeData) },
+            { typeof(BlendSpace1DNode), typeof(BlendSpace1DNodeData) },
+            { typeof(BlendSpace2DNode), typeof(BlendSpace2DNodeData) },
         };
 
         private static readonly IReadOnlyDictionary<Type, Type> _dataToNodeType = new Dictionary<Type, Type>
@@ -26,6 +28,8 @@ namespace GBG.AnimationGraph.Editor.Node
             { typeof(StateMachineNodeData), typeof(StateMachineNode) },
             { typeof(SubGraphNodeData), typeof(SubGraphNode) },
             { typeof(AnimationScriptNodeData), typeof(AnimationScriptNode) },
+            { typeof(BlendSpace1DNodeData), typeof(BlendSpace1DNode) },
+            { typeof(BlendSpace2DNodeData), typeof(BlendSpace2DNode) },
         };
 
 

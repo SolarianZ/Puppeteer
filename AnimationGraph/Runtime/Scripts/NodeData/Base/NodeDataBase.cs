@@ -16,7 +16,7 @@ namespace GBG.AnimationGraph.NodeData
         public Vector2 EditorPosition
         {
             get => _editorPosition;
-            set => _editorPosition = value;
+            internal set => _editorPosition = value;
         }
 
         [SerializeField]

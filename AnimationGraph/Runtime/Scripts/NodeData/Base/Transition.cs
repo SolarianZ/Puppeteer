@@ -100,7 +100,7 @@ namespace GBG.AnimationGraph.NodeData
         public float ExitTime
         {
             get => _exitTime;
-            set => _exitTime = value;
+            internal set => _exitTime = value;
         }
 
         [SerializeField]
@@ -111,7 +111,7 @@ namespace GBG.AnimationGraph.NodeData
         public float FadeTime
         {
             get => _fadeTime;
-            set => _fadeTime = value;
+            internal set => _fadeTime = value;
         }
 
         [SerializeField]
@@ -122,7 +122,7 @@ namespace GBG.AnimationGraph.NodeData
         public TransitionMode TransitionMode
         {
             get => _transitionMode;
-            set => _transitionMode = value;
+            internal set => _transitionMode = value;
         }
 
         [SerializeField]
@@ -131,7 +131,7 @@ namespace GBG.AnimationGraph.NodeData
         public AnimationCurve BlendCurve
         {
             get => _blendCurve;
-            set => _blendCurve = value;
+            internal set => _blendCurve = value;
         }
 
         [SerializeField]

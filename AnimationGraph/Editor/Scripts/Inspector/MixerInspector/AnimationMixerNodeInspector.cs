@@ -90,10 +90,10 @@ namespace GBG.AnimationGraph.Editor.Inspector
 
         private VisualElement MakeInputListItem()
         {
-            var mixerDrawer = CreateMixerInputDataDrawer();
-            mixerDrawer.OnDataChanged += () => RaiseDataChangedEvent(DataCategories.NodeData);
+            var drawer = CreateMixerInputDataDrawer();
+            drawer.OnDataChanged += () => RaiseDataChangedEvent(DataCategories.NodeData);
 
-            return mixerDrawer;
+            return drawer;
         }
 
         private void BindInputListItem(VisualElement element, int index)
