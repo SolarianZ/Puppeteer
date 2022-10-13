@@ -1,4 +1,4 @@
-﻿namespace GBG.Puppeteer
+﻿namespace GBG.AnimationGraph
 {
     public enum TimeMode
     {

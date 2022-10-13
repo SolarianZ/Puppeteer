@@ -1,0 +1,16 @@
+{
+    "name": "GBG.AnimationGraph.Tests",
+    "rootNamespace": "GBG.AnimationGraph.Tests",
+    "references": [
+        "GUID:80a65f576685b204ea6d2dabaf45ccf8"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

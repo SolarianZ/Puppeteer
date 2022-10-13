@@ -1,3 +1,3 @@
 ﻿using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("GBG.Puppeteer.Editor")]
+[assembly: InternalsVisibleTo("GBG.AnimationGraph.Editor")]

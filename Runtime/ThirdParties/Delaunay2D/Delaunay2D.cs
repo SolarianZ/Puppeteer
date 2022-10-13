@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GBG.Puppeteer.ThirdParties
+namespace GBG.AnimationGraph.ThirdParties
 {
     // Upstream: https://github.com/godotengine/godot/blob/master/core/math/delaunay_2d.h
     // Copyright (c) 2007-2022 Juan Linietsky, Ariel Manzur.

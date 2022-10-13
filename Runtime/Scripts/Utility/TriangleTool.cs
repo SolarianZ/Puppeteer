@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace GBG.Puppeteer
+namespace GBG.AnimationGraph.Utility
 {
     public static class TriangleTool
     {

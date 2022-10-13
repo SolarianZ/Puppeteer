@@ -6,7 +6,7 @@ using UnityEngine.Animations;
 using UnityEngine.Assertions;
 using UDebug = UnityEngine.Debug;
 
-namespace GBG.Puppeteer
+namespace GBG.AnimationGraph.Component
 {
     /// <summary>
     /// 骨骼节点数据。
@@ -123,6 +123,8 @@ namespace GBG.Puppeteer
         [NonReorderable]
         private Transform[] _bones = Array.Empty<Transform>();
 
+        private NativeArray<BoneInfo> _boneInfos;
+
 
         private void Reset()
         {
@@ -140,6 +142,13 @@ namespace GBG.Puppeteer
             }
         }
 
+        private void OnDestroy()
+        {
+            if (_boneInfos.IsCreated)
+            {
+                _boneInfos.Dispose();
+            }
+        }
 
         /// <summary>
         /// 分配一个存储 <see cref="BoneInfo"/> 的 <see cref="NativeArray{T}"/> 实例。
@@ -148,9 +157,14 @@ namespace GBG.Puppeteer
         /// <param name="animator">Animator组件。</param>
         /// <param name="nameToHash">将骨骼节点名称转为Hash值的方法。默认为 <see cref="Animator.StringToHash"/> 。</param>
         /// <returns>含有骨骼节点数据的 <see cref="NativeArray{T}"/> 实例。</returns>
-        public NativeArray<BoneInfo> AllocateBoneInfos(Animator animator, Func<string, int> nameToHash = null)
+        public NativeArray<BoneInfo> GetOrAllocateBoneInfos(Animator animator, Func<string, int> nameToHash = null)
         {
-            return BoneInfo.AllocateBoneInfos(animator, _bones, nameToHash);
+            if (!_boneInfos.IsCreated)
+            {
+                _boneInfos = BoneInfo.AllocateBoneInfos(animator, _bones, nameToHash);
+            }
+
+            return _boneInfos;
         }
 
         public static bool CollectBonesFromHierarchy(Skeleton skeleton, bool noRenderer)

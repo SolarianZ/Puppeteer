@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace GBG.Puppeteer
+namespace GBG.AnimationGraph
 {
     public static class NameHashTool
     {

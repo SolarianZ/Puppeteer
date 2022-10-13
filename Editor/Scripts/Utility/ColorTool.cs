@@ -1,32 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
+using GBG.AnimationGraph.Editor.Node;
 using UnityEngine;
 using UnityEngine.Playables;
 using Random = UnityEngine.Random;
 
-namespace GBG.Puppeteer.Editor.Utility
+namespace GBG.AnimationGraph.Editor.Utility
 {
     public static class ColorTool
     {
         private static readonly Dictionary<Type, Color> _colors = new Dictionary<Type, Color>
         {
-            { typeof(Playable), Color.cyan }
+            { typeof(Playable), Color.cyan },
+            { typeof(StateMachineEntryNode), new Color(30 / 255f, 110 / 255f, 55 / 255f) },
         };
 
 
-        public static void SetColor(Type type, Color color)
+        public static Color GetColor<T>()
         {
-            _colors[type] = color;
+            return GetColor(typeof(T));
         }
 
-        public static Color GetColor(Type type, Color? defaultColor = null)
+        public static Color GetColor(Type type)
         {
             if (_colors.TryGetValue(type, out var color))
             {
                 return color;
             }
 
-            return defaultColor ?? Color.white;
+            return GetRandomColor();
+        }
+
+        public static Color GetSeparatorColor()
+        {
+            return new Color(35 / 255f, 35 / 255f, 35 / 255f);
         }
 
         public static Color GetRandomColor(byte rgbMax = 200, byte minInterval = 25, int? randomSeed = null)

@@ -1,0 +1,28 @@
+.edge {
+    --layer: -10;
+}
+
+/*
+#state-transition-edge-control {
+    border-left-width: 0;
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+}
+
+:hover > #state-transition-edge-control {
+    border-color: rgb(68, 192, 255);
+    border-top-width: 2px;
+    border-left-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+}
+
+:selected > #state-transition-edge-control {
+    border-color: rgb(68, 192, 255);
+    border-top-width: 2px;
+    border-left-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+}
+*/
