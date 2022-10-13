@@ -35,7 +35,9 @@ namespace GBG.AnimationGraph
 
 
 #if UNITY_EDITOR
-        // TODO: Isolated nodes(Editor only) 
+        
+        // TODO: Isolated graphs(Editor only) 
+        
 #endif
 
 

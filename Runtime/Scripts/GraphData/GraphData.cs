@@ -38,7 +38,7 @@ namespace GBG.AnimationGraph.GraphData
         }
 
         [SerializeField]
-        private GraphType _graphType = GraphType.StateMachine;
+        private GraphType _graphType;
 
 
         public string RootNodeGuid
@@ -56,6 +56,19 @@ namespace GBG.AnimationGraph.GraphData
         [SerializeReference]
         private List<NodeDataBase> _nodes = new List<NodeDataBase>();
 
+#if UNITY_EDITOR
+        public Vector2 EditorGraphRootNodePosition
+        {
+            get => _editorGraphRootNodePosition;
+            internal set => _editorGraphRootNodePosition = value;
+        }
+
+        [SerializeField]
+        private Vector2 _editorGraphRootNodePosition;
+
+        // TODO: Isolated nodes(Editor only) 
+
+#endif
 
         public GraphData(string guid, string name, GraphType type)
         {
