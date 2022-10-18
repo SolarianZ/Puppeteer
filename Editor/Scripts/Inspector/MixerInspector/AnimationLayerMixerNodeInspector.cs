@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using GBG.AnimationGraph.Editor.Node;
 using GBG.AnimationGraph.NodeData;
 using GBG.AnimationGraph.Parameter;
 
@@ -14,6 +15,11 @@ namespace GBG.AnimationGraph.Editor.Inspector
         {
         }
 
+
+        protected override List<MixerInputData> GetMixerInputs()
+        {
+            return ((AnimationLayerMixerNode)Target).NodeData.MixerInputs;
+        }
 
         protected override MixerInputDataDrawer CreateMixerInputDataDrawer()
         {

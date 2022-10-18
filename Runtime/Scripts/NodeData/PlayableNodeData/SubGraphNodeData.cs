@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace GBG.AnimationGraph.NodeData
@@ -18,6 +19,11 @@ namespace GBG.AnimationGraph.NodeData
 
         public SubGraphNodeData(string guid) : base(guid)
         {
+        }
+
+        public override IList<string> GetInputNodeGuids()
+        {
+            return EmptyInputs;
         }
     }
 }

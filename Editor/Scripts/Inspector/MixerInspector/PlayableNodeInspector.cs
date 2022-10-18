@@ -6,7 +6,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
 {
     public class PlayableNodeInspector : GraphElementInspector<GraphNode>
     {
-        protected new PlayableNode Target => (PlayableNode)base.Target;
+        protected new MixerGraphNode Target => (MixerGraphNode)base.Target;
 
         protected ParamField SpeedParamField { get; }
 

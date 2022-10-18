@@ -6,7 +6,7 @@ using UnityEngine;
 namespace GBG.AnimationGraph.NodeData
 {
     [Serializable]
-    public class PlayableNodeData : NodeDataBase
+    public abstract class PlayableNodeData : NodeDataBase
     {
         #region Speed
 
@@ -30,23 +30,18 @@ namespace GBG.AnimationGraph.NodeData
 
         #endregion
 
-        
-        #region Mixer Inputs
 
-        public List<MixerInputData> MixerInputs
+        protected PlayableNodeData(string guid) : base(guid)
         {
-            get => _mixerInputs;
-            internal set => _mixerInputs = value;
         }
 
-        [SerializeReference]
-        private List<MixerInputData> _mixerInputs = new List<MixerInputData>();
+
+        #region Non Serializable Input Data
+
+        protected static string[] EmptyInputs = Array.Empty<string>();
+
+        public abstract IList<string> GetInputNodeGuids();
 
         #endregion
-
-
-        public PlayableNodeData(string guid) : base(guid)
-        {
-        }
     }
 }

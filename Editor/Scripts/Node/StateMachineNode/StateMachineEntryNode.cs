@@ -1,19 +1,22 @@
 ﻿using System;
+using System.Collections.Generic;
 using GBG.AnimationGraph.Editor.GraphEdge;
 using GBG.AnimationGraph.Editor.Inspector;
 using GBG.AnimationGraph.Editor.Utility;
-using GBG.AnimationGraph.GraphData;
 using GBG.AnimationGraph.NodeData;
 using UnityEditor.Experimental.GraphView;
+using UnityEngine;
 
 namespace GBG.AnimationGraph.Editor.Node
 {
-    public sealed class StateMachineEntryNode : StateNode
+    public sealed class StateMachineEntryNode : StateGraphNode
     {
         public const string NODE_GUID = "StateMachineEntryNode";
 
         public override string Guid => NODE_GUID;
 
+        internal override List<Transition> Transitions => _nodeData.Transitions;
+        
         public override string StateName
         {
             get => nameof(StateMachineEntryNode);
@@ -22,30 +25,36 @@ namespace GBG.AnimationGraph.Editor.Node
 
         public string DestStateNodeGuid
         {
-            get => _graphData.RootNodeGuid;
-            internal set => _graphData.RootNodeGuid = value;
+            get => GraphData.RootNodeGuid;
+            internal set => GraphData.RootNodeGuid = value;
         }
 
-        private readonly GraphData.GraphData _graphData;
 
+        private readonly StateNodeData _nodeData;
+        
 
         public StateMachineEntryNode(AnimationGraphAsset graphAsset, GraphData.GraphData graphData)
-            : base(graphAsset, 
-                new StateNodeData(NODE_GUID),
-                new GraphData.GraphData(NODE_GUID, NODE_GUID, GraphType.StateMachine))
+            : base(graphAsset, graphData)
         {
-            _graphData = graphData;
-
+            _nodeData = new StateNodeData(NODE_GUID);
+            
             title = "State Machine Entry";
             titleContainer.style.backgroundColor = ColorTool.GetColor<StateMachineEntryNode>();
 
             // Capabilities
-            capabilities &= ~Capabilities.Movable;
             capabilities &= ~Capabilities.Deletable;
             capabilities &= ~Capabilities.Copiable;
 
+            SetPosition(new Rect(GraphData.EditorGraphRootNodePosition, Vector2.zero));
+
             RefreshPorts();
             RefreshExpandedState();
+        }
+
+        public override void SetPosition(Rect newPos)
+        {
+            base.SetPosition(newPos);
+            GraphData.EditorGraphRootNodePosition = newPos.position;
         }
 
         public override IInspector<GraphNode> GetInspector()
@@ -56,7 +65,7 @@ namespace GBG.AnimationGraph.Editor.Node
             return inspector;
         }
 
-        public override StateTransitionEdge AddTransition(StateNode destNode, out bool dataDirty)
+        public override StateTransitionEdge AddTransition(StateGraphNode destNode, out bool dataDirty)
         {
             // Only allow one transition
             if (OutputTransitions.Count > 0)
@@ -75,7 +84,7 @@ namespace GBG.AnimationGraph.Editor.Node
             edge.IsEntryEdge = true;
 
             // Transition data
-            _graphData.RootNodeGuid = destNode.Guid;
+            GraphData.RootNodeGuid = destNode.Guid;
             dataDirty = true;
 
             return edge;

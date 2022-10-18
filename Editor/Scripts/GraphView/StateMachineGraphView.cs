@@ -49,7 +49,7 @@ namespace GBG.AnimationGraph.Editor.GraphView
             // Transitions
             foreach (var stateNode in nodeTable.Values)
             {
-                foreach (var transition in stateNode.NodeData.Transitions)
+                foreach (var transition in stateNode.Transitions)
                 {
                     var destNode = nodeTable[transition.DestStateGuid];
                     var edge = stateNode.ViewOnlyConnect(destNode);
@@ -62,9 +62,9 @@ namespace GBG.AnimationGraph.Editor.GraphView
             graphViewChanged += OnGraphViewChanged;
         }
 
-        public List<StateNode> GetCompatibleStateNodes(StateNode fromNode)
+        public List<StateGraphNode> GetCompatibleNodes(StateGraphNode fromNode)
         {
-            var nodeList = new List<StateNode>();
+            var nodeList = new List<StateGraphNode>();
             foreach (var node in nodes)
             {
                 if (node == fromNode || node is StateMachineEntryNode)
@@ -72,7 +72,7 @@ namespace GBG.AnimationGraph.Editor.GraphView
                     continue;
                 }
 
-                nodeList.Add((StateNode)node);
+                nodeList.Add((StateGraphNode)node);
             }
 
             return nodeList;

@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using GBG.AnimationGraph.Parameter;
 using UnityEngine;
 
 namespace GBG.AnimationGraph.NodeData
 {
     [Serializable]
-    public class BlendSpace2DSample
+    public class BlendSpace2DInput : NodeInputBase
     {
         [SerializeField]
         public AnimationClip Clip;
@@ -42,14 +43,14 @@ namespace GBG.AnimationGraph.NodeData
         [SerializeField]
         private ParamGuidOrValue _positionYParam = new ParamGuidOrValue(null, 0);
 
-        public List<BlendSpace2DSample> Samples
+        public List<BlendSpace2DInput> Samples
         {
             get => _samples;
             internal set => _samples = value;
         }
 
         [SerializeField]
-        private List<BlendSpace2DSample> _samples = new List<BlendSpace2DSample>();
+        private List<BlendSpace2DInput> _samples = new List<BlendSpace2DInput>();
 
         public int[] Triangles
         {
@@ -60,9 +61,25 @@ namespace GBG.AnimationGraph.NodeData
         [SerializeField]
         private int[] _triangles = Array.Empty<int>();
 
+        private string[] _inputGuids;
+
 
         public BlendSpace2DNodeData(string guid) : base(guid)
         {
+        }
+
+        public override IList<string> GetInputNodeGuids()
+        {
+            if (Application.isPlaying)
+            {
+                _inputGuids ??= (from input in Samples select input.InputNodeGuid).ToArray();
+            }
+            else
+            {
+                _inputGuids = (from input in Samples select input.InputNodeGuid).ToArray();
+            }
+
+            return _inputGuids;
         }
     }
 }

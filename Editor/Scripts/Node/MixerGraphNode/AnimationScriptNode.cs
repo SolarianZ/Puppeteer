@@ -3,12 +3,12 @@ using GBG.AnimationGraph.NodeData;
 
 namespace GBG.AnimationGraph.Editor.Node
 {
-    public sealed class AnimationClipNode : PlayableNode
+    public sealed class AnimationScriptNode : MixerGraphNode
     {
-        public AnimationClipNode(AnimationGraphAsset graphAsset, AnimationClipNodeData nodeData)
-            : base(graphAsset, nodeData)
+        public AnimationScriptNode(AnimationGraphAsset graphAsset, AnimationScriptNodeData nodeData,
+            NodeExtraInfo extraInfo) : base(graphAsset, nodeData, extraInfo)
         {
-            title = "Animation Clip";
+            title = "Animation Script";
 
             RefreshPorts();
             RefreshExpandedState();
@@ -16,7 +16,7 @@ namespace GBG.AnimationGraph.Editor.Node
 
         public override IInspector<GraphNode> GetInspector()
         {
-            var inspector = new AnimationClipNodeInspector();
+            var inspector = new AnimationScriptNodeInspector();
             inspector.SetTarget(this);
 
             return inspector;

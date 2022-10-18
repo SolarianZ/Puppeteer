@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using GBG.AnimationGraph.Parameter;
 using UnityEngine;
 
@@ -80,6 +81,11 @@ namespace GBG.AnimationGraph.NodeData
 
         public AnimationClipNodeData(string guid) : base(guid)
         {
+        }
+
+        public override IList<string> GetInputNodeGuids()
+        {
+            return EmptyInputs;
         }
     }
 }

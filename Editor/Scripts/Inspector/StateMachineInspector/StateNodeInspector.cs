@@ -7,7 +7,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
 {
     public class StateNodeInspector : GraphElementInspector<GraphNode>
     {
-        protected new StateNode Target => (StateNode)base.Target;
+        protected new StateGraphNode Target => (StateGraphNode)base.Target;
 
         protected TextField StateName { get; }
 
@@ -76,7 +76,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
 
         private class DestDrawer : VisualElement
         {
-            public DestDrawer(StateNode destNode)
+            public DestDrawer(StateGraphNode destNode)
             {
                 style.marginTop = 3;
                 style.marginBottom = 3;

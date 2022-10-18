@@ -5,15 +5,17 @@ using UEdge = UnityEditor.Experimental.GraphView.Edge;
 
 namespace GBG.AnimationGraph.Editor.Node
 {
-    public sealed class AnimationLayerMixerNode : PlayableNode
+    public sealed class BlendSpace1DNode : MixerGraphNode
     {
-        private AnimationLayerMixerNodeInspector _inspector;
+        internal new BlendSpace1DNodeData NodeData => (BlendSpace1DNodeData)base.NodeData;
+
+        private BlendSpace1DNodeInspector _inspector;
 
 
-        public AnimationLayerMixerNode(AnimationGraphAsset graphAsset, AnimationLayerMixerNodeData nodeData)
-            : base(graphAsset, nodeData)
+        public BlendSpace1DNode(AnimationGraphAsset graphAsset, BlendSpace1DNodeData nodeData,
+            NodeExtraInfo extraInfo) : base(graphAsset, nodeData, extraInfo)
         {
-            title = "Layer Mixer";
+            title = "Blend Space 1D";
 
             RestoreInputPortElement();
 
@@ -21,11 +23,10 @@ namespace GBG.AnimationGraph.Editor.Node
             RefreshExpandedState();
         }
 
-
         public override IInspector<GraphNode> GetInspector()
         {
-            _inspector ??= new AnimationLayerMixerNodeInspector(GraphAsset.Parameters,
-                AddInputPortElement, RemoveInputPortElement, ReorderInputPortElement);
+            _inspector ??= new BlendSpace1DNodeInspector(AddInputPortElement,
+                RemoveInputPortElement, ReorderInputPortElement);
             _inspector.SetTarget(this);
 
             return _inspector;
@@ -38,8 +39,8 @@ namespace GBG.AnimationGraph.Editor.Node
             if (graphEdge.InputPort.OwnerNode == this)
             {
                 var portIndex = InputPorts.IndexOf(graphEdge.InputPort);
-                NodeData.MixerInputs[portIndex].InputNodeGuid = graphEdge.OutputPort.OwnerNode.Guid;
-                _inspector?.RefreshMixerInputList();
+                NodeData.Samples[portIndex].InputNodeGuid = graphEdge.OutputPort.OwnerNode.Guid;
+                _inspector?.RefreshSampleInputList();
             }
 
             base.OnPortConnected(edge);
@@ -51,8 +52,8 @@ namespace GBG.AnimationGraph.Editor.Node
             if (graphEdge.InputPort.OwnerNode == this)
             {
                 var portIndex = InputPorts.IndexOf(graphEdge.InputPort);
-                NodeData.MixerInputs[portIndex].InputNodeGuid = null;
-                _inspector?.RefreshMixerInputList();
+                NodeData.Samples[portIndex].InputNodeGuid = null;
+                _inspector?.RefreshSampleInputList();
             }
 
             base.OnPortDisconnected(edge);
@@ -61,7 +62,7 @@ namespace GBG.AnimationGraph.Editor.Node
 
         private void RestoreInputPortElement()
         {
-            for (var i = 0; i < NodeData.MixerInputs.Count; i++)
+            for (var i = 0; i < NodeData.Samples.Count; i++)
             {
                 AddInputPortElement(i);
             }

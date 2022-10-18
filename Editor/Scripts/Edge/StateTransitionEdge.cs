@@ -29,9 +29,9 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
             }
         }
 
-        public StateNode ConnectedNode0 { get; internal set; }
+        public StateGraphNode ConnectedNode0 { get; internal set; }
 
-        public StateNode ConnectedNode1 { get; internal set; }
+        public StateGraphNode ConnectedNode1 { get; internal set; }
 
         public StateTransitionEdgeControl EdgeControl { get; }
 
@@ -39,7 +39,7 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
         private Vector2 _dragPoint;
 
 
-        public StateTransitionEdge(AnimationGraphAsset graphAsset, StateNode node0, StateNode node1)
+        public StateTransitionEdge(AnimationGraphAsset graphAsset, StateGraphNode node0, StateGraphNode node1)
         {
             GraphAsset = graphAsset;
             ConnectedNode0 = node0;
@@ -108,7 +108,7 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
             _dragPoint = mousePosition;
         }
 
-        public void SetConnection(int index, StateNode node)
+        public void SetConnection(int index, StateGraphNode node)
         {
             switch (index)
             {
@@ -130,12 +130,12 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
             }
         }
 
-        public bool IsConnection(StateNode a, StateNode b)
+        public bool IsConnection(StateGraphNode a, StateGraphNode b)
         {
             return (ConnectedNode0 == a && ConnectedNode1 == b) || (ConnectedNode0 == b && ConnectedNode1 == a);
         }
 
-        public bool TryGetConnectedNode(StateNode node, out StateNode connectedNode)
+        public bool TryGetConnectedNode(StateGraphNode node, out StateGraphNode connectedNode)
         {
             if (node == ConnectedNode0)
             {
@@ -211,7 +211,7 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
         {
         }
 
-        private void DeleteTransition(StateNode fromNode, StateNode destNode)
+        private void DeleteTransition(StateGraphNode fromNode, StateGraphNode destNode)
         {
             var edge = fromNode.RemoveTransition(destNode);
             if (!edge.IsConnection(fromNode, destNode))

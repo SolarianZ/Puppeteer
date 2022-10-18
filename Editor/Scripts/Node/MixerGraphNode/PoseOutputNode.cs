@@ -2,6 +2,7 @@
 using GBG.AnimationGraph.Editor.Port;
 using GBG.AnimationGraph.Editor.Utility;
 using UnityEditor.Experimental.GraphView;
+using UnityEngine;
 using UnityEngine.Playables;
 using UEdge = UnityEditor.Experimental.GraphView.Edge;
 
@@ -25,7 +26,6 @@ namespace GBG.AnimationGraph.Editor.Node
             title = "Pose Output";
 
             // Capabilities
-            capabilities &= ~Capabilities.Movable;
             capabilities &= ~Capabilities.Deletable;
             capabilities &= ~Capabilities.Copiable;
 
@@ -37,10 +37,17 @@ namespace GBG.AnimationGraph.Editor.Node
             PoseInputPort.OnDisconnected += OnPortDisconnected;
             inputContainer.Add(PoseInputPort);
 
+            SetPosition(new Rect(_graphData.EditorGraphRootNodePosition, Vector2.zero));
+
             RefreshPorts();
             RefreshExpandedState();
         }
 
+        public override void SetPosition(Rect newPos)
+        {
+            base.SetPosition(newPos);
+            _graphData.EditorGraphRootNodePosition = newPos.position;
+        }
 
         protected override void OnPortConnected(UEdge edge)
         {

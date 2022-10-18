@@ -35,19 +35,21 @@ namespace GBG.AnimationGraph.Editor.Node
 
         public static IEnumerable<Type> GetPlayableNodeTypes() => _nodeToDataType.Keys;
 
-        public static PlayableNode CreateNode(AnimationGraphAsset graphAsset, Type nodeType, Vector2 position)
+        public static MixerGraphNode CreateNode(AnimationGraphAsset graphAsset, Type nodeType, Vector2 position)
         {
             var nodeDataType = _nodeToDataType[nodeType];
             var nodeData = (PlayableNodeData)Activator.CreateInstance(nodeDataType, GuidTool.NewGuid());
             nodeData.EditorPosition = position;
 
-            return CreateNode(graphAsset, nodeData);
+            return CreateNode(graphAsset, nodeData, true);
         }
 
-        public static PlayableNode CreateNode(AnimationGraphAsset graphAsset, PlayableNodeData nodeData)
+        public static MixerGraphNode CreateNode(AnimationGraphAsset graphAsset, PlayableNodeData nodeData,
+            bool isCreateFromContextualMenu)
         {
             var nodeType = _dataToNodeType[nodeData.GetType()];
-            var node = (PlayableNode)Activator.CreateInstance(nodeType, graphAsset, nodeData);
+            var extraInfo = new NodeExtraInfo(isCreateFromContextualMenu);
+            var node = (MixerGraphNode)Activator.CreateInstance(nodeType, graphAsset, nodeData, extraInfo);
             return node;
         }
     }

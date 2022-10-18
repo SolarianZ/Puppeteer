@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace GBG.AnimationGraph.NodeData
 {
@@ -10,6 +11,11 @@ namespace GBG.AnimationGraph.NodeData
 
         public StateMachineNodeData(string guid) : base(guid)
         {
+        }
+
+        public override IList<string> GetInputNodeGuids()
+        {
+            return EmptyInputs;
         }
     }
 }

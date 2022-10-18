@@ -69,17 +69,32 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             var asset = EditorUtility.InstanceIDToObject(instanceId);
             if (asset is AnimationGraphAsset animGraphAsset)
             {
+                var success = true;
                 var editor = Resources.FindObjectsOfTypeAll<AnimationGraphEditorWindow>()
                     .FirstOrDefault(window => window._graphAsset == animGraphAsset);
                 // var editor = windows.Find();
                 if (!editor)
                 {
                     editor = CreateInstance<AnimationGraphEditorWindow>();
-                    editor.OpenGraphAsset(animGraphAsset);
+                    try
+                    {
+                        editor.OpenGraphAsset(animGraphAsset);
+                    }
+                    catch
+                    {
+                        success = false;
+                    }
                 }
 
-                editor.Show();
-                editor.Focus();
+                if (success)
+                {
+                    editor.Show();
+                    editor.Focus();
+                }
+                else
+                {
+                    editor.Close();
+                }
 
                 return true;
             }

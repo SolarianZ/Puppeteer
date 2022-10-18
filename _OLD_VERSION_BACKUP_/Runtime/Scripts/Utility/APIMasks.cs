@@ -1,4 +1,6 @@
-﻿namespace UnityEngine.Playables
+﻿using UnityEngine.Playables;
+
+namespace GBG.Puppeteer
 {
     /** Why API Masks?
      * When the following events occur, Unity will reset animation Playables to Playing state:

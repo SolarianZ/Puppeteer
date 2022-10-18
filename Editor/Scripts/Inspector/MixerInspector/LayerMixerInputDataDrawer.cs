@@ -9,7 +9,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
 {
     public class LayerMixerInputDataDrawer : MixerInputDataDrawer
     {
-        public new const float DRAWER_HEIGHT = 90;
+        public new const float DRAWER_HEIGHT = 88;
 
         private readonly Toggle _isAdditiveField;
 

@@ -11,7 +11,7 @@ using UnityEngine.UIElements;
 
 namespace GBG.AnimationGraph.Editor.Node
 {
-    public abstract partial class PlayableNode : GraphNode
+    public abstract partial class MixerGraphNode : GraphNode
     {
         public const string INPUT_PORT_NAME_PREFIX = "Input";
 
@@ -25,10 +25,14 @@ namespace GBG.AnimationGraph.Editor.Node
 
         internal PlayableNodeData NodeData { get; }
 
+        protected NodeExtraInfo ExtraInfo { get; }
 
-        protected PlayableNode(AnimationGraphAsset graphAsset, PlayableNodeData nodeData) : base(graphAsset)
+
+        protected MixerGraphNode(AnimationGraphAsset graphAsset, PlayableNodeData nodeData,
+            NodeExtraInfo extraInfo) : base(graphAsset)
         {
             NodeData = nodeData;
+            ExtraInfo = extraInfo;
 
             OutputPort = InstantiatePort(Direction.Output, typeof(Playable));
             OutputPort.portColor = ColorTool.GetColor(typeof(Playable));
@@ -78,10 +82,13 @@ namespace GBG.AnimationGraph.Editor.Node
 
         protected void ReorderInputPortElement(int fromIndex, int toIndex)
         {
-            (InputPorts[fromIndex], InputPorts[toIndex]) = (InputPorts[toIndex], InputPorts[fromIndex]);
-            var targetPort = base.inputContainer[fromIndex];
+            var targetPort = InputPorts[fromIndex];
+            InputPorts.RemoveAt(fromIndex);
+            InputPorts.Insert(toIndex, targetPort);
+
+            var targetPortElem = base.inputContainer[fromIndex];
             base.inputContainer.RemoveAt(fromIndex);
-            base.inputContainer.Insert(toIndex, targetPort);
+            base.inputContainer.Insert(toIndex, targetPortElem);
 
             UpdatePortName(fromIndex, toIndex);
             RaiseNodeChangedEvent();
@@ -98,7 +105,7 @@ namespace GBG.AnimationGraph.Editor.Node
     }
 
     // API Masks
-    public partial class PlayableNode
+    public partial class MixerGraphNode
     {
         // ReSharper disable once InconsistentNaming
         [Obsolete("Use AddInputPort() or RemoveInputPort or ReorderInputPort() instead.", true)]

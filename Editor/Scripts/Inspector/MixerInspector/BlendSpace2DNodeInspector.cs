@@ -14,32 +14,30 @@ namespace GBG.AnimationGraph.Editor.Inspector
 {
     public class BlendSpace2DSampleDrawer : VisualElement
     {
-        public const float DRAWER_HEIGHT = 88;
+        public const float DRAWER_HEIGHT = 66;
 
         public event Action OnDataChanged;
 
 
-        private readonly ObjectField _clipField;
+        private readonly TextField _inputNodeField;
 
         private readonly Vector2Field _positionField;
 
         private readonly FloatField _playbackSpeedField;
 
-        private BlendSpace2DSample _target;
+        private BlendSpace2DInput _target;
 
 
         public BlendSpace2DSampleDrawer(Length nameLabelWidth)
         {
-            // Clip
-            _clipField = new ObjectField("Clip")
-            {
-                objectType = typeof(AnimationClip),
-            };
-            _clipField.labelElement.style.minWidth = StyleKeyword.Auto;
-            _clipField.labelElement.style.maxWidth = StyleKeyword.Auto;
-            _clipField.labelElement.style.width = nameLabelWidth;
-            _clipField.RegisterValueChangedCallback(OnClipChanged);
-            Add(_clipField);
+            // Input
+            _inputNodeField = new TextField("Input Node");
+            _inputNodeField.labelElement.style.minWidth = StyleKeyword.Auto;
+            _inputNodeField.labelElement.style.maxWidth = StyleKeyword.Auto;
+            _inputNodeField.labelElement.style.width = nameLabelWidth;
+            _inputNodeField.labelElement.style.overflow = Overflow.Hidden;
+            _inputNodeField.SetEnabled(false);
+            Add(_inputNodeField);
 
             // Position
             _positionField = new Vector2Field("Position");
@@ -58,21 +56,15 @@ namespace GBG.AnimationGraph.Editor.Inspector
             Add(_playbackSpeedField);
         }
 
-        public void SetTarget(BlendSpace2DSample target)
+        public void SetTarget(BlendSpace2DInput target, int targetIndex)
         {
             _target = target;
 
-            _clipField.SetValueWithoutNotify(_target.Clip);
+            _inputNodeField.label = $"Input Node {targetIndex.ToString()}";
             _positionField.SetValueWithoutNotify(_target.Position);
             _playbackSpeedField.SetValueWithoutNotify(_target.PlaybackSpeed);
         }
 
-
-        private void OnClipChanged(ChangeEvent<UObject> evt)
-        {
-            _target.Clip = (AnimationClip)evt.newValue;
-            OnDataChanged?.Invoke();
-        }
 
         private void OnPositionChanged(ChangeEvent<Vector2> evt)
         {
@@ -91,6 +83,12 @@ namespace GBG.AnimationGraph.Editor.Inspector
     // TODO: Visual preview
     public class BlendSpace2DNodeInspector : PlayableNodeInspector
     {
+        private readonly Action<int> _addInputPortElement;
+
+        private readonly Action<int> _removeInputPortElement;
+
+        private readonly Action<int, int> _reorderInputPortElement;
+
         private readonly ParamField _positionXParamField;
 
         private readonly ParamField _positionYParamField;
@@ -100,8 +98,13 @@ namespace GBG.AnimationGraph.Editor.Inspector
         private BlendSpace2DNodeData _nodeData;
 
 
-        public BlendSpace2DNodeInspector()
+        public BlendSpace2DNodeInspector(Action<int> addInputPortElement, Action<int> removeInputPortElement,
+            Action<int, int> reorderInputPortElement)
         {
+            _addInputPortElement = addInputPortElement;
+            _removeInputPortElement = removeInputPortElement;
+            _reorderInputPortElement = reorderInputPortElement;
+
             // Position X param
             _positionXParamField = new ParamField(FieldLabelWidth);
             _positionXParamField.OnParamChanged += OnPositionChanged;
@@ -112,8 +115,8 @@ namespace GBG.AnimationGraph.Editor.Inspector
             _positionYParamField.OnParamChanged += OnPositionChanged;
             Add(_positionYParamField);
 
-            // Samples
-            var sampleListViewLabel = new Label("Samples")
+            // Inputs
+            var sampleListViewLabel = new Label("Inputs")
             {
                 style =
                 {
@@ -144,7 +147,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
         {
             base.SetTarget(target);
 
-            _nodeData = (BlendSpace2DNodeData)((BlendSpace2DNode)target).NodeData;
+            _nodeData = ((BlendSpace2DNode)target).NodeData;
 
             // Position X param
             _positionXParamField.SetParamTarget("Position X", _nodeData.PositionXParam,
@@ -163,6 +166,12 @@ namespace GBG.AnimationGraph.Editor.Inspector
             _sampleListView.RefreshItems();
         }
 
+        public void RefreshSampleInputList()
+        {
+            _sampleListView.RefreshItems();
+        }
+
+
         private void OnPositionChanged(ParamGuidOrValue _)
         {
             RaiseDataChangedEvent(DataCategories.NodeData);
@@ -179,23 +188,26 @@ namespace GBG.AnimationGraph.Editor.Inspector
         private void BindSampleListItem(VisualElement element, int index)
         {
             var drawer = (BlendSpace2DSampleDrawer)element;
-            drawer.SetTarget(_nodeData.Samples[index]);
+            drawer.SetTarget(_nodeData.Samples[index], index);
         }
 
         private void OnSampleIndexChanged(int from, int to)
         {
+            _reorderInputPortElement(from, to);
             RaiseDataChangedEvent(DataCategories.NodeData);
         }
 
         private void OnSampleItemAdded(IEnumerable<int> indices)
         {
             var index = indices.First();
-            _nodeData.Samples[index] = new BlendSpace2DSample();
+            _nodeData.Samples[index] = new BlendSpace2DInput();
+            _addInputPortElement(index);
             RaiseDataChangedEvent(DataCategories.NodeData);
         }
 
         private void OnSampleItemRemoved(IEnumerable<int> indices)
         {
+            _removeInputPortElement(indices.First());
             RaiseDataChangedEvent(DataCategories.NodeData);
         }
     }

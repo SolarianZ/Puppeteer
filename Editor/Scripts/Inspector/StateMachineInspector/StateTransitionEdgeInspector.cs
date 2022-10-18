@@ -143,7 +143,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
         }
     }
 
-    public delegate void WantsToDeleteTransition(StateNode fromNode, StateNode destNode);
+    public delegate void WantsToDeleteTransition(StateGraphNode fromNode, StateGraphNode destNode);
 
     public sealed class TransitionDrawer : VisualElement
     {
@@ -171,9 +171,9 @@ namespace GBG.AnimationGraph.Editor.Inspector
 
         private readonly List<ParamInfo> _paramTable;
 
-        private StateNode _fromNode;
+        private StateGraphNode _fromNode;
 
-        private StateNode _destNode;
+        private StateGraphNode _destNode;
 
         private Transition _transition;
 
@@ -277,7 +277,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
             _foldout.Add(deleteButton);
         }
 
-        public void SetTransition(StateNode fromNode, StateNode destNode, Transition transition)
+        public void SetTransition(StateGraphNode fromNode, StateGraphNode destNode, Transition transition)
         {
             _fromNode = fromNode;
             _destNode = destNode;
@@ -414,7 +414,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
                 _transition0.visible = true;
                 _transition0.SetEnabled(true);
                 _transition0.style.position = Position.Relative;
-                var data0 = target.ConnectedNode0.NodeData.Transitions.Find(t =>
+                var data0 = target.ConnectedNode0.Transitions.Find(t =>
                     t.DestStateGuid.Equals(target.ConnectedNode1.Guid));
                 _transition0.SetTransition(transition0.ConnectedNode0, transition0.ConnectedNode1, data0);
             }
@@ -432,7 +432,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
                 _transition1.visible = true;
                 _transition1.SetEnabled(true);
                 _transition1.style.position = Position.Relative;
-                var data1 = target.ConnectedNode1.NodeData.Transitions.Find(t =>
+                var data1 = target.ConnectedNode1.Transitions.Find(t =>
                     t.DestStateGuid.Equals(target.ConnectedNode0.Guid));
                 _transition1.SetTransition(transition1.ConnectedNode1, transition1.ConnectedNode0, data1);
             }
@@ -445,7 +445,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
         }
 
 
-        private void OnWantsToDeleteTransition(StateNode fromNode, StateNode destNode)
+        private void OnWantsToDeleteTransition(StateGraphNode fromNode, StateGraphNode destNode)
         {
             _onWantsToDeleteTransition(fromNode, destNode);
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using GBG.AnimationGraph.Component;
 using UnityEngine;
 using UnityEngine.Animations;
@@ -28,6 +29,11 @@ namespace GBG.AnimationGraph.NodeData
 
         public AnimationScriptNodeData(string guid) : base(guid)
         {
+        }
+
+        public override IList<string> GetInputNodeGuids()
+        {
+            return EmptyInputs;
         }
     }
 }

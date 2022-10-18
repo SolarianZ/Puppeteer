@@ -3,10 +3,10 @@ using GBG.AnimationGraph.NodeData;
 
 namespace GBG.AnimationGraph.Editor.Node
 {
-    public sealed class SubGraphNode : PlayableNode
+    public sealed class SubGraphNode : MixerGraphNode
     {
-        public SubGraphNode(AnimationGraphAsset graphAsset, SubGraphNodeData nodeData)
-            : base(graphAsset, nodeData)
+        public SubGraphNode(AnimationGraphAsset graphAsset, SubGraphNodeData nodeData,
+            NodeExtraInfo extraInfo) : base(graphAsset, nodeData, extraInfo)
         {
             title = "Sub Graph";
 

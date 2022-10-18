@@ -66,7 +66,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
         {
             base.SetTarget(target);
 
-            _mixerInputs = Target.NodeData.MixerInputs;
+            _mixerInputs = GetMixerInputs();
             _inputListView.itemsSource = _mixerInputs;
             _inputListView.RefreshItems();
         }
@@ -76,6 +76,11 @@ namespace GBG.AnimationGraph.Editor.Inspector
             _inputListView.RefreshItems();
         }
 
+
+        protected virtual List<MixerInputData> GetMixerInputs()
+        {
+           return ((AnimationMixerNode)Target).NodeData.MixerInputs;
+        }
 
         protected virtual MixerInputDataDrawer CreateMixerInputDataDrawer()
         {

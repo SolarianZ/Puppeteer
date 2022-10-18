@@ -27,10 +27,10 @@ namespace GBG.AnimationGraph.Editor.GraphView
             AddElement(PoseOutputNode);
 
             // Nodes
-            var nodeTable = new Dictionary<string, PlayableNode>(GraphData.Nodes.Count + 1);
+            var nodeTable = new Dictionary<string, MixerGraphNode>(GraphData.Nodes.Count + 1);
             foreach (var nodeData in GraphData.Nodes)
             {
-                var node = PlayableNodeFactory.CreateNode(GraphAsset, (PlayableNodeData)nodeData);
+                var node = PlayableNodeFactory.CreateNode(GraphAsset, (PlayableNodeData)nodeData, false);
                 node.OnDoubleClicked += OnDoubleClickNode;
                 AddElement(node);
                 nodeTable.Add(node.Guid, node);
@@ -105,20 +105,21 @@ namespace GBG.AnimationGraph.Editor.GraphView
         }
 
 
-        private void ConnectNodeChildren(PlayableNode parentNode, Dictionary<string, PlayableNode> nodeTable)
+        private void ConnectNodeChildren(MixerGraphNode parentNode, Dictionary<string, MixerGraphNode> nodeTable)
         {
-            Assert.AreEqual(parentNode.NodeData.MixerInputs.Count, parentNode.InputPorts.Count);
+            var parentNodeInputGuids = parentNode.NodeData.GetInputNodeGuids();
+            Assert.AreEqual(parentNodeInputGuids.Count, parentNode.InputPorts.Count);
 
             for (var i = 0; i < parentNode.InputPorts.Count; i++)
             {
                 var inputPort = parentNode.InputPorts[i];
-                var childNodeGuid = parentNode.NodeData.MixerInputs[i].InputNodeGuid;
+                var childNodeGuid = parentNodeInputGuids[i];
                 if (string.IsNullOrEmpty(childNodeGuid))
                 {
                     continue;
                 }
 
-                var childNode = nodeTable[parentNode.NodeData.MixerInputs[i].InputNodeGuid];
+                var childNode = nodeTable[childNodeGuid];
                 var edge = inputPort.ConnectTo<FlowingGraphEdge>(childNode.OutputPort);
                 AddElement(edge);
             }
@@ -128,7 +129,7 @@ namespace GBG.AnimationGraph.Editor.GraphView
         {
             graphViewChange.elementsToRemove?.ForEach(element =>
             {
-                if (element is PlayableNode playableNode)
+                if (element is MixerGraphNode playableNode)
                 {
                     for (int i = 0; i < GraphData.Nodes.Count; i++)
                     {
