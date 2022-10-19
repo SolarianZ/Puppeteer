@@ -143,6 +143,8 @@ namespace GBG.AnimationGraph.Editor.Inspector
         }
     }
 
+    public delegate void WantsToIndicateTransition(StateGraphNode fromNode, StateGraphNode destNode);
+
     public delegate void WantsToDeleteTransition(StateGraphNode fromNode, StateGraphNode destNode);
 
     public sealed class TransitionDrawer : VisualElement
@@ -182,6 +184,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
             Action onParamChanged,
             Action<int> addTransitionElement,
             Action<int> removeTransitionElement,
+            WantsToIndicateTransition onWantsToIndicate,
             WantsToDeleteTransition onWantsToDelete)
         {
             _onParamChanged = onParamChanged;
@@ -265,16 +268,34 @@ namespace GBG.AnimationGraph.Editor.Inspector
             _conditionListView.itemsRemoved += OnConditionItemRemoved;
             _foldout.contentContainer.Add(_conditionListView);
 
-            // Delete
+            // Buttons
+            var buttonContainer = new VisualElement
+            {
+                style =
+                {
+                    flexDirection = FlexDirection.Row,
+                    marginBottom = 20,
+                },
+            };
+            _foldout.Add(buttonContainer);
+
+            // Indicate button
+            var indicateButton = new Button(() => { onWantsToIndicate(_fromNode, _destNode); })
+            {
+                text = "Indicate",
+                style =
+                {
+                    width = 64,
+                },
+            };
+            buttonContainer.Add(indicateButton);
+
+            // Delete button
             var deleteButton = new Button(() => { onWantsToDelete(_fromNode, _destNode); })
             {
                 text = "Delete Transition",
-                style =
-                {
-                    marginBottom = 20,
-                }
             };
-            _foldout.Add(deleteButton);
+            buttonContainer.Add(deleteButton);
         }
 
         public void SetTransition(StateGraphNode fromNode, StateGraphNode destNode, Transition transition)
@@ -373,23 +394,27 @@ namespace GBG.AnimationGraph.Editor.Inspector
 
         private readonly TransitionDrawer _transition1;
 
+        private readonly WantsToIndicateTransition _onWantsToIndicateTransition;
+
         private readonly WantsToDeleteTransition _onWantsToDeleteTransition;
 
 
         public StateTransitionEdgeInspector(List<ParamInfo> paramTable, Action<int> addTransitionElement,
-            Action<int> removeTransitionElement, WantsToDeleteTransition onWantsToDeleteTransition)
+            Action<int> removeTransitionElement, WantsToIndicateTransition onWantsToIndicateTransition,
+            WantsToDeleteTransition onWantsToDeleteTransition)
         {
+            _onWantsToIndicateTransition = onWantsToIndicateTransition;
             _onWantsToDeleteTransition = onWantsToDeleteTransition;
 
             var scrollView = new ScrollView();
             Add(scrollView);
 
             _transition0 = new TransitionDrawer(paramTable, FieldLabelWidth, OnTransitionParamChanged,
-                addTransitionElement, removeTransitionElement, OnWantsToDeleteTransition);
+                addTransitionElement, removeTransitionElement, OnWantsToIndicateTransition, OnWantsToDeleteTransition);
             scrollView.contentContainer.Add(_transition0);
 
             _transition1 = new TransitionDrawer(paramTable, FieldLabelWidth, OnTransitionParamChanged,
-                addTransitionElement, removeTransitionElement, OnWantsToDeleteTransition);
+                addTransitionElement, removeTransitionElement, OnWantsToIndicateTransition, OnWantsToDeleteTransition);
             scrollView.contentContainer.Add(_transition1);
         }
 
@@ -444,6 +469,11 @@ namespace GBG.AnimationGraph.Editor.Inspector
             }
         }
 
+
+        private void OnWantsToIndicateTransition(StateGraphNode fromNode, StateGraphNode destNode)
+        {
+            _onWantsToIndicateTransition(fromNode, destNode);
+        }
 
         private void OnWantsToDeleteTransition(StateGraphNode fromNode, StateGraphNode destNode)
         {

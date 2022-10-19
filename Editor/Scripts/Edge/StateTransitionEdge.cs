@@ -194,7 +194,7 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
         public IInspector<StateTransitionEdge> GetInspector()
         {
             var inspector = new StateTransitionEdgeInspector(GraphAsset.Parameters,
-                AddConditionElement, RemoveConditionElement, DeleteTransition);
+                AddConditionElement, RemoveConditionElement, IndicateTransition, DeleteTransition);
             inspector.SetTarget(this);
 
             return inspector;
@@ -209,6 +209,25 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
         // TODO: Can be deleted
         private void RemoveConditionElement(int index)
         {
+        }
+
+        private void IndicateTransition(StateGraphNode fromNode, StateGraphNode destNode)
+        {
+            if (fromNode == ConnectedNode0 && destNode == ConnectedNode1)
+            {
+                // 0 -> 1
+                EdgeControl.Indicate(StateTransitionEdgeDirections.Dir_0_1);
+                return;
+            }
+
+            if (fromNode == ConnectedNode1 && destNode == ConnectedNode0)
+            {
+                // 1 -> 0
+                EdgeControl.Indicate(StateTransitionEdgeDirections.Dir_1_0);
+                return;
+            }
+
+            throw new ArgumentException("Node not connected.");
         }
 
         private void DeleteTransition(StateGraphNode fromNode, StateGraphNode destNode)

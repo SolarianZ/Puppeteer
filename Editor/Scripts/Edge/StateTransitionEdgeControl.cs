@@ -3,16 +3,20 @@ using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityEngine.UIElements.Experimental;
 
 namespace GBG.AnimationGraph.Editor.GraphEdge
 {
     [Flags]
     public enum StateTransitionEdgeDirections
     {
+        // 0 -> 1
         Dir_0_1 = 1,
 
+        // 1 -> 0
         Dir_1_0 = 2,
 
+        // 0 <-> 1
         Bidirectional = Dir_0_1 | Dir_1_0,
     }
 
@@ -36,6 +40,10 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
 
         public Color HighlightColor { get; set; } = new Color(68 / 255f, 192 / 255f, 255 / 255f);
 
+        public Color IndicationColor { get; set; } = new Color(200 / 255f, 200 / 255f, 40 / 255f);
+
+        public ushort IndicationDurationMs { get; set; } = 600;
+
         public bool Highlight { get; set; }
 
         public byte EdgeWidth { get; set; } = 4;
@@ -50,6 +58,12 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
         private static Texture2D _lineTex;
 
         private static Texture2D _arrowTex;
+
+        private StateTransitionEdgeDirections _indicationDirections;
+
+        private float? _indicationAlpha01;
+
+        private float? _indicationAlpha10;
 
 
         public StateTransitionEdgeControl(IEdgePointProvider pointProvider)
@@ -108,13 +122,50 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
             return false;
         }
 
+        public void Indicate(StateTransitionEdgeDirections directions)
+        {
+            if (_indicationAlpha01 == null && (directions & StateTransitionEdgeDirections.Dir_0_1) != 0)
+            {
+                var anim = ValueAnimation<float>.Create(this,
+                    (a, b, t) => Mathf.Lerp(a, b, Easing.InCubic(t)));
+                anim.autoRecycle = true;
+                anim.from = 1;
+                anim.to = 0;
+                anim.durationMs = IndicationDurationMs;
+                anim.valueUpdated = (_, alpha) =>
+                {
+                    _indicationAlpha01 = alpha;
+                    MarkDirtyRepaint();
+                };
+                anim.onAnimationCompleted = () => _indicationAlpha01 = null;
+                anim.Start();
+            }
+
+            if (_indicationAlpha10 == null && (directions & StateTransitionEdgeDirections.Dir_1_0) != 0)
+            {
+                var anim = ValueAnimation<float>.Create(this,
+                    (a, b, t) => Mathf.Lerp(a, b, Easing.InCubic(t)));
+                anim.autoRecycle = true;
+                anim.from = 1;
+                anim.to = 0;
+                anim.durationMs = IndicationDurationMs;
+                anim.valueUpdated = (_, alpha) =>
+                {
+                    _indicationAlpha10 = alpha;
+                    MarkDirtyRepaint();
+                };
+                anim.onAnimationCompleted = () => _indicationAlpha10 = null;
+                anim.Start();
+            }
+        }
+
 
         private void DrawEdge()
         {
-            var color = Highlight ? HighlightColor : NormalColor;
+            var baseColor = Highlight ? HighlightColor : NormalColor;
 
             // Line
-            Handles.color = color;
+            Handles.color = baseColor;
             Handles.DrawAAPolyLine(_lineTex, EdgeWidth, EdgePoint0, EdgePoint1);
 
             // Arrow
@@ -122,17 +173,22 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
             var arrowOffset = arrowSize / 2;
             var rotSign = (EdgePoint1.x - EdgePoint0.x) >= 0 ? 1 : -1;
             var guiColor = GUI.color;
-            GUI.color = color;
             switch (EdgeDirections)
             {
                 case StateTransitionEdgeDirections.Dir_0_1:
                 {
+                    GUI.color = _indicationAlpha01.HasValue
+                        ? Color.Lerp(IndicationColor, baseColor, _indicationAlpha01.Value)
+                        : baseColor;
                     DrawArrow01(arrowSize, Vector2.zero, rotSign);
                     break;
                 }
 
                 case StateTransitionEdgeDirections.Dir_1_0:
                 {
+                    GUI.color = _indicationAlpha10.HasValue
+                        ? Color.Lerp(IndicationColor, baseColor, _indicationAlpha10.Value)
+                        : baseColor;
                     DrawArrow10(arrowSize, Vector2.zero, rotSign);
                     break;
                 }
@@ -140,9 +196,16 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
                 case StateTransitionEdgeDirections.Bidirectional:
                 {
                     var lineDir = (EdgePoint1 - EdgePoint0).normalized;
-                    DrawArrow01(arrowSize, lineDir * arrowOffset, rotSign);
-                    DrawArrow10(arrowSize, lineDir * arrowOffset, rotSign);
 
+                    GUI.color = _indicationAlpha01.HasValue
+                        ? Color.Lerp(IndicationColor, baseColor, _indicationAlpha01.Value)
+                        : baseColor;
+                    DrawArrow01(arrowSize, lineDir * arrowOffset, rotSign);
+
+                    GUI.color = _indicationAlpha10.HasValue
+                        ? Color.Lerp(IndicationColor, baseColor, _indicationAlpha10.Value)
+                        : baseColor;
+                    DrawArrow10(arrowSize, lineDir * arrowOffset, rotSign);
                     break;
                 }
 
