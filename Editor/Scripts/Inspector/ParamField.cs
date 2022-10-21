@@ -34,6 +34,8 @@ namespace GBG.AnimationGraph.Editor.Inspector
 
     public class ParamField : VisualElement
     {
+        public const float MIN_ELEMENT_HEIGHT = 20;
+        
         public event Action<ParamGuidOrValue> OnParamChanged;
 
         public event Action<bool> OnActivityChanged;

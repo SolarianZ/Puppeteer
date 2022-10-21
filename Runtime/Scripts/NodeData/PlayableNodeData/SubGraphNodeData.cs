@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using GBG.AnimationGraph.Parameter;
 using UnityEngine;
 
 namespace GBG.AnimationGraph.NodeData
@@ -15,6 +16,15 @@ namespace GBG.AnimationGraph.NodeData
 
         [SerializeField]
         private AnimationGraphAsset _subGraph;
+
+        public List<ParamBindingGuidOrValue> ParamBindings
+        {
+            get => _paramBindings;
+            internal set => _paramBindings = value;
+        }
+
+        [SerializeField]
+        private List<ParamBindingGuidOrValue> _paramBindings = new List<ParamBindingGuidOrValue>();
 
 
         public SubGraphNodeData(string guid) : base(guid)

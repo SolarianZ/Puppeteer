@@ -16,7 +16,7 @@ namespace GBG.AnimationGraph.Editor.Node
 
         public override IInspector<GraphNode> GetInspector()
         {
-            var inspector = new SubGraphNodeInspector();
+            var inspector = new SubGraphNodeInspector(GraphAsset.Parameters);
             inspector.SetTarget(this);
 
             return inspector;

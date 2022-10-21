@@ -3,38 +3,41 @@ using UnityEngine.Assertions;
 
 namespace GBG.AnimationGraph.Parameter
 {
+    /// <summary>
+    /// Give the source param's value or the raw value to the destination param.
+    /// </summary>
     public class ParamBinding : IDisposable
     {
-        public ParamInfo FromParam { get; }
+        public ParamInfo SrcParam { get; }
 
-        public ParamInfo ToParam { get; }
+        public ParamInfo DestParam { get; }
 
 
-        public ParamBinding(ParamInfo fromParam, ParamInfo toParam)
+        public ParamBinding(ParamInfo srcParam, ParamInfo destParam)
         {
-            Assert.IsTrue((fromParam == null) || (fromParam.Type == toParam.Type));
+            Assert.IsTrue((srcParam == null) || (srcParam.Type == destParam.Type));
 
-            FromParam = fromParam;
-            ToParam = toParam;
+            SrcParam = srcParam;
+            DestParam = destParam;
 
-            if (FromParam != null)
+            if (SrcParam != null)
             {
-                FromParam.OnValueChanged += OnSourceValueChanged;
+                SrcParam.OnValueChanged += OnSourceValueChanged;
             }
         }
 
 
         private void OnSourceValueChanged(ParamInfo fromParam)
         {
-            ToParam.SetRawValue(fromParam.RawValue);
+            DestParam.SetRawValue(fromParam.RawValue);
         }
 
 
         public void Dispose()
         {
-            if (FromParam != null)
+            if (SrcParam != null)
             {
-                FromParam.OnValueChanged -= OnSourceValueChanged;
+                SrcParam.OnValueChanged -= OnSourceValueChanged;
             }
         }
     }
