@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using GBG.AnimationGraph.Editor.Inspector;
-using GBG.AnimationGraph.NodeData;
+using GBG.AnimationGraph.Node;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UPort = UnityEditor.Experimental.GraphView.Port;
@@ -9,33 +9,33 @@ namespace GBG.AnimationGraph.Editor.Node
 {
     public sealed class StateEditorNode : StateGraphEditorNode
     {
-        public override string Guid => NodeData.Guid;
+        public override string Guid => Node.Guid;
 
-        internal override List<Transition> Transitions => NodeData.Transitions;
+        internal override List<Transition> Transitions => Node.Transitions;
 
-        public string MixerGraphGuid => NodeData.MixerGraphGuid;
+        public string MixerGraphGuid => Node.MixerGraphGuid;
 
-        internal StateNodeData NodeData { get; }
+        internal StateNode Node { get; }
 
         public override string StateName
         {
-            get => GraphData.Name;
+            get => Graph.Name;
             internal set
             {
-                GraphData.Name = value;
-                title = GraphData.Name;
+                Graph.Name = value;
+                title = Graph.Name;
             }
         }
 
 
-        public StateEditorNode(AnimationGraphAsset graphAsset, StateNodeData nodeData,
-            GraphData.GraphData graphData) : base(graphAsset, graphData)
+        public StateEditorNode(AnimationGraphAsset graphAsset, StateNode node,
+            Graph.Graph graph) : base(graphAsset, graph)
         {
-            Assert.AreEqual(nodeData.MixerGraphGuid, graphData.Guid);
+            Assert.AreEqual(node.MixerGraphGuid, graph.Guid);
 
-            NodeData = nodeData;
+            Node = node;
 
-            SetPosition(new Rect(NodeData.EditorPosition, Vector2.zero));
+            SetPosition(new Rect(Node.EditorPosition, Vector2.zero));
 
             RefreshPorts();
             RefreshExpandedState();
@@ -44,7 +44,7 @@ namespace GBG.AnimationGraph.Editor.Node
         public override void SetPosition(Rect newPos)
         {
             base.SetPosition(newPos);
-            NodeData.EditorPosition = newPos.position;
+            Node.EditorPosition = newPos.position;
         }
 
         public override IInspector<GraphEditorNode> GetInspector()

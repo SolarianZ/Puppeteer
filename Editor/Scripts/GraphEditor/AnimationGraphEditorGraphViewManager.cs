@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using GBG.AnimationGraph.Editor.GraphView;
-using GBG.AnimationGraph.GraphData;
+using GBG.AnimationGraph.Graph;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
 using UnityEngine;

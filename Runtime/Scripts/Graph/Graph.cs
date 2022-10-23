@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using GBG.AnimationGraph.NodeData;
+using GBG.AnimationGraph.Node;
 using UnityEngine;
 
-namespace GBG.AnimationGraph.GraphData
+namespace GBG.AnimationGraph.Graph
 {
     public enum GraphType
     {
@@ -13,7 +13,7 @@ namespace GBG.AnimationGraph.GraphData
     }
 
     [Serializable]
-    public class GraphData
+    public class Graph
     {
         public string Name
         {
@@ -51,10 +51,10 @@ namespace GBG.AnimationGraph.GraphData
         private string _rootNodeGuid;
 
 
-        public List<NodeDataBase> Nodes => _nodes;
+        public List<NodeBase> Nodes => _nodes;
 
         [SerializeReference]
-        private List<NodeDataBase> _nodes = new List<NodeDataBase>();
+        private List<NodeBase> _nodes = new List<NodeBase>();
 
 #if UNITY_EDITOR
         public Vector2 EditorGraphRootNodePosition
@@ -70,7 +70,7 @@ namespace GBG.AnimationGraph.GraphData
 
 #endif
 
-        public GraphData(string guid, string name, GraphType type)
+        public Graph(string guid, string name, GraphType type)
         {
             _guid = guid;
             _name = name;

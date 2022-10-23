@@ -4,7 +4,7 @@ using System.Linq;
 using GBG.AnimationGraph.Parameter;
 using UnityEngine;
 
-namespace GBG.AnimationGraph.NodeData
+namespace GBG.AnimationGraph.Node
 {
     [Serializable]
     public class BlendSpace1DInput : NodeInputBase
@@ -17,7 +17,7 @@ namespace GBG.AnimationGraph.NodeData
     }
 
     [Serializable]
-    public class BlendSpace1DNodeData : PlayableNodeData
+    public class BlendSpace1DNode : PlayableNodeBase
     {
         public ParamGuidOrValue PositionParam
         {
@@ -40,7 +40,7 @@ namespace GBG.AnimationGraph.NodeData
         private string[] _inputGuids;
 
 
-        public BlendSpace1DNodeData(string guid) : base(guid)
+        public BlendSpace1DNode(string guid) : base(guid)
         {
         }
 

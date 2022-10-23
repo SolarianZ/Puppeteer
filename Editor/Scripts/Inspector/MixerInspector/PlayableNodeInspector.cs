@@ -26,10 +26,10 @@ namespace GBG.AnimationGraph.Editor.Inspector
             base.SetTarget(target);
 
             // Speed
-            SpeedParamField.SetParamTarget("Speed", Target.NodeData.SpeedParam,
+            SpeedParamField.SetParamTarget("Speed", Target.Node.SpeedParam,
                 ParamType.Float, Target.GraphAsset.Parameters,
-                Target.NodeData.SpeedParam.IsValue ? ParamLinkState.Unlinked : ParamLinkState.Linked,
-                Target.NodeData.SpeedParamActive ? ParamActiveState.Active : ParamActiveState.Inactive, null);
+                Target.Node.SpeedParam.IsValue ? ParamLinkState.Unlinked : ParamLinkState.Linked,
+                Target.Node.SpeedParamActive ? ParamActiveState.Active : ParamActiveState.Inactive, null);
         }
 
 
@@ -40,7 +40,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
 
         private void OnSpeedActiveChanged(bool isActive)
         {
-            Target.NodeData.SpeedParamActive = isActive;
+            Target.Node.SpeedParamActive = isActive;
             RaiseDataChangedEvent(DataCategories.NodeData);
         }
     }

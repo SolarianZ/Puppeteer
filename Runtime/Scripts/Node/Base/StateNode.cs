@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GBG.AnimationGraph.NodeData
+namespace GBG.AnimationGraph.Node
 {
     [Serializable]
-    public class StateNodeData : NodeDataBase
+    public class StateNode : NodeBase
     {
         public string MixerGraphGuid => Guid;
 
@@ -15,7 +15,7 @@ namespace GBG.AnimationGraph.NodeData
         private List<Transition> _transitions = new List<Transition>();
 
 
-        public StateNodeData(string graphGuid) : base(graphGuid)
+        public StateNode(string graphGuid) : base(graphGuid)
         {
         }
     }

@@ -1,18 +1,18 @@
 ﻿using GBG.AnimationGraph.Editor.GraphEdge;
 using GBG.AnimationGraph.Editor.Inspector;
-using GBG.AnimationGraph.NodeData;
+using GBG.AnimationGraph.Node;
 using UEdge = UnityEditor.Experimental.GraphView.Edge;
 
 namespace GBG.AnimationGraph.Editor.Node
 {
     public sealed class BlendSpace2DEditorNode : MixerGraphEditorNode
     {
-        internal new BlendSpace2DNodeData NodeData => (BlendSpace2DNodeData)base.NodeData;
+        internal new BlendSpace2DNode Node => (BlendSpace2DNode)base.Node;
 
         private BlendSpace2DNodeInspector _inspector;
 
-        public BlendSpace2DEditorNode(AnimationGraphAsset graphAsset, BlendSpace2DNodeData nodeData,
-            EditorNodeExtraInfo extraInfo) : base(graphAsset, nodeData, extraInfo)
+        public BlendSpace2DEditorNode(AnimationGraphAsset graphAsset, BlendSpace2DNode node,
+            EditorNodeExtraInfo extraInfo) : base(graphAsset, node, extraInfo)
         {
             title = "Blend Space 2D";
 
@@ -38,7 +38,7 @@ namespace GBG.AnimationGraph.Editor.Node
             if (graphEdge.InputPort.OwnerNode == this)
             {
                 var portIndex = InputPorts.IndexOf(graphEdge.InputPort);
-                NodeData.Samples[portIndex].InputNodeGuid = graphEdge.OutputPort.OwnerNode.Guid;
+                Node.Samples[portIndex].InputNodeGuid = graphEdge.OutputPort.OwnerNode.Guid;
                 _inspector?.RefreshSampleInputList();
             }
 
@@ -51,7 +51,7 @@ namespace GBG.AnimationGraph.Editor.Node
             if (graphEdge.InputPort.OwnerNode == this)
             {
                 var portIndex = InputPorts.IndexOf(graphEdge.InputPort);
-                NodeData.Samples[portIndex].InputNodeGuid = null;
+                Node.Samples[portIndex].InputNodeGuid = null;
                 _inspector?.RefreshSampleInputList();
             }
 
@@ -61,7 +61,7 @@ namespace GBG.AnimationGraph.Editor.Node
 
         private void RestoreInputPortElement()
         {
-            for (var i = 0; i < NodeData.Samples.Count; i++)
+            for (var i = 0; i < Node.Samples.Count; i++)
             {
                 AddInputPortElement(i);
             }

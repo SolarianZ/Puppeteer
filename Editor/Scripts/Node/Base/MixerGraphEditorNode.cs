@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GBG.AnimationGraph.Editor.Port;
 using GBG.AnimationGraph.Editor.Utility;
-using GBG.AnimationGraph.NodeData;
+using GBG.AnimationGraph.Node;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.Playables;
@@ -15,7 +15,7 @@ namespace GBG.AnimationGraph.Editor.Node
     {
         public const string INPUT_PORT_NAME_PREFIX = "Input";
 
-        public override string Guid => NodeData.Guid;
+        public override string Guid => Node.Guid;
 
         internal Playable Output { get; set; }
 
@@ -23,15 +23,15 @@ namespace GBG.AnimationGraph.Editor.Node
 
         internal GraphPort OutputPort { get; }
 
-        internal PlayableNodeData NodeData { get; }
+        internal PlayableNodeBase Node { get; }
 
         protected EditorNodeExtraInfo ExtraInfo { get; }
 
 
-        protected MixerGraphEditorNode(AnimationGraphAsset graphAsset, PlayableNodeData nodeData,
+        protected MixerGraphEditorNode(AnimationGraphAsset graphAsset, PlayableNodeBase node,
             EditorNodeExtraInfo extraInfo) : base(graphAsset)
         {
-            NodeData = nodeData;
+            Node = node;
             ExtraInfo = extraInfo;
 
             OutputPort = InstantiatePort(Direction.Output, typeof(Playable));
@@ -39,14 +39,14 @@ namespace GBG.AnimationGraph.Editor.Node
             OutputPort.portName = "Output";
             outputContainer.Add(OutputPort);
 
-            SetPosition(new Rect(NodeData.EditorPosition, Vector2.zero));
+            SetPosition(new Rect(Node.EditorPosition, Vector2.zero));
         }
 
 
         public sealed override void SetPosition(Rect newPos)
         {
             base.SetPosition(newPos);
-            NodeData.EditorPosition = newPos.position;
+            Node.EditorPosition = newPos.position;
         }
 
 

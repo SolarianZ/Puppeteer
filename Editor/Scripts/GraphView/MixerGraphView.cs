@@ -3,8 +3,8 @@ using GBG.AnimationGraph.Editor.GraphEdge;
 using GBG.AnimationGraph.Editor.GraphEditor;
 using GBG.AnimationGraph.Editor.Node;
 using GBG.AnimationGraph.Editor.Utility;
-using GBG.AnimationGraph.GraphData;
-using GBG.AnimationGraph.NodeData;
+using GBG.AnimationGraph.Graph;
+using GBG.AnimationGraph.Node;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.Assertions;
 using UnityEngine.UIElements;
@@ -19,18 +19,18 @@ namespace GBG.AnimationGraph.Editor.GraphView
         public PoseOutputEditorNode PoseOutputNode { get; }
 
 
-        public MixerGraphView(AnimationGraphAsset graphAsset, GraphData.GraphData graphData)
-            : base(graphAsset, graphData)
+        public MixerGraphView(AnimationGraphAsset graphAsset, Graph.Graph graph)
+            : base(graphAsset, graph)
         {
             // Root node
-            PoseOutputNode = new PoseOutputEditorNode(GraphAsset, graphData);
+            PoseOutputNode = new PoseOutputEditorNode(GraphAsset, graph);
             AddElement(PoseOutputNode);
 
             // Nodes
-            var nodeTable = new Dictionary<string, MixerGraphEditorNode>(GraphData.Nodes.Count + 1);
-            foreach (var nodeData in GraphData.Nodes)
+            var nodeTable = new Dictionary<string, MixerGraphEditorNode>(Graph.Nodes.Count + 1);
+            foreach (var nodeData in Graph.Nodes)
             {
-                var node = PlayableEditorNodeFactory.CreateNode(GraphAsset, (PlayableNodeData)nodeData, false);
+                var node = PlayableEditorNodeFactory.CreateNode(GraphAsset, (PlayableNodeBase)nodeData, false);
                 node.OnDoubleClicked += OnDoubleClickNode;
                 AddElement(node);
                 nodeTable.Add(node.Guid, node);
@@ -71,10 +71,10 @@ namespace GBG.AnimationGraph.Editor.GraphView
                         {
                             node.OnDoubleClicked += OnDoubleClickNode;
 
-                            GraphData.Nodes.Add(node.NodeData);
+                            Graph.Nodes.Add(node.Node);
                             if (node is StateMachineEditorNode stateMachineNode)
                             {
-                                GraphAsset.Graphs.Add(new GraphData.GraphData(stateMachineNode.StateMachineGraphGuid,
+                                GraphAsset.Graphs.Add(new Graph.Graph(stateMachineNode.StateMachineGraphGuid,
                                     $"SubGraph_{GuidTool.NewUniqueSuffix()}", GraphType.StateMachine));
                             }
 
@@ -107,7 +107,7 @@ namespace GBG.AnimationGraph.Editor.GraphView
 
         private void ConnectNodeChildren(MixerGraphEditorNode parentNode, Dictionary<string, MixerGraphEditorNode> nodeTable)
         {
-            var parentNodeInputGuids = parentNode.NodeData.GetInputNodeGuids();
+            var parentNodeInputGuids = parentNode.Node.GetInputNodeGuids();
             Assert.AreEqual(parentNodeInputGuids.Count, parentNode.InputPorts.Count);
 
             for (var i = 0; i < parentNode.InputPorts.Count; i++)
@@ -131,11 +131,11 @@ namespace GBG.AnimationGraph.Editor.GraphView
             {
                 if (element is MixerGraphEditorNode playableNode)
                 {
-                    for (int i = 0; i < GraphData.Nodes.Count; i++)
+                    for (int i = 0; i < Graph.Nodes.Count; i++)
                     {
-                        if (GraphData.Nodes[i].Guid == playableNode.Guid)
+                        if (Graph.Nodes[i].Guid == playableNode.Guid)
                         {
-                            GraphData.Nodes.RemoveAt(i);
+                            Graph.Nodes.RemoveAt(i);
                             break;
                         }
                     }

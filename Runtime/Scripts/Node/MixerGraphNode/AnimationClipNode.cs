@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using GBG.AnimationGraph.Parameter;
 using UnityEngine;
 
-namespace GBG.AnimationGraph.NodeData
+namespace GBG.AnimationGraph.Node
 {
     // https://docs.unity3d.com/ScriptReference/Animations.AnimatorState.html
     [Serializable]
-    public class AnimationClipNodeData : PlayableNodeData
+    public class AnimationClipNode : PlayableNodeBase
     {
         public AnimationClip Clip
         {
@@ -79,7 +79,7 @@ namespace GBG.AnimationGraph.NodeData
         private bool _applyPlayableIK;
 
 
-        public AnimationClipNodeData(string guid) : base(guid)
+        public AnimationClipNode(string guid) : base(guid)
         {
         }
 

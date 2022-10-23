@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using GBG.AnimationGraph.Parameter;
 using UnityEngine;
 
-namespace GBG.AnimationGraph.NodeData
+namespace GBG.AnimationGraph.Node
 {
     public enum ConditionOperator
     {

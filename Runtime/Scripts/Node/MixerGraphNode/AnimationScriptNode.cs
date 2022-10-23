@@ -4,7 +4,7 @@ using GBG.AnimationGraph.Component;
 using UnityEngine;
 using UnityEngine.Animations;
 
-namespace GBG.AnimationGraph.NodeData
+namespace GBG.AnimationGraph.Node
 {
     public abstract class AnimationScriptAsset : ScriptableObject
     {
@@ -15,7 +15,7 @@ namespace GBG.AnimationGraph.NodeData
     }
 
     [Serializable]
-    public class AnimationScriptNodeData : PlayableNodeData
+    public class AnimationScriptNode : PlayableNodeBase
     {
         public AnimationScriptAsset ScriptAsset
         {
@@ -27,7 +27,7 @@ namespace GBG.AnimationGraph.NodeData
         private AnimationScriptAsset _scriptAsset;
 
 
-        public AnimationScriptNodeData(string guid) : base(guid)
+        public AnimationScriptNode(string guid) : base(guid)
         {
         }
 

@@ -1,6 +1,6 @@
 ﻿using GBG.AnimationGraph.Editor.GraphEditor;
 using GBG.AnimationGraph.Editor.Node;
-using GBG.AnimationGraph.NodeData;
+using GBG.AnimationGraph.Node;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 using UObject = UnityEngine.Object;
@@ -9,7 +9,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
 {
     public class AnimationScriptNodeInspector : PlayableNodeInspector
     {
-        private AnimationScriptNodeData NodeData => (AnimationScriptNodeData)Target.NodeData;
+        private AnimationScriptNode Node => (AnimationScriptNode)Target.Node;
 
         private readonly ObjectField _scriptAssetField;
 
@@ -33,12 +33,12 @@ namespace GBG.AnimationGraph.Editor.Inspector
             base.SetTarget(target);
 
             // Script asset
-            _scriptAssetField.SetValueWithoutNotify(NodeData.ScriptAsset);
+            _scriptAssetField.SetValueWithoutNotify(Node.ScriptAsset);
         }
 
         private void OnScriptAssetChanged(ChangeEvent<UObject> evt)
         {
-            NodeData.ScriptAsset = (AnimationScriptAsset)evt.newValue;
+            Node.ScriptAsset = (AnimationScriptAsset)evt.newValue;
             RaiseDataChangedEvent(DataCategories.NodeData);
         }
     }

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using GBG.AnimationGraph.Parameter;
 using UnityEngine;
 
-namespace GBG.AnimationGraph.NodeData
+namespace GBG.AnimationGraph.Node
 {
     [Serializable]
-    public abstract class PlayableNodeData : NodeDataBase
+    public abstract class PlayableNodeBase : NodeBase
     {
         #region Speed
 
@@ -31,7 +31,7 @@ namespace GBG.AnimationGraph.NodeData
         #endregion
 
 
-        protected PlayableNodeData(string guid) : base(guid)
+        protected PlayableNodeBase(string guid) : base(guid)
         {
         }
 

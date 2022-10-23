@@ -1,6 +1,6 @@
 ﻿using GBG.AnimationGraph.Editor.GraphEdge;
 using GBG.AnimationGraph.Editor.Inspector;
-using GBG.AnimationGraph.NodeData;
+using GBG.AnimationGraph.Node;
 using UEdge = UnityEditor.Experimental.GraphView.Edge;
 
 namespace GBG.AnimationGraph.Editor.Node
@@ -8,13 +8,13 @@ namespace GBG.AnimationGraph.Editor.Node
     // TODO: Sync inputs
     public sealed class AnimationMixerEditorNode : MixerGraphEditorNode
     {
-        internal new AnimationMixerNodeData NodeData => (AnimationMixerNodeData)base.NodeData;
+        internal new AnimationMixerNode Node => (AnimationMixerNode)base.Node;
 
         private AnimationMixerNodeInspector _inspector;
 
 
-        public AnimationMixerEditorNode(AnimationGraphAsset graphAsset, AnimationMixerNodeData nodeData,
-            EditorNodeExtraInfo extraInfo) : base(graphAsset, nodeData, extraInfo)
+        public AnimationMixerEditorNode(AnimationGraphAsset graphAsset, AnimationMixerNode node,
+            EditorNodeExtraInfo extraInfo) : base(graphAsset, node, extraInfo)
         {
             title = "Mixer";
 
@@ -41,7 +41,7 @@ namespace GBG.AnimationGraph.Editor.Node
             if (graphEdge.InputPort.OwnerNode == this)
             {
                 var portIndex = InputPorts.IndexOf(graphEdge.InputPort);
-                NodeData.MixerInputs[portIndex].InputNodeGuid = graphEdge.OutputPort.OwnerNode.Guid;
+                Node.MixerInputs[portIndex].InputNodeGuid = graphEdge.OutputPort.OwnerNode.Guid;
                 _inspector?.RefreshMixerInputList();
             }
 
@@ -54,7 +54,7 @@ namespace GBG.AnimationGraph.Editor.Node
             if (graphEdge.InputPort.OwnerNode == this)
             {
                 var portIndex = InputPorts.IndexOf(graphEdge.InputPort);
-                NodeData.MixerInputs[portIndex].InputNodeGuid = null;
+                Node.MixerInputs[portIndex].InputNodeGuid = null;
                 _inspector?.RefreshMixerInputList();
             }
 
@@ -67,11 +67,11 @@ namespace GBG.AnimationGraph.Editor.Node
             // Add two inputs for new created node
             if (ExtraInfo.IsCreateFromContextualMenu)
             {
-                NodeData.MixerInputs.Add(new MixerInputData());
-                NodeData.MixerInputs.Add(new MixerInputData());
+                Node.MixerInputs.Add(new MixerInputData());
+                Node.MixerInputs.Add(new MixerInputData());
             }
 
-            for (var i = 0; i < NodeData.MixerInputs.Count; i++)
+            for (var i = 0; i < Node.MixerInputs.Count; i++)
             {
                 AddInputPortElement(i);
             }

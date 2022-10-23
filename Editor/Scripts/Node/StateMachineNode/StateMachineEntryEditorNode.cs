@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using GBG.AnimationGraph.Editor.GraphEdge;
 using GBG.AnimationGraph.Editor.Inspector;
 using GBG.AnimationGraph.Editor.Utility;
-using GBG.AnimationGraph.NodeData;
+using GBG.AnimationGraph.Node;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
@@ -15,7 +15,7 @@ namespace GBG.AnimationGraph.Editor.Node
 
         public override string Guid => NODE_GUID;
 
-        internal override List<Transition> Transitions => _nodeData.Transitions;
+        internal override List<Transition> Transitions => _node.Transitions;
         
         public override string StateName
         {
@@ -25,18 +25,18 @@ namespace GBG.AnimationGraph.Editor.Node
 
         public string DestStateNodeGuid
         {
-            get => GraphData.RootNodeGuid;
-            internal set => GraphData.RootNodeGuid = value;
+            get => Graph.RootNodeGuid;
+            internal set => Graph.RootNodeGuid = value;
         }
 
 
-        private readonly StateNodeData _nodeData;
+        private readonly StateNode _node;
         
 
-        public StateMachineEntryEditorNode(AnimationGraphAsset graphAsset, GraphData.GraphData graphData)
-            : base(graphAsset, graphData)
+        public StateMachineEntryEditorNode(AnimationGraphAsset graphAsset, Graph.Graph graph)
+            : base(graphAsset, graph)
         {
-            _nodeData = new StateNodeData(NODE_GUID);
+            _node = new StateNode(NODE_GUID);
             
             title = "State Machine Entry";
             titleContainer.style.backgroundColor = ColorTool.GetColor<StateMachineEntryEditorNode>();
@@ -45,7 +45,7 @@ namespace GBG.AnimationGraph.Editor.Node
             capabilities &= ~Capabilities.Deletable;
             capabilities &= ~Capabilities.Copiable;
 
-            SetPosition(new Rect(GraphData.EditorGraphRootNodePosition, Vector2.zero));
+            SetPosition(new Rect(Graph.EditorGraphRootNodePosition, Vector2.zero));
 
             RefreshPorts();
             RefreshExpandedState();
@@ -54,7 +54,7 @@ namespace GBG.AnimationGraph.Editor.Node
         public override void SetPosition(Rect newPos)
         {
             base.SetPosition(newPos);
-            GraphData.EditorGraphRootNodePosition = newPos.position;
+            Graph.EditorGraphRootNodePosition = newPos.position;
         }
 
         public override IInspector<GraphEditorNode> GetInspector()
@@ -84,7 +84,7 @@ namespace GBG.AnimationGraph.Editor.Node
             edge.IsEntryEdge = true;
 
             // Transition data
-            GraphData.RootNodeGuid = destNode.Guid;
+            Graph.RootNodeGuid = destNode.Guid;
             dataDirty = true;
 
             return edge;

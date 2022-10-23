@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GBG.AnimationGraph.Editor.Utility;
 using GBG.AnimationGraph.Editor.ViewElement;
-using GBG.AnimationGraph.GraphData;
+using GBG.AnimationGraph.Graph;
 using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEngine;
@@ -273,7 +273,7 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             if (_graphAsset.Graphs.Count == 0)
             {
                 // Add a default node
-                var rootGraph = new GraphData.GraphData(GuidTool.NewGuid(), "RootGraph", GraphType.Mixer);
+                var rootGraph = new Graph.Graph(GuidTool.NewGuid(), "RootGraph", GraphType.Mixer);
                 _graphAsset.RootGraphGuid = rootGraph.Guid;
                 _graphAsset.Graphs.Add(rootGraph);
             }

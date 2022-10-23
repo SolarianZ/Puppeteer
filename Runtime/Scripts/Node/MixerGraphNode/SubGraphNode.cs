@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using GBG.AnimationGraph.Parameter;
 using UnityEngine;
 
-namespace GBG.AnimationGraph.NodeData
+namespace GBG.AnimationGraph.Node
 {
     [Serializable]
-    public class SubGraphNodeData : PlayableNodeData
+    public class SubGraphNode : PlayableNodeBase
     {
         public AnimationGraphAsset SubGraph
         {
@@ -27,7 +27,7 @@ namespace GBG.AnimationGraph.NodeData
         private List<ParamBindingGuidOrValue> _paramBindings = new List<ParamBindingGuidOrValue>();
 
 
-        public SubGraphNodeData(string guid) : base(guid)
+        public SubGraphNode(string guid) : base(guid)
         {
         }
 

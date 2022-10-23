@@ -14,14 +14,14 @@ namespace GBG.AnimationGraph.Editor.Node
 
         public GraphPort PoseInputPort { get; }
 
-        public string RootPlayableNodeGuid => _graphData.RootNodeGuid;
+        public string RootPlayableNodeGuid => _graph.RootNodeGuid;
 
-        private readonly GraphData.GraphData _graphData;
+        private readonly Graph.Graph _graph;
 
 
-        public PoseOutputEditorNode(AnimationGraphAsset graphAsset, GraphData.GraphData graphData) : base(graphAsset)
+        public PoseOutputEditorNode(AnimationGraphAsset graphAsset, Graph.Graph graph) : base(graphAsset)
         {
-            _graphData = graphData;
+            _graph = graph;
 
             title = "Pose Output";
 
@@ -37,7 +37,7 @@ namespace GBG.AnimationGraph.Editor.Node
             PoseInputPort.OnDisconnected += OnPortDisconnected;
             inputContainer.Add(PoseInputPort);
 
-            SetPosition(new Rect(_graphData.EditorGraphRootNodePosition, Vector2.zero));
+            SetPosition(new Rect(_graph.EditorGraphRootNodePosition, Vector2.zero));
 
             RefreshPorts();
             RefreshExpandedState();
@@ -46,20 +46,20 @@ namespace GBG.AnimationGraph.Editor.Node
         public override void SetPosition(Rect newPos)
         {
             base.SetPosition(newPos);
-            _graphData.EditorGraphRootNodePosition = newPos.position;
+            _graph.EditorGraphRootNodePosition = newPos.position;
         }
 
         protected override void OnPortConnected(UEdge edge)
         {
             var graphEdge = (FlowingGraphEdge)edge;
-            _graphData.RootNodeGuid = graphEdge.OutputPort.OwnerNode.Guid;
+            _graph.RootNodeGuid = graphEdge.OutputPort.OwnerNode.Guid;
 
             base.OnPortConnected(edge);
         }
 
         protected override void OnPortDisconnected(UEdge edge)
         {
-            _graphData.RootNodeGuid = null;
+            _graph.RootNodeGuid = null;
 
             base.OnPortDisconnected(edge);
         }

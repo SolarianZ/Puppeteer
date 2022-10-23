@@ -1,34 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using GBG.AnimationGraph.Parameter;
 using UnityEngine;
 
-namespace GBG.AnimationGraph.NodeData
+namespace GBG.AnimationGraph.Node
 {
     [Serializable]
-    public class LayerMixerInputData : MixerInputData
+    public class MixerInputData : NodeInputBase
     {
-        public bool IsAdditive
+        public ParamGuidOrValue InputWeightParam
         {
-            get => _isAdditive;
-            internal set => _isAdditive = value;
+            get => _inputWeightParam;
+            internal set => _inputWeightParam = value;
         }
 
         [SerializeField]
-        private bool _isAdditive;
-
-        public AvatarMask AvatarMask
-        {
-            get => _avatarMask;
-            internal set => _avatarMask = value;
-        }
-
-        [SerializeField]
-        private AvatarMask _avatarMask;
+        private ParamGuidOrValue _inputWeightParam = new ParamGuidOrValue(null, 0);
     }
-
+    
     [Serializable]
-    public class AnimationLayerMixerNodeData : PlayableNodeData
+    public class AnimationMixerNode : PlayableNodeBase
     {
         #region Mixer Inputs
 
@@ -46,7 +38,7 @@ namespace GBG.AnimationGraph.NodeData
         #endregion
 
 
-        public AnimationLayerMixerNodeData(string guid) : base(guid)
+        public AnimationMixerNode(string guid) : base(guid)
         {
         }
 
@@ -60,7 +52,7 @@ namespace GBG.AnimationGraph.NodeData
             {
                 _inputGuids = (from input in MixerInputs select input.InputNodeGuid).ToArray();
             }
-
+            
             return _inputGuids;
         }
     }

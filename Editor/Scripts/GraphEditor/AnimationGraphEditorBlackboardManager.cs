@@ -3,7 +3,7 @@ using System.Linq;
 using GBG.AnimationGraph.Editor.Blackboard;
 using GBG.AnimationGraph.Editor.Utility;
 using GBG.AnimationGraph.Editor.ViewElement;
-using GBG.AnimationGraph.GraphData;
+using GBG.AnimationGraph.Graph;
 using GBG.AnimationGraph.Parameter;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -225,7 +225,7 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             var menu = new GenericDropdownMenu();
             menu.AddItem("Mixer Graph", false, () =>
             {
-                _graphAsset.Graphs.Add(new GraphData.GraphData(GuidTool.NewGuid(),
+                _graphAsset.Graphs.Add(new Graph.Graph(GuidTool.NewGuid(),
                     $"SubGraph_{GuidTool.NewUniqueSuffix()}",
                     GraphType.Mixer));
                 _graphListView.RefreshItems();
@@ -233,7 +233,7 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             });
             menu.AddItem("State Machine Graph", false, () =>
             {
-                _graphAsset.Graphs.Add(new GraphData.GraphData(GuidTool.NewGuid(),
+                _graphAsset.Graphs.Add(new Graph.Graph(GuidTool.NewGuid(),
                     $"SubGraph_{GuidTool.NewUniqueSuffix()}",
                     GraphType.StateMachine));
                 _graphListView.RefreshItems();
@@ -282,15 +282,15 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             OnDataChanged?.Invoke(DataCategories.GraphList);
         }
 
-        private void OnWantsToRenameGraph(GraphData.GraphData graphData)
+        private void OnWantsToRenameGraph(Graph.Graph graph)
         {
-            var conflictingNames = from graph in _graphAsset.Graphs
-                where !graph.Name.Equals(graphData.Name)
-                select graph.Name;
-            RenameWindow.Open(graphData.Name, conflictingNames, (oldName, newName) =>
+            var conflictingNames = from g in _graphAsset.Graphs
+                where !g.Name.Equals(graph.Name)
+                select g.Name;
+            RenameWindow.Open(graph.Name, conflictingNames, (oldName, newName) =>
             {
                 if (oldName.Equals(newName)) return;
-                graphData.Name = newName;
+                graph.Name = newName;
 
                 _graphListView.RefreshItems();
 
@@ -298,12 +298,12 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             });
         }
 
-        private void OnWantsToOpenGraph(GraphData.GraphData graphData)
+        private void OnWantsToOpenGraph(Graph.Graph graph)
         {
-            OnWantsOpenGraph?.Invoke(graphData.Guid);
+            OnWantsOpenGraph?.Invoke(graph.Guid);
         }
 
-        private void OnWantsToDeleteGraph(GraphData.GraphData graphData)
+        private void OnWantsToDeleteGraph(Graph.Graph graph)
         {
             Debug.LogError("TODO: OnWantsToDeleteGraph");
         }

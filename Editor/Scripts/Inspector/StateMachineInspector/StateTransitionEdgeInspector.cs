@@ -4,7 +4,7 @@ using System.Linq;
 using GBG.AnimationGraph.Editor.GraphEdge;
 using GBG.AnimationGraph.Editor.GraphEditor;
 using GBG.AnimationGraph.Editor.Node;
-using GBG.AnimationGraph.NodeData;
+using GBG.AnimationGraph.Node;
 using GBG.AnimationGraph.Parameter;
 using UnityEditor.UIElements;
 using UnityEngine;

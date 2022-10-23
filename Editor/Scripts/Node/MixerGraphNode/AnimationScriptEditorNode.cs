@@ -1,12 +1,12 @@
 ﻿using GBG.AnimationGraph.Editor.Inspector;
-using GBG.AnimationGraph.NodeData;
+using GBG.AnimationGraph.Node;
 
 namespace GBG.AnimationGraph.Editor.Node
 {
     public sealed class AnimationScriptEditorNode : MixerGraphEditorNode
     {
-        public AnimationScriptEditorNode(AnimationGraphAsset graphAsset, AnimationScriptNodeData nodeData,
-            EditorNodeExtraInfo extraInfo) : base(graphAsset, nodeData, extraInfo)
+        public AnimationScriptEditorNode(AnimationGraphAsset graphAsset, AnimationScriptNode node,
+            EditorNodeExtraInfo extraInfo) : base(graphAsset, node, extraInfo)
         {
             title = "Animation Script";
 

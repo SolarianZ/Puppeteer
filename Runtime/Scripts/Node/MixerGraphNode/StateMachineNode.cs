@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GBG.AnimationGraph.NodeData
+namespace GBG.AnimationGraph.Node
 {
     [Serializable]
-    public class StateMachineNodeData : PlayableNodeData
+    public class StateMachineNode : PlayableNodeBase
     {
         public string StateMachineGraphGuid => Guid;
 
 
-        public StateMachineNodeData(string guid) : base(guid)
+        public StateMachineNode(string guid) : base(guid)
         {
         }
 

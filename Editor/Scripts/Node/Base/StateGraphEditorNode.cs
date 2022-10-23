@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using GBG.AnimationGraph.Editor.GraphEdge;
-using GBG.AnimationGraph.NodeData;
+using GBG.AnimationGraph.Node;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UPort = UnityEditor.Experimental.GraphView.Port;
@@ -14,15 +14,15 @@ namespace GBG.AnimationGraph.Editor.Node
 
         internal abstract List<Transition> Transitions { get; }
 
-        internal GraphData.GraphData GraphData { get; }
+        internal Graph.Graph Graph { get; }
 
 
         private const float _CONNECTION_HANDLER_WIDTH = 12;
 
 
-        protected StateGraphEditorNode(AnimationGraphAsset graphAsset, GraphData.GraphData graphData) : base(graphAsset)
+        protected StateGraphEditorNode(AnimationGraphAsset graphAsset, Graph.Graph graph) : base(graphAsset)
         {
-            GraphData = graphData;
+            Graph = graph;
 
             // Styles
             mainContainer.style.backgroundColor = new Color(45 / 255f, 45 / 255f, 45 / 255f, 1.0f);

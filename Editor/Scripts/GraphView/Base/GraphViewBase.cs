@@ -13,21 +13,21 @@ namespace GBG.AnimationGraph.Editor.GraphView
     {
         private const string _GRID_BACKGROUND_STYLE_PATH = "AnimationGraph/GridBackground";
 
-        public string Guid => GraphData.Guid;
+        public string Guid => Graph.Guid;
 
-        public string Name => GraphData.Name;
+        public string Name => Graph.Name;
 
         public abstract GraphEditorNode RootNode { get; }
 
         protected AnimationGraphAsset GraphAsset { get; }
 
-        protected GraphData.GraphData GraphData { get; }
+        protected Graph.Graph Graph { get; }
 
 
-        protected GraphViewBase(AnimationGraphAsset graphAsset, GraphData.GraphData graphData)
+        protected GraphViewBase(AnimationGraphAsset graphAsset, Graph.Graph graph)
         {
             GraphAsset = graphAsset;
-            GraphData = graphData;
+            Graph = graph;
 
             this.AddManipulator(new ContentDragger());
             this.AddManipulator(new SelectionDragger());

@@ -1,6 +1,6 @@
 ﻿using GBG.AnimationGraph.Editor.GraphEdge;
 using GBG.AnimationGraph.Editor.Inspector;
-using GBG.AnimationGraph.NodeData;
+using GBG.AnimationGraph.Node;
 using GBG.AnimationGraph.Parameter;
 using UEdge = UnityEditor.Experimental.GraphView.Edge;
 
@@ -8,13 +8,13 @@ namespace GBG.AnimationGraph.Editor.Node
 {
     public sealed class AnimationLayerMixerEditorNode : MixerGraphEditorNode
     {
-        internal new AnimationLayerMixerNodeData NodeData => (AnimationLayerMixerNodeData)base.NodeData;
+        internal new AnimationLayerMixerNode Node => (AnimationLayerMixerNode)base.Node;
 
         private AnimationLayerMixerNodeInspector _inspector;
 
 
-        public AnimationLayerMixerEditorNode(AnimationGraphAsset graphAsset, AnimationLayerMixerNodeData nodeData,
-            EditorNodeExtraInfo extraInfo) : base(graphAsset, nodeData, extraInfo)
+        public AnimationLayerMixerEditorNode(AnimationGraphAsset graphAsset, AnimationLayerMixerNode node,
+            EditorNodeExtraInfo extraInfo) : base(graphAsset, node, extraInfo)
         {
             title = "Layer Mixer";
 
@@ -41,7 +41,7 @@ namespace GBG.AnimationGraph.Editor.Node
             if (graphEdge.InputPort.OwnerNode == this)
             {
                 var portIndex = InputPorts.IndexOf(graphEdge.InputPort);
-                NodeData.MixerInputs[portIndex].InputNodeGuid = graphEdge.OutputPort.OwnerNode.Guid;
+                Node.MixerInputs[portIndex].InputNodeGuid = graphEdge.OutputPort.OwnerNode.Guid;
                 _inspector?.RefreshMixerInputList();
             }
 
@@ -54,7 +54,7 @@ namespace GBG.AnimationGraph.Editor.Node
             if (graphEdge.InputPort.OwnerNode == this)
             {
                 var portIndex = InputPorts.IndexOf(graphEdge.InputPort);
-                NodeData.MixerInputs[portIndex].InputNodeGuid = null;
+                Node.MixerInputs[portIndex].InputNodeGuid = null;
                 _inspector?.RefreshMixerInputList();
             }
 
@@ -67,14 +67,14 @@ namespace GBG.AnimationGraph.Editor.Node
             // Add two inputs for new created node
             if (ExtraInfo.IsCreateFromContextualMenu)
             {
-                NodeData.MixerInputs.Add(new LayerMixerInputData
+                Node.MixerInputs.Add(new LayerMixerInputData
                 {
                     InputWeightParam = new ParamGuidOrValue(null, 1), // Base layer
                 });
-                NodeData.MixerInputs.Add(new LayerMixerInputData());
+                Node.MixerInputs.Add(new LayerMixerInputData());
             }
 
-            for (var i = 0; i < NodeData.MixerInputs.Count; i++)
+            for (var i = 0; i < Node.MixerInputs.Count; i++)
             {
                 AddInputPortElement(i);
             }

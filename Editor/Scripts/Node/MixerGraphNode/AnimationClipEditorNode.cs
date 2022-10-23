@@ -1,12 +1,12 @@
 ﻿using GBG.AnimationGraph.Editor.Inspector;
-using GBG.AnimationGraph.NodeData;
+using GBG.AnimationGraph.Node;
 
 namespace GBG.AnimationGraph.Editor.Node
 {
     public sealed class AnimationClipEditorNode : MixerGraphEditorNode
     {
-        public AnimationClipEditorNode(AnimationGraphAsset graphAsset, AnimationClipNodeData nodeData,
-            EditorNodeExtraInfo extraInfo) : base(graphAsset, nodeData, extraInfo)
+        public AnimationClipEditorNode(AnimationGraphAsset graphAsset, AnimationClipNode node,
+            EditorNodeExtraInfo extraInfo) : base(graphAsset, node, extraInfo)
         {
             title = "Animation Clip";
 

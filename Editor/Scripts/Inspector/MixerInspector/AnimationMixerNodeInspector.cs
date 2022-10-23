@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GBG.AnimationGraph.Editor.GraphEditor;
 using GBG.AnimationGraph.Editor.Node;
-using GBG.AnimationGraph.NodeData;
+using GBG.AnimationGraph.Node;
 using GBG.AnimationGraph.Parameter;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -79,7 +79,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
 
         protected virtual List<MixerInputData> GetMixerInputs()
         {
-           return ((AnimationMixerEditorNode)Target).NodeData.MixerInputs;
+           return ((AnimationMixerEditorNode)Target).Node.MixerInputs;
         }
 
         protected virtual MixerInputDataDrawer CreateMixerInputDataDrawer()

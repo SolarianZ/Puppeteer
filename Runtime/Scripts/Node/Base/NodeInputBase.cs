@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace GBG.AnimationGraph.NodeData
+namespace GBG.AnimationGraph.Node
 {
     [Serializable]
     public abstract class NodeInputBase

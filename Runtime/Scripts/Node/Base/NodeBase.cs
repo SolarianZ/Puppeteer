@@ -1,10 +1,10 @@
 ﻿using System;
 using UnityEngine;
 
-namespace GBG.AnimationGraph.NodeData
+namespace GBG.AnimationGraph.Node
 {
     [Serializable]
-    public abstract class NodeDataBase
+    public abstract class NodeBase
     {
         public string Guid => _guid;
 
@@ -24,7 +24,7 @@ namespace GBG.AnimationGraph.NodeData
 #endif
 
 
-        protected NodeDataBase(string guid)
+        protected NodeBase(string guid)
         {
             _guid = guid;
         }

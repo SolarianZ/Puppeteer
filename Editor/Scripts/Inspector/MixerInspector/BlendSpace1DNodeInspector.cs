@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GBG.AnimationGraph.Editor.GraphEditor;
 using GBG.AnimationGraph.Editor.Node;
-using GBG.AnimationGraph.NodeData;
+using GBG.AnimationGraph.Node;
 using GBG.AnimationGraph.Parameter;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -93,7 +93,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
 
         private readonly ListView _sampleListView;
 
-        private BlendSpace1DNodeData _nodeData;
+        private BlendSpace1DNode _node;
 
 
         public BlendSpace1DNodeInspector(Action<int> addInputPortElement, Action<int> removeInputPortElement,
@@ -140,16 +140,16 @@ namespace GBG.AnimationGraph.Editor.Inspector
         {
             base.SetTarget(target);
 
-            _nodeData = ((BlendSpace1DEditorNode)target).NodeData;
+            _node = ((BlendSpace1DEditorNode)target).Node;
 
             // Position param
-            _positionParamField.SetParamTarget("Position", _nodeData.PositionParam,
+            _positionParamField.SetParamTarget("Position", _node.PositionParam,
                 ParamType.Float, Target.GraphAsset.Parameters,
-                _nodeData.PositionParam.IsValue ? ParamLinkState.Unlinked : ParamLinkState.Linked,
+                _node.PositionParam.IsValue ? ParamLinkState.Unlinked : ParamLinkState.Linked,
                 ParamActiveState.ActiveLocked, null);
 
             // Samples
-            _sampleListView.itemsSource = _nodeData.Samples;
+            _sampleListView.itemsSource = _node.Samples;
             _sampleListView.RefreshItems();
         }
 
@@ -175,7 +175,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
         private void BindSampleListItem(VisualElement element, int index)
         {
             var drawer = (BlendSpace1DSampleDrawer)element;
-            drawer.SetTarget(_nodeData.Samples[index], index);
+            drawer.SetTarget(_node.Samples[index], index);
         }
 
         private void OnSampleIndexChanged(int from, int to)
@@ -187,7 +187,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
         private void OnSampleItemAdded(IEnumerable<int> indices)
         {
             var index = indices.First();
-            _nodeData.Samples[index] = new BlendSpace1DInput();
+            _node.Samples[index] = new BlendSpace1DInput();
             _addInputPortElement(index);
             RaiseDataChangedEvent(DataCategories.NodeData);
         }

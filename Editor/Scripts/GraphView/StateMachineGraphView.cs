@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using GBG.AnimationGraph.Editor.GraphEdge;
 using GBG.AnimationGraph.Editor.GraphEditor;
 using GBG.AnimationGraph.Editor.Node;
-using GBG.AnimationGraph.GraphData;
-using GBG.AnimationGraph.NodeData;
+using GBG.AnimationGraph.Graph;
+using GBG.AnimationGraph.Node;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -18,18 +18,18 @@ namespace GBG.AnimationGraph.Editor.GraphView
         public StateMachineEntryEditorNode StateMachineEntryNode { get; }
 
 
-        public StateMachineGraphView(AnimationGraphAsset graphAsset, GraphData.GraphData graphData)
-            : base(graphAsset, graphData)
+        public StateMachineGraphView(AnimationGraphAsset graphAsset, Graph.Graph graph)
+            : base(graphAsset, graph)
         {
             // Root node
-            StateMachineEntryNode = new StateMachineEntryEditorNode(GraphAsset, GraphData);
+            StateMachineEntryNode = new StateMachineEntryEditorNode(GraphAsset, Graph);
             AddElement(StateMachineEntryNode);
 
             // Nodes
-            var nodeTable = new Dictionary<string, StateEditorNode>(GraphData.Nodes.Count + 1);
-            foreach (var nodeData in GraphData.Nodes)
+            var nodeTable = new Dictionary<string, StateEditorNode>(Graph.Nodes.Count + 1);
+            foreach (var nodeData in Graph.Nodes)
             {
-                var stateNodeData = (StateNodeData)nodeData;
+                var stateNodeData = (StateNode)nodeData;
                 var stateNodeGraphData = GraphAsset.Graphs.Find(data => data.Guid.Equals(stateNodeData.MixerGraphGuid));
                 var node = StateEditorNodeFactory.CreateNode(GraphAsset, stateNodeData, stateNodeGraphData);
                 node.OnDoubleClicked += OnDoubleClickNode;
@@ -110,7 +110,7 @@ namespace GBG.AnimationGraph.Editor.GraphView
                     stateNode.OnDoubleClicked += OnDoubleClickNode;
 
                     GraphAsset.Graphs.Add(stateNodeGraphData);
-                    GraphData.Nodes.Add(stateNode.NodeData);
+                    Graph.Nodes.Add(stateNode.Node);
                     AddElement(stateNode);
                     RaiseContentChangedEvent(DataCategories.GraphData);
                 }
@@ -151,11 +151,11 @@ namespace GBG.AnimationGraph.Editor.GraphView
                     else if (element is StateEditorNode stateNode)
                     {
                         // Node table
-                        for (int j = 0; j < GraphData.Nodes.Count; j++)
+                        for (int j = 0; j < Graph.Nodes.Count; j++)
                         {
-                            if (GraphData.Nodes[j].Guid == stateNode.Guid)
+                            if (Graph.Nodes[j].Guid == stateNode.Guid)
                             {
-                                GraphData.Nodes.RemoveAt(j);
+                                Graph.Nodes.RemoveAt(j);
                                 break;
                             }
                         }

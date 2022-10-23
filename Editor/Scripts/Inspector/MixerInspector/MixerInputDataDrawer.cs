@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using GBG.AnimationGraph.NodeData;
+using GBG.AnimationGraph.Node;
 using GBG.AnimationGraph.Parameter;
 using UnityEngine;
 using UnityEngine.UIElements;

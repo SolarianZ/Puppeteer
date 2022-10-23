@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using GBG.AnimationGraph.Editor.GraphEditor;
 using GBG.AnimationGraph.Editor.Node;
-using GBG.AnimationGraph.NodeData;
+using GBG.AnimationGraph.Node;
 using GBG.AnimationGraph.Parameter;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -15,7 +15,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
     {
         protected List<ParamInfo> ParamTable { get; }
 
-        private SubGraphNodeData NodeData => (SubGraphNodeData)Target.NodeData;
+        private SubGraphNode Node => (SubGraphNode)Target.Node;
 
         private readonly ObjectField _subGraphField;
 
@@ -65,31 +65,31 @@ namespace GBG.AnimationGraph.Editor.Inspector
             base.SetTarget(target);
 
             // Sub graph
-            var subGraph = NodeData.SubGraph;
+            var subGraph = Node.SubGraph;
             _subGraphField.SetValueWithoutNotify(subGraph);
 
             // Param bindings
             ResetParamBindings();
-            _paramBindingListView.itemsSource = NodeData.ParamBindings;
+            _paramBindingListView.itemsSource = Node.ParamBindings;
         }
 
         private void ResetParamBindings()
         {
-            NodeData.ParamBindings.Clear();
-            if (!NodeData.SubGraph)
+            Node.ParamBindings.Clear();
+            if (!Node.SubGraph)
             {
                 return;
             }
 
-            foreach (var param in NodeData.SubGraph.Parameters)
+            foreach (var param in Node.SubGraph.Parameters)
             {
-                NodeData.ParamBindings.Add(new ParamBindingGuidOrValue(0, param.Guid));
+                Node.ParamBindings.Add(new ParamBindingGuidOrValue(0, param.Guid));
             }
         }
 
         private void OnSubGraphChanged(ChangeEvent<UObject> evt)
         {
-            var oldSubGraph = NodeData.SubGraph;
+            var oldSubGraph = Node.SubGraph;
             var newSubGraph = (AnimationGraphAsset)evt.newValue;
             if (newSubGraph == Target.GraphAsset)
             {
@@ -101,7 +101,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
                 return;
             }
 
-            NodeData.SubGraph = (AnimationGraphAsset)evt.newValue;
+            Node.SubGraph = (AnimationGraphAsset)evt.newValue;
 
             ResetParamBindings();
             _paramBindingListView.RefreshItems();
@@ -120,11 +120,11 @@ namespace GBG.AnimationGraph.Editor.Inspector
         private void BindParamBindingListItem(VisualElement element, int index)
         {
             var srcParamField = (ParamField)element;
-            var destParamInfo = NodeData.SubGraph.Parameters[index];
+            var destParamInfo = Node.SubGraph.Parameters[index];
             srcParamField.SetParamTarget(destParamInfo.Name,
-                NodeData.ParamBindings[index].SrcParamGuidOrValue,
+                Node.ParamBindings[index].SrcParamGuidOrValue,
                 destParamInfo.Type, ParamTable,
-                NodeData.ParamBindings[index].IsValue() ? ParamLinkState.Unlinked : ParamLinkState.Linked,
+                Node.ParamBindings[index].IsValue() ? ParamLinkState.Unlinked : ParamLinkState.Linked,
                 ParamActiveState.ActiveLocked, null);
         }
     }

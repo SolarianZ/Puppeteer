@@ -28,10 +28,10 @@ namespace GBG.AnimationGraph
         private string _rootGraphGuid;
 
 
-        public List<GraphData.GraphData> Graphs => _graphs;
+        public List<Graph.Graph> Graphs => _graphs;
 
         [SerializeField]
-        private List<GraphData.GraphData> _graphs = new List<GraphData.GraphData>();
+        private List<Graph.Graph> _graphs = new List<Graph.Graph>();
 
 
 #if UNITY_EDITOR

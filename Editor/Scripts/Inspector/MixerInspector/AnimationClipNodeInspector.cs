@@ -1,6 +1,6 @@
 ﻿using GBG.AnimationGraph.Editor.GraphEditor;
 using GBG.AnimationGraph.Editor.Node;
-using GBG.AnimationGraph.NodeData;
+using GBG.AnimationGraph.Node;
 using GBG.AnimationGraph.Parameter;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -11,7 +11,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
 {
     public class AnimationClipNodeInspector : PlayableNodeInspector
     {
-        private AnimationClipNodeData NodeData => (AnimationClipNodeData)Target.NodeData;
+        private AnimationClipNode Node => (AnimationClipNode)Target.Node;
 
         private readonly ObjectField _clipField;
 
@@ -71,23 +71,23 @@ namespace GBG.AnimationGraph.Editor.Inspector
             base.SetTarget(target);
 
             // Motion Time
-            _motionTimeParamField.SetParamTarget("Motion Time", NodeData.MotionTimeParam,
+            _motionTimeParamField.SetParamTarget("Motion Time", Node.MotionTimeParam,
                 ParamType.Float, Target.GraphAsset.Parameters,
-                NodeData.MotionTimeParam.IsValue ? ParamLinkState.Unlinked : ParamLinkState.Linked,
-                NodeData.MotionTimeParamActive ? ParamActiveState.Active : ParamActiveState.Inactive, null);
+                Node.MotionTimeParam.IsValue ? ParamLinkState.Unlinked : ParamLinkState.Linked,
+                Node.MotionTimeParamActive ? ParamActiveState.Active : ParamActiveState.Inactive, null);
 
             // Cycle Offset
             // _cycleOffsetParamField.SetParamTarget("Cycle Offset", ClipNodeData.CycleOffsetParam, ParamType.Float,
             //     TargetNode.GraphAsset.Parameters, true, ClipNodeData.CycleOffsetParamActive, new Vector2(0, 1));
 
             // Clip
-            _clipField.SetValueWithoutNotify(NodeData.Clip);
+            _clipField.SetValueWithoutNotify(Node.Clip);
 
             // FootIK
-            _footIKField.SetValueWithoutNotify(NodeData.ApplyFootIK);
+            _footIKField.SetValueWithoutNotify(Node.ApplyFootIK);
 
             // PlayableIK
-            _playableIKField.SetValueWithoutNotify(NodeData.ApplyPlayableIK);
+            _playableIKField.SetValueWithoutNotify(Node.ApplyPlayableIK);
         }
 
 
@@ -98,7 +98,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
 
         private void OnMotionTimeActiveChanged(bool isActive)
         {
-            NodeData.MotionTimeParamActive = isActive;
+            Node.MotionTimeParamActive = isActive;
             RaiseDataChangedEvent(DataCategories.NodeData);
         }
 
@@ -115,19 +115,19 @@ namespace GBG.AnimationGraph.Editor.Inspector
 
         private void OnClipChanged(ChangeEvent<UObject> evt)
         {
-            NodeData.Clip = (AnimationClip)evt.newValue;
+            Node.Clip = (AnimationClip)evt.newValue;
             RaiseDataChangedEvent(DataCategories.NodeData);
         }
 
         private void OnFootIKParamChanged(ChangeEvent<bool> evt)
         {
-            NodeData.ApplyFootIK = evt.newValue;
+            Node.ApplyFootIK = evt.newValue;
             RaiseDataChangedEvent(DataCategories.NodeData);
         }
 
         private void OnPlayableIKParamChanged(ChangeEvent<bool> evt)
         {
-            NodeData.ApplyPlayableIK = evt.newValue;
+            Node.ApplyPlayableIK = evt.newValue;
             RaiseDataChangedEvent(DataCategories.NodeData);
         }
     }
