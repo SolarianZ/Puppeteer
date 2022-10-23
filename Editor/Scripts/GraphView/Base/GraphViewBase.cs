@@ -17,7 +17,7 @@ namespace GBG.AnimationGraph.Editor.GraphView
 
         public string Name => GraphData.Name;
 
-        public abstract GraphNode RootNode { get; }
+        public abstract GraphEditorNode RootNode { get; }
 
         protected AnimationGraphAsset GraphAsset { get; }
 

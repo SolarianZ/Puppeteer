@@ -1,22 +1,22 @@
 ﻿using GBG.AnimationGraph.Editor.GraphEdge;
 using GBG.AnimationGraph.Editor.Inspector;
 using GBG.AnimationGraph.NodeData;
+using GBG.AnimationGraph.Parameter;
 using UEdge = UnityEditor.Experimental.GraphView.Edge;
 
 namespace GBG.AnimationGraph.Editor.Node
 {
-    // TODO: Sync inputs
-    public sealed class AnimationMixerNode : MixerGraphNode
+    public sealed class AnimationLayerMixerEditorNode : MixerGraphEditorNode
     {
-        internal new AnimationMixerNodeData NodeData => (AnimationMixerNodeData)base.NodeData;
+        internal new AnimationLayerMixerNodeData NodeData => (AnimationLayerMixerNodeData)base.NodeData;
 
-        private AnimationMixerNodeInspector _inspector;
+        private AnimationLayerMixerNodeInspector _inspector;
 
 
-        public AnimationMixerNode(AnimationGraphAsset graphAsset, AnimationMixerNodeData nodeData,
-            NodeExtraInfo extraInfo) : base(graphAsset, nodeData, extraInfo)
+        public AnimationLayerMixerEditorNode(AnimationGraphAsset graphAsset, AnimationLayerMixerNodeData nodeData,
+            EditorNodeExtraInfo extraInfo) : base(graphAsset, nodeData, extraInfo)
         {
-            title = "Mixer";
+            title = "Layer Mixer";
 
             RestoreInputPortElement();
 
@@ -25,9 +25,9 @@ namespace GBG.AnimationGraph.Editor.Node
         }
 
 
-        public override IInspector<GraphNode> GetInspector()
+        public override IInspector<GraphEditorNode> GetInspector()
         {
-            _inspector ??= new AnimationMixerNodeInspector(GraphAsset.Parameters,
+            _inspector ??= new AnimationLayerMixerNodeInspector(GraphAsset.Parameters,
                 AddInputPortElement, RemoveInputPortElement, ReorderInputPortElement);
             _inspector.SetTarget(this);
 
@@ -67,8 +67,11 @@ namespace GBG.AnimationGraph.Editor.Node
             // Add two inputs for new created node
             if (ExtraInfo.IsCreateFromContextualMenu)
             {
-                NodeData.MixerInputs.Add(new MixerInputData());
-                NodeData.MixerInputs.Add(new MixerInputData());
+                NodeData.MixerInputs.Add(new LayerMixerInputData
+                {
+                    InputWeightParam = new ParamGuidOrValue(null, 1), // Base layer
+                });
+                NodeData.MixerInputs.Add(new LayerMixerInputData());
             }
 
             for (var i = 0; i < NodeData.MixerInputs.Count; i++)

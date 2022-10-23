@@ -18,7 +18,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
 
         protected override List<MixerInputData> GetMixerInputs()
         {
-            return ((AnimationLayerMixerNode)Target).NodeData.MixerInputs;
+            return ((AnimationLayerMixerEditorNode)Target).NodeData.MixerInputs;
         }
 
         protected override MixerInputDataDrawer CreateMixerInputDataDrawer()

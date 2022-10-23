@@ -28,7 +28,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
             Add(_scriptAssetField);
         }
 
-        public override void SetTarget(GraphNode target)
+        public override void SetTarget(GraphEditorNode target)
         {
             base.SetTarget(target);
 

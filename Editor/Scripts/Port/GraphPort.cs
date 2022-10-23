@@ -10,7 +10,7 @@ namespace GBG.AnimationGraph.Editor.Port
 {
     public class GraphPort : UPort
     {
-        public GraphNode OwnerNode => (GraphNode)node;
+        public GraphEditorNode OwnerNode => (GraphEditorNode)node;
 
         // public GraphNode ConnectedNode
         // {

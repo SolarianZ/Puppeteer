@@ -3,10 +3,10 @@ using GBG.AnimationGraph.NodeData;
 
 namespace GBG.AnimationGraph.Editor.Node
 {
-    public sealed class SubGraphNode : MixerGraphNode
+    public sealed class SubGraphEditorNode : MixerGraphEditorNode
     {
-        public SubGraphNode(AnimationGraphAsset graphAsset, SubGraphNodeData nodeData,
-            NodeExtraInfo extraInfo) : base(graphAsset, nodeData, extraInfo)
+        public SubGraphEditorNode(AnimationGraphAsset graphAsset, SubGraphNodeData nodeData,
+            EditorNodeExtraInfo extraInfo) : base(graphAsset, nodeData, extraInfo)
         {
             title = "Sub Graph";
 
@@ -14,7 +14,7 @@ namespace GBG.AnimationGraph.Editor.Node
             RefreshExpandedState();
         }
 
-        public override IInspector<GraphNode> GetInspector()
+        public override IInspector<GraphEditorNode> GetInspector()
         {
             var inspector = new SubGraphNodeInspector(GraphAsset.Parameters);
             inspector.SetTarget(this);

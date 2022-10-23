@@ -34,7 +34,7 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             IInspector newInspector = null;
             if (selection != null && selection.Count == 1)
             {
-                if (selection[0] is GraphNode graphNode)
+                if (selection[0] is GraphEditorNode graphNode)
                 {
                     newInspector = graphNode.GetInspector();
                 }

@@ -12,7 +12,7 @@ namespace GBG.AnimationGraph.Editor.Utility
         private static readonly Dictionary<Type, Color> _colors = new Dictionary<Type, Color>
         {
             { typeof(Playable), Color.cyan },
-            { typeof(StateMachineEntryNode), new Color(30 / 255f, 110 / 255f, 55 / 255f) },
+            { typeof(StateMachineEntryEditorNode), new Color(30 / 255f, 110 / 255f, 55 / 255f) },
         };
 
 

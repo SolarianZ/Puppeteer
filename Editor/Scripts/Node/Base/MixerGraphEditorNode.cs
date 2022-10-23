@@ -11,7 +11,7 @@ using UnityEngine.UIElements;
 
 namespace GBG.AnimationGraph.Editor.Node
 {
-    public abstract partial class MixerGraphNode : GraphNode
+    public abstract partial class MixerGraphEditorNode : GraphEditorNode
     {
         public const string INPUT_PORT_NAME_PREFIX = "Input";
 
@@ -25,11 +25,11 @@ namespace GBG.AnimationGraph.Editor.Node
 
         internal PlayableNodeData NodeData { get; }
 
-        protected NodeExtraInfo ExtraInfo { get; }
+        protected EditorNodeExtraInfo ExtraInfo { get; }
 
 
-        protected MixerGraphNode(AnimationGraphAsset graphAsset, PlayableNodeData nodeData,
-            NodeExtraInfo extraInfo) : base(graphAsset)
+        protected MixerGraphEditorNode(AnimationGraphAsset graphAsset, PlayableNodeData nodeData,
+            EditorNodeExtraInfo extraInfo) : base(graphAsset)
         {
             NodeData = nodeData;
             ExtraInfo = extraInfo;
@@ -105,7 +105,7 @@ namespace GBG.AnimationGraph.Editor.Node
     }
 
     // API Masks
-    public partial class MixerGraphNode
+    public partial class MixerGraphEditorNode
     {
         // ReSharper disable once InconsistentNaming
         [Obsolete("Use AddInputPort() or RemoveInputPort or ReorderInputPort() instead.", true)]

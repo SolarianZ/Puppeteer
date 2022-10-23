@@ -11,12 +11,12 @@ using UPort = UnityEditor.Experimental.GraphView.Port;
 
 namespace GBG.AnimationGraph.Editor.Node
 {
-    public class GraphNodeClickManipulator : MouseManipulator
+    public class GraphEditorNodeClickManipulator : MouseManipulator
     {
         private readonly Action<MouseDownEvent> _onClicked;
 
 
-        public GraphNodeClickManipulator(Action<MouseDownEvent> onClicked)
+        public GraphEditorNodeClickManipulator(Action<MouseDownEvent> onClicked)
         {
             _onClicked = onClicked;
 
@@ -41,7 +41,7 @@ namespace GBG.AnimationGraph.Editor.Node
         }
     }
 
-    public abstract partial class GraphNode : UNode, IInspectable<GraphNode>
+    public abstract partial class GraphEditorNode : UNode, IInspectable<GraphEditorNode>
     {
         public abstract string Guid { get; }
 
@@ -59,7 +59,7 @@ namespace GBG.AnimationGraph.Editor.Node
         protected UGraphView GraphView => GetFirstAncestorOfType<UGraphView>();
 
 
-        protected GraphNode(AnimationGraphAsset graphAsset)
+        protected GraphEditorNode(AnimationGraphAsset graphAsset)
         {
             GraphAsset = graphAsset;
 
@@ -75,7 +75,7 @@ namespace GBG.AnimationGraph.Editor.Node
             BannerContainer = mainContainer.Q("divider");
 
             // Callbacks
-            this.AddManipulator(new GraphNodeClickManipulator(OnClicked));
+            this.AddManipulator(new GraphEditorNodeClickManipulator(OnClicked));
         }
 
 
@@ -107,9 +107,9 @@ namespace GBG.AnimationGraph.Editor.Node
 
         #region Inspector
 
-        public virtual IInspector<GraphNode> GetInspector()
+        public virtual IInspector<GraphEditorNode> GetInspector()
         {
-            var defaultInspector = new GraphElementInspector<GraphNode>();
+            var defaultInspector = new GraphElementInspector<GraphEditorNode>();
             defaultInspector.SetTarget(this);
 
             return defaultInspector;
@@ -131,7 +131,7 @@ namespace GBG.AnimationGraph.Editor.Node
         }
 
 
-        public event Action<GraphNode> OnDoubleClicked;
+        public event Action<GraphEditorNode> OnDoubleClicked;
 
         private void OnClicked(MouseDownEvent evt)
         {
@@ -145,7 +145,7 @@ namespace GBG.AnimationGraph.Editor.Node
     }
 
     // Api Masks
-    public partial class GraphNode
+    public partial class GraphEditorNode
     {
         // ReSharper disable once InconsistentNaming
         [Obsolete("Don't use!", true)]

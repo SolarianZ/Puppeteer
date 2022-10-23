@@ -13,25 +13,25 @@ namespace GBG.AnimationGraph.Editor.GraphView
 {
     public class StateMachineGraphView : GraphViewBase
     {
-        public override GraphNode RootNode => StateMachineEntryNode;
+        public override GraphEditorNode RootNode => StateMachineEntryNode;
 
-        public StateMachineEntryNode StateMachineEntryNode { get; }
+        public StateMachineEntryEditorNode StateMachineEntryNode { get; }
 
 
         public StateMachineGraphView(AnimationGraphAsset graphAsset, GraphData.GraphData graphData)
             : base(graphAsset, graphData)
         {
             // Root node
-            StateMachineEntryNode = new StateMachineEntryNode(GraphAsset, GraphData);
+            StateMachineEntryNode = new StateMachineEntryEditorNode(GraphAsset, GraphData);
             AddElement(StateMachineEntryNode);
 
             // Nodes
-            var nodeTable = new Dictionary<string, StateNode>(GraphData.Nodes.Count + 1);
+            var nodeTable = new Dictionary<string, StateEditorNode>(GraphData.Nodes.Count + 1);
             foreach (var nodeData in GraphData.Nodes)
             {
                 var stateNodeData = (StateNodeData)nodeData;
                 var stateNodeGraphData = GraphAsset.Graphs.Find(data => data.Guid.Equals(stateNodeData.MixerGraphGuid));
-                var node = StateNodeFactory.CreateNode(GraphAsset, stateNodeData, stateNodeGraphData);
+                var node = StateEditorNodeFactory.CreateNode(GraphAsset, stateNodeData, stateNodeGraphData);
                 node.OnDoubleClicked += OnDoubleClickNode;
                 nodeTable.Add(node.Guid, node);
                 AddElement(node);
@@ -62,17 +62,17 @@ namespace GBG.AnimationGraph.Editor.GraphView
             graphViewChanged += OnGraphViewChanged;
         }
 
-        public List<StateGraphNode> GetCompatibleNodes(StateGraphNode fromNode)
+        public List<StateGraphEditorNode> GetCompatibleNodes(StateGraphEditorNode fromNode)
         {
-            var nodeList = new List<StateGraphNode>();
+            var nodeList = new List<StateGraphEditorNode>();
             foreach (var node in nodes)
             {
-                if (node == fromNode || node is StateMachineEntryNode)
+                if (node == fromNode || node is StateMachineEntryEditorNode)
                 {
                     continue;
                 }
 
-                nodeList.Add((StateGraphNode)node);
+                nodeList.Add((StateGraphEditorNode)node);
             }
 
             return nodeList;
@@ -86,7 +86,7 @@ namespace GBG.AnimationGraph.Editor.GraphView
             {
                 // Build menu items
                 var localMousePos = contentViewContainer.WorldToLocal(evt.mousePosition);
-                foreach (var nodeType in StateNodeFactory.GetStateNodeTypes())
+                foreach (var nodeType in StateEditorNodeFactory.GetStateNodeTypes())
                 {
                     // New mixer state
                     evt.menu.AppendAction($"Create Mixer {nodeType.Name}",
@@ -103,7 +103,7 @@ namespace GBG.AnimationGraph.Editor.GraphView
 
             void CreateNode(Type nodeType, GraphType graphType, Vector2 localMousePosition)
             {
-                var stateNode = StateNodeFactory.CreateNode(GraphAsset, nodeType, graphType,
+                var stateNode = StateEditorNodeFactory.CreateNode(GraphAsset, nodeType, graphType,
                     localMousePosition, out var stateNodeGraphData);
                 if (stateNode != null)
                 {
@@ -148,7 +148,7 @@ namespace GBG.AnimationGraph.Editor.GraphView
                         changedDataCategories |= DataCategories.TransitionData;
                     }
                     // Delete nodes
-                    else if (element is StateNode stateNode)
+                    else if (element is StateEditorNode stateNode)
                     {
                         // Node table
                         for (int j = 0; j < GraphData.Nodes.Count; j++)
@@ -195,11 +195,11 @@ namespace GBG.AnimationGraph.Editor.GraphView
             return graphViewChange;
         }
 
-        private void OnDoubleClickNode(GraphNode graphNode)
+        private void OnDoubleClickNode(GraphEditorNode graphNode)
         {
-            if (graphNode is StateMachineEntryNode) return;
+            if (graphNode is StateMachineEntryEditorNode) return;
 
-            var graphGuid = ((StateNode)graphNode).MixerGraphGuid;
+            var graphGuid = ((StateEditorNode)graphNode).MixerGraphGuid;
             RaiseWantsToOpenGraphEvent(graphGuid);
         }
     }

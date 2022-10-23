@@ -136,11 +136,11 @@ namespace GBG.AnimationGraph.Editor.Inspector
             Add(_sampleListView);
         }
 
-        public override void SetTarget(GraphNode target)
+        public override void SetTarget(GraphEditorNode target)
         {
             base.SetTarget(target);
 
-            _nodeData = ((BlendSpace1DNode)target).NodeData;
+            _nodeData = ((BlendSpace1DEditorNode)target).NodeData;
 
             // Position param
             _positionParamField.SetParamTarget("Position", _nodeData.PositionParam,

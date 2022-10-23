@@ -5,9 +5,9 @@ using UnityEngine.UIElements;
 
 namespace GBG.AnimationGraph.Editor.Inspector
 {
-    public class StateNodeInspector : GraphElementInspector<GraphNode>
+    public class StateNodeInspector : GraphElementInspector<GraphEditorNode>
     {
-        protected new StateGraphNode Target => (StateGraphNode)base.Target;
+        protected new StateGraphEditorNode Target => (StateGraphEditorNode)base.Target;
 
         protected TextField StateName { get; }
 
@@ -36,7 +36,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
             Add(_destFoldout);
         }
 
-        public override void SetTarget(GraphNode target)
+        public override void SetTarget(GraphEditorNode target)
         {
             base.SetTarget(target);
 
@@ -76,7 +76,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
 
         private class DestDrawer : VisualElement
         {
-            public DestDrawer(StateGraphNode destNode)
+            public DestDrawer(StateGraphEditorNode destNode)
             {
                 style.marginTop = 3;
                 style.marginBottom = 3;

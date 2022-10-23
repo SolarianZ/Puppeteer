@@ -14,23 +14,23 @@ namespace GBG.AnimationGraph.Editor.GraphView
 {
     public class MixerGraphView : GraphViewBase
     {
-        public override GraphNode RootNode => PoseOutputNode;
+        public override GraphEditorNode RootNode => PoseOutputNode;
 
-        public PoseOutputNode PoseOutputNode { get; }
+        public PoseOutputEditorNode PoseOutputNode { get; }
 
 
         public MixerGraphView(AnimationGraphAsset graphAsset, GraphData.GraphData graphData)
             : base(graphAsset, graphData)
         {
             // Root node
-            PoseOutputNode = new PoseOutputNode(GraphAsset, graphData);
+            PoseOutputNode = new PoseOutputEditorNode(GraphAsset, graphData);
             AddElement(PoseOutputNode);
 
             // Nodes
-            var nodeTable = new Dictionary<string, MixerGraphNode>(GraphData.Nodes.Count + 1);
+            var nodeTable = new Dictionary<string, MixerGraphEditorNode>(GraphData.Nodes.Count + 1);
             foreach (var nodeData in GraphData.Nodes)
             {
-                var node = PlayableNodeFactory.CreateNode(GraphAsset, (PlayableNodeData)nodeData, false);
+                var node = PlayableEditorNodeFactory.CreateNode(GraphAsset, (PlayableNodeData)nodeData, false);
                 node.OnDoubleClicked += OnDoubleClickNode;
                 AddElement(node);
                 nodeTable.Add(node.Guid, node);
@@ -62,17 +62,17 @@ namespace GBG.AnimationGraph.Editor.GraphView
             {
                 // Build menu items
                 var localMousePos = contentViewContainer.WorldToLocal(evt.mousePosition);
-                foreach (var nodeType in PlayableNodeFactory.GetPlayableNodeTypes())
+                foreach (var nodeType in PlayableEditorNodeFactory.GetPlayableNodeTypes())
                 {
                     evt.menu.AppendAction($"Create {nodeType.Name}", _ =>
                     {
-                        var node = PlayableNodeFactory.CreateNode(GraphAsset, nodeType, localMousePos);
+                        var node = PlayableEditorNodeFactory.CreateNode(GraphAsset, nodeType, localMousePos);
                         if (node != null)
                         {
                             node.OnDoubleClicked += OnDoubleClickNode;
 
                             GraphData.Nodes.Add(node.NodeData);
-                            if (node is StateMachineNode stateMachineNode)
+                            if (node is StateMachineEditorNode stateMachineNode)
                             {
                                 GraphAsset.Graphs.Add(new GraphData.GraphData(stateMachineNode.StateMachineGraphGuid,
                                     $"SubGraph_{GuidTool.NewUniqueSuffix()}", GraphType.StateMachine));
@@ -105,7 +105,7 @@ namespace GBG.AnimationGraph.Editor.GraphView
         }
 
 
-        private void ConnectNodeChildren(MixerGraphNode parentNode, Dictionary<string, MixerGraphNode> nodeTable)
+        private void ConnectNodeChildren(MixerGraphEditorNode parentNode, Dictionary<string, MixerGraphEditorNode> nodeTable)
         {
             var parentNodeInputGuids = parentNode.NodeData.GetInputNodeGuids();
             Assert.AreEqual(parentNodeInputGuids.Count, parentNode.InputPorts.Count);
@@ -129,7 +129,7 @@ namespace GBG.AnimationGraph.Editor.GraphView
         {
             graphViewChange.elementsToRemove?.ForEach(element =>
             {
-                if (element is MixerGraphNode playableNode)
+                if (element is MixerGraphEditorNode playableNode)
                 {
                     for (int i = 0; i < GraphData.Nodes.Count; i++)
                     {
@@ -147,9 +147,9 @@ namespace GBG.AnimationGraph.Editor.GraphView
             return graphViewChange;
         }
 
-        private void OnDoubleClickNode(GraphNode graphNode)
+        private void OnDoubleClickNode(GraphEditorNode graphNode)
         {
-            if (graphNode is StateMachineNode stateMachineNode)
+            if (graphNode is StateMachineEditorNode stateMachineNode)
             {
                 RaiseWantsToOpenGraphEvent(stateMachineNode.StateMachineGraphGuid);
             }

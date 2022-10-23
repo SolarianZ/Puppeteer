@@ -2,13 +2,13 @@
 
 namespace GBG.AnimationGraph.Editor.Node
 {
-    public sealed class StateMachineNode : MixerGraphNode
+    public sealed class StateMachineEditorNode : MixerGraphEditorNode
     {
         public string StateMachineGraphGuid => ((StateMachineNodeData)NodeData).StateMachineGraphGuid;
 
 
-        public StateMachineNode(AnimationGraphAsset graphAsset, StateMachineNodeData nodeData,
-            NodeExtraInfo extraInfo) : base(graphAsset, nodeData, extraInfo)
+        public StateMachineEditorNode(AnimationGraphAsset graphAsset, StateMachineNodeData nodeData,
+            EditorNodeExtraInfo extraInfo) : base(graphAsset, nodeData, extraInfo)
         {
             title = "State Machine";
 

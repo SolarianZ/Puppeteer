@@ -143,9 +143,9 @@ namespace GBG.AnimationGraph.Editor.Inspector
         }
     }
 
-    public delegate void WantsToIndicateTransition(StateGraphNode fromNode, StateGraphNode destNode);
+    public delegate void WantsToIndicateTransition(StateGraphEditorNode fromNode, StateGraphEditorNode destNode);
 
-    public delegate void WantsToDeleteTransition(StateGraphNode fromNode, StateGraphNode destNode);
+    public delegate void WantsToDeleteTransition(StateGraphEditorNode fromNode, StateGraphEditorNode destNode);
 
     public sealed class TransitionDrawer : VisualElement
     {
@@ -173,9 +173,9 @@ namespace GBG.AnimationGraph.Editor.Inspector
 
         private readonly List<ParamInfo> _paramTable;
 
-        private StateGraphNode _fromNode;
+        private StateGraphEditorNode _fromNode;
 
-        private StateGraphNode _destNode;
+        private StateGraphEditorNode _destNode;
 
         private Transition _transition;
 
@@ -298,7 +298,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
             buttonContainer.Add(deleteButton);
         }
 
-        public void SetTransition(StateGraphNode fromNode, StateGraphNode destNode, Transition transition)
+        public void SetTransition(StateGraphEditorNode fromNode, StateGraphEditorNode destNode, Transition transition)
         {
             _fromNode = fromNode;
             _destNode = destNode;
@@ -470,12 +470,12 @@ namespace GBG.AnimationGraph.Editor.Inspector
         }
 
 
-        private void OnWantsToIndicateTransition(StateGraphNode fromNode, StateGraphNode destNode)
+        private void OnWantsToIndicateTransition(StateGraphEditorNode fromNode, StateGraphEditorNode destNode)
         {
             _onWantsToIndicateTransition(fromNode, destNode);
         }
 
-        private void OnWantsToDeleteTransition(StateGraphNode fromNode, StateGraphNode destNode)
+        private void OnWantsToDeleteTransition(StateGraphEditorNode fromNode, StateGraphEditorNode destNode)
         {
             _onWantsToDeleteTransition(fromNode, destNode);
 

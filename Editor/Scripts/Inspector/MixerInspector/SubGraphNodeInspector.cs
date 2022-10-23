@@ -60,7 +60,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
             Add(_paramBindingListView);
         }
 
-        public override void SetTarget(GraphNode target)
+        public override void SetTarget(GraphEditorNode target)
         {
             base.SetTarget(target);
 

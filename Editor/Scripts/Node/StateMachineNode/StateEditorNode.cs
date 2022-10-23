@@ -7,7 +7,7 @@ using UPort = UnityEditor.Experimental.GraphView.Port;
 
 namespace GBG.AnimationGraph.Editor.Node
 {
-    public sealed class StateNode : StateGraphNode
+    public sealed class StateEditorNode : StateGraphEditorNode
     {
         public override string Guid => NodeData.Guid;
 
@@ -28,7 +28,7 @@ namespace GBG.AnimationGraph.Editor.Node
         }
 
 
-        public StateNode(AnimationGraphAsset graphAsset, StateNodeData nodeData,
+        public StateEditorNode(AnimationGraphAsset graphAsset, StateNodeData nodeData,
             GraphData.GraphData graphData) : base(graphAsset, graphData)
         {
             Assert.AreEqual(nodeData.MixerGraphGuid, graphData.Guid);
@@ -47,7 +47,7 @@ namespace GBG.AnimationGraph.Editor.Node
             NodeData.EditorPosition = newPos.position;
         }
 
-        public override IInspector<GraphNode> GetInspector()
+        public override IInspector<GraphEditorNode> GetInspector()
         {
             var inspector = new StateNodeInspector();
             inspector.SetTarget(this);

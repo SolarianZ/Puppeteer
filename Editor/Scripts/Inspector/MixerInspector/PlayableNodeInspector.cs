@@ -4,9 +4,9 @@ using GBG.AnimationGraph.Parameter;
 
 namespace GBG.AnimationGraph.Editor.Inspector
 {
-    public class PlayableNodeInspector : GraphElementInspector<GraphNode>
+    public class PlayableNodeInspector : GraphElementInspector<GraphEditorNode>
     {
-        protected new MixerGraphNode Target => (MixerGraphNode)base.Target;
+        protected new MixerGraphEditorNode Target => (MixerGraphEditorNode)base.Target;
 
         protected ParamField SpeedParamField { get; }
 
@@ -21,7 +21,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
         }
 
 
-        public override void SetTarget(GraphNode target)
+        public override void SetTarget(GraphEditorNode target)
         {
             base.SetTarget(target);
 

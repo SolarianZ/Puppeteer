@@ -62,7 +62,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
             Add(_inputListView);
         }
 
-        public override void SetTarget(GraphNode target)
+        public override void SetTarget(GraphEditorNode target)
         {
             base.SetTarget(target);
 
@@ -79,7 +79,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
 
         protected virtual List<MixerInputData> GetMixerInputs()
         {
-           return ((AnimationMixerNode)Target).NodeData.MixerInputs;
+           return ((AnimationMixerEditorNode)Target).NodeData.MixerInputs;
         }
 
         protected virtual MixerInputDataDrawer CreateMixerInputDataDrawer()

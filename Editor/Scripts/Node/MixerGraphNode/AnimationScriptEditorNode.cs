@@ -3,10 +3,10 @@ using GBG.AnimationGraph.NodeData;
 
 namespace GBG.AnimationGraph.Editor.Node
 {
-    public sealed class AnimationScriptNode : MixerGraphNode
+    public sealed class AnimationScriptEditorNode : MixerGraphEditorNode
     {
-        public AnimationScriptNode(AnimationGraphAsset graphAsset, AnimationScriptNodeData nodeData,
-            NodeExtraInfo extraInfo) : base(graphAsset, nodeData, extraInfo)
+        public AnimationScriptEditorNode(AnimationGraphAsset graphAsset, AnimationScriptNodeData nodeData,
+            EditorNodeExtraInfo extraInfo) : base(graphAsset, nodeData, extraInfo)
         {
             title = "Animation Script";
 
@@ -14,7 +14,7 @@ namespace GBG.AnimationGraph.Editor.Node
             RefreshExpandedState();
         }
 
-        public override IInspector<GraphNode> GetInspector()
+        public override IInspector<GraphEditorNode> GetInspector()
         {
             var inspector = new AnimationScriptNodeInspector();
             inspector.SetTarget(this);

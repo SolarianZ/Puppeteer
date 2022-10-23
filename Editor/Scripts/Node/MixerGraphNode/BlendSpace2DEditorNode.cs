@@ -5,17 +5,16 @@ using UEdge = UnityEditor.Experimental.GraphView.Edge;
 
 namespace GBG.AnimationGraph.Editor.Node
 {
-    public sealed class BlendSpace1DNode : MixerGraphNode
+    public sealed class BlendSpace2DEditorNode : MixerGraphEditorNode
     {
-        internal new BlendSpace1DNodeData NodeData => (BlendSpace1DNodeData)base.NodeData;
+        internal new BlendSpace2DNodeData NodeData => (BlendSpace2DNodeData)base.NodeData;
 
-        private BlendSpace1DNodeInspector _inspector;
+        private BlendSpace2DNodeInspector _inspector;
 
-
-        public BlendSpace1DNode(AnimationGraphAsset graphAsset, BlendSpace1DNodeData nodeData,
-            NodeExtraInfo extraInfo) : base(graphAsset, nodeData, extraInfo)
+        public BlendSpace2DEditorNode(AnimationGraphAsset graphAsset, BlendSpace2DNodeData nodeData,
+            EditorNodeExtraInfo extraInfo) : base(graphAsset, nodeData, extraInfo)
         {
-            title = "Blend Space 1D";
+            title = "Blend Space 2D";
 
             RestoreInputPortElement();
 
@@ -23,9 +22,9 @@ namespace GBG.AnimationGraph.Editor.Node
             RefreshExpandedState();
         }
 
-        public override IInspector<GraphNode> GetInspector()
+        public override IInspector<GraphEditorNode> GetInspector()
         {
-            _inspector ??= new BlendSpace1DNodeInspector(AddInputPortElement,
+            _inspector ??= new BlendSpace2DNodeInspector(AddInputPortElement,
                 RemoveInputPortElement, ReorderInputPortElement);
             _inspector.SetTarget(this);
 

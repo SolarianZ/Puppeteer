@@ -8,7 +8,7 @@ using UEdge = UnityEditor.Experimental.GraphView.Edge;
 
 namespace GBG.AnimationGraph.Editor.Node
 {
-    public sealed class PoseOutputNode : GraphNode
+    public sealed class PoseOutputEditorNode : GraphEditorNode
     {
         public override string Guid => "PoseOutputNode";
 
@@ -19,7 +19,7 @@ namespace GBG.AnimationGraph.Editor.Node
         private readonly GraphData.GraphData _graphData;
 
 
-        public PoseOutputNode(AnimationGraphAsset graphAsset, GraphData.GraphData graphData) : base(graphAsset)
+        public PoseOutputEditorNode(AnimationGraphAsset graphAsset, GraphData.GraphData graphData) : base(graphAsset)
         {
             _graphData = graphData;
 

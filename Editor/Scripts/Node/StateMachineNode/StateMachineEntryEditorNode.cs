@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace GBG.AnimationGraph.Editor.Node
 {
-    public sealed class StateMachineEntryNode : StateGraphNode
+    public sealed class StateMachineEntryEditorNode : StateGraphEditorNode
     {
         public const string NODE_GUID = "StateMachineEntryNode";
 
@@ -19,7 +19,7 @@ namespace GBG.AnimationGraph.Editor.Node
         
         public override string StateName
         {
-            get => nameof(StateMachineEntryNode);
+            get => nameof(StateMachineEntryEditorNode);
             internal set => throw new InvalidOperationException();
         }
 
@@ -33,13 +33,13 @@ namespace GBG.AnimationGraph.Editor.Node
         private readonly StateNodeData _nodeData;
         
 
-        public StateMachineEntryNode(AnimationGraphAsset graphAsset, GraphData.GraphData graphData)
+        public StateMachineEntryEditorNode(AnimationGraphAsset graphAsset, GraphData.GraphData graphData)
             : base(graphAsset, graphData)
         {
             _nodeData = new StateNodeData(NODE_GUID);
             
             title = "State Machine Entry";
-            titleContainer.style.backgroundColor = ColorTool.GetColor<StateMachineEntryNode>();
+            titleContainer.style.backgroundColor = ColorTool.GetColor<StateMachineEntryEditorNode>();
 
             // Capabilities
             capabilities &= ~Capabilities.Deletable;
@@ -57,7 +57,7 @@ namespace GBG.AnimationGraph.Editor.Node
             GraphData.EditorGraphRootNodePosition = newPos.position;
         }
 
-        public override IInspector<GraphNode> GetInspector()
+        public override IInspector<GraphEditorNode> GetInspector()
         {
             var inspector = new StateMachineEntryNodeInspector();
             inspector.SetTarget(this);
@@ -65,7 +65,7 @@ namespace GBG.AnimationGraph.Editor.Node
             return inspector;
         }
 
-        public override StateTransitionEdge AddTransition(StateGraphNode destNode, out bool dataDirty)
+        public override StateTransitionEdge AddTransition(StateGraphEditorNode destNode, out bool dataDirty)
         {
             // Only allow one transition
             if (OutputTransitions.Count > 0)

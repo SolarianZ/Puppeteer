@@ -11,7 +11,7 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
 
         private bool _active;
 
-        private StateGraphNode _fromNode;
+        private StateGraphEditorNode _fromNode;
 
         private StateTransitionEdge _dragEdge;
 
@@ -66,10 +66,10 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
                 }
             }
 
-            _fromNode = target as StateGraphNode;
+            _fromNode = target as StateGraphEditorNode;
             if (_fromNode == null)
             {
-                _fromNode = target.GetFirstAncestorOfType<StateGraphNode>();
+                _fromNode = target.GetFirstAncestorOfType<StateGraphEditorNode>();
                 if (_fromNode == null)
                 {
                     return;
@@ -105,7 +105,7 @@ namespace GBG.AnimationGraph.Editor.GraphEdge
             }
 
             var compatibleNodes = _graphView.GetCompatibleNodes(_dragEdge.ConnectedNode0);
-            StateGraphNode destNode = null;
+            StateGraphEditorNode destNode = null;
             foreach (var node in compatibleNodes)
             {
                 if (node.worldBound.Contains(e.mousePosition))
