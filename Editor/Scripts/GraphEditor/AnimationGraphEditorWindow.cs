@@ -270,12 +270,12 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             _blackboardManager.Initialize(_graphAsset);
 
             // GraphView
-            if (_graphAsset.Graphs.Count == 0)
+            if (_graphAsset.GraphLayers.Count == 0)
             {
                 // Add a default node
-                var rootGraph = new Graph.Graph(GuidTool.NewGuid(), "RootGraph", GraphType.Mixer);
+                var rootGraph = new Graph.GraphLayer(GuidTool.NewGuid(), "RootGraph", GraphType.Mixer);
                 _graphAsset.RootGraphGuid = rootGraph.Guid;
-                _graphAsset.Graphs.Add(rootGraph);
+                _graphAsset.GraphLayers.Add(rootGraph);
             }
 
             OpenGraphFromGraphList(_graphAsset.RootGraphGuid);

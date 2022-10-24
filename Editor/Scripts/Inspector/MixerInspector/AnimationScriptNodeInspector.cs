@@ -1,7 +1,12 @@
-﻿using GBG.AnimationGraph.Editor.GraphEditor;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using GBG.AnimationGraph.Editor.GraphEditor;
 using GBG.AnimationGraph.Editor.Node;
 using GBG.AnimationGraph.Node;
+using GBG.AnimationGraph.Parameter;
 using UnityEditor.UIElements;
+using UnityEngine;
 using UnityEngine.UIElements;
 using UObject = UnityEngine.Object;
 
@@ -11,11 +16,29 @@ namespace GBG.AnimationGraph.Editor.Inspector
     {
         private AnimationScriptNode Node => (AnimationScriptNode)Target.Node;
 
+        private List<ParamInfo> ParamTable { get; }
+
+        private readonly Action<int> _addInputPortElement;
+
+        private readonly Action<int> _removeInputPortElement;
+
+        private readonly Action<int, int> _reorderInputPortElement;
+
         private readonly ObjectField _scriptAssetField;
 
+        private readonly ListView _inputListView;
 
-        public AnimationScriptNodeInspector()
+        private List<MixerInputData> _mixerInputs;
+
+
+        public AnimationScriptNodeInspector(List<ParamInfo> paramTable, Action<int> addInputPortElement,
+            Action<int> removeInputPortElement, Action<int, int> reorderInputPortElement)
         {
+            ParamTable = paramTable;
+            _addInputPortElement = addInputPortElement;
+            _removeInputPortElement = removeInputPortElement;
+            _reorderInputPortElement = reorderInputPortElement;
+
             // Script asset
             _scriptAssetField = new ObjectField("Script Asset")
             {
@@ -26,6 +49,33 @@ namespace GBG.AnimationGraph.Editor.Inspector
             _scriptAssetField.labelElement.style.width = FieldLabelWidth;
             _scriptAssetField.RegisterValueChangedCallback(OnScriptAssetChanged);
             Add(_scriptAssetField);
+
+            // Mixer inputs
+            var inputListViewLabel = new Label("Mixer Inputs")
+            {
+                style =
+                {
+                    height = 20,
+                    marginLeft = 3,
+                    marginRight = 3,
+                    unityTextAlign = TextAnchor.MiddleLeft,
+                }
+            };
+            Add(inputListViewLabel);
+            _inputListView = new ListView
+            {
+                reorderable = true,
+                reorderMode = ListViewReorderMode.Animated,
+                fixedItemHeight = MixerInputDataDrawer.DRAWER_HEIGHT,
+                makeItem = MakeInputListItem,
+                bindItem = BindInputListItem,
+                selectionType = SelectionType.Single,
+                showAddRemoveFooter = true,
+            };
+            _inputListView.itemIndexChanged += OnInputIndexChanged;
+            _inputListView.itemsAdded += OnInputItemAdded;
+            _inputListView.itemsRemoved += OnInputItemRemoved;
+            Add(_inputListView);
         }
 
         public override void SetTarget(GraphEditorNode target)
@@ -34,11 +84,56 @@ namespace GBG.AnimationGraph.Editor.Inspector
 
             // Script asset
             _scriptAssetField.SetValueWithoutNotify(Node.ScriptAsset);
+
+            // Inputs
+            _mixerInputs = ((AnimationScriptEditorNode)Target).Node.MixerInputs;
+            _inputListView.itemsSource = _mixerInputs;
+            _inputListView.RefreshItems();
         }
+
+        public void RefreshMixerInputList()
+        {
+            _inputListView.RefreshItems();
+        }
+
 
         private void OnScriptAssetChanged(ChangeEvent<UObject> evt)
         {
             Node.ScriptAsset = (AnimationScriptAsset)evt.newValue;
+            RaiseDataChangedEvent(DataCategories.NodeData);
+        }
+
+        private VisualElement MakeInputListItem()
+        {
+            var drawer = new MixerInputDataDrawer(ParamTable, FieldLabelWidth);
+            drawer.OnDataChanged += () => RaiseDataChangedEvent(DataCategories.NodeData);
+
+            return drawer;
+        }
+
+        private void BindInputListItem(VisualElement element, int index)
+        {
+            var drawer = (MixerInputDataDrawer)element;
+            drawer.SetMixerInputData(_mixerInputs[index], index);
+        }
+
+        private void OnInputIndexChanged(int from, int to)
+        {
+            _reorderInputPortElement(from, to);
+            RaiseDataChangedEvent(DataCategories.NodeData);
+        }
+
+        private void OnInputItemAdded(IEnumerable<int> indices)
+        {
+            var index = indices.First();
+            _mixerInputs[index] = new MixerInputData();
+            _addInputPortElement(index);
+            RaiseDataChangedEvent(DataCategories.NodeData);
+        }
+
+        private void OnInputItemRemoved(IEnumerable<int> indices)
+        {
+            _removeInputPortElement(indices.First());
             RaiseDataChangedEvent(DataCategories.NodeData);
         }
     }

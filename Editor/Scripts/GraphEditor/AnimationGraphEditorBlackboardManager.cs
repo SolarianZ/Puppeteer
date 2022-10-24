@@ -36,7 +36,7 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             _graphAsset = graphAsset;
 
             _paramListView.itemsSource = _graphAsset.Parameters;
-            _graphListView.itemsSource = _graphAsset.Graphs;
+            _graphListView.itemsSource = _graphAsset.GraphLayers;
         }
 
         public void Update(DataCategories changedDataCategories)
@@ -225,7 +225,7 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             var menu = new GenericDropdownMenu();
             menu.AddItem("Mixer Graph", false, () =>
             {
-                _graphAsset.Graphs.Add(new Graph.Graph(GuidTool.NewGuid(),
+                _graphAsset.GraphLayers.Add(new Graph.GraphLayer(GuidTool.NewGuid(),
                     $"SubGraph_{GuidTool.NewUniqueSuffix()}",
                     GraphType.Mixer));
                 _graphListView.RefreshItems();
@@ -233,7 +233,7 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             });
             menu.AddItem("State Machine Graph", false, () =>
             {
-                _graphAsset.Graphs.Add(new Graph.Graph(GuidTool.NewGuid(),
+                _graphAsset.GraphLayers.Add(new Graph.GraphLayer(GuidTool.NewGuid(),
                     $"SubGraph_{GuidTool.NewUniqueSuffix()}",
                     GraphType.StateMachine));
                 _graphListView.RefreshItems();
@@ -273,7 +273,7 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             var graphField = (GraphField)listItem;
             graphField.style.flexGrow = 1;
 
-            var graphData = _graphAsset.Graphs[index];
+            var graphData = _graphAsset.GraphLayers[index];
             graphField.SetGraphData(graphData, graphData.Guid != _graphAsset.RootGraphGuid);
         }
 
@@ -282,15 +282,15 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             OnDataChanged?.Invoke(DataCategories.GraphList);
         }
 
-        private void OnWantsToRenameGraph(Graph.Graph graph)
+        private void OnWantsToRenameGraph(Graph.GraphLayer graphLayer)
         {
-            var conflictingNames = from g in _graphAsset.Graphs
-                where !g.Name.Equals(graph.Name)
+            var conflictingNames = from g in _graphAsset.GraphLayers
+                where !g.Name.Equals(graphLayer.Name)
                 select g.Name;
-            RenameWindow.Open(graph.Name, conflictingNames, (oldName, newName) =>
+            RenameWindow.Open(graphLayer.Name, conflictingNames, (oldName, newName) =>
             {
                 if (oldName.Equals(newName)) return;
-                graph.Name = newName;
+                graphLayer.Name = newName;
 
                 _graphListView.RefreshItems();
 
@@ -298,12 +298,12 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             });
         }
 
-        private void OnWantsToOpenGraph(Graph.Graph graph)
+        private void OnWantsToOpenGraph(Graph.GraphLayer graphLayer)
         {
-            OnWantsOpenGraph?.Invoke(graph.Guid);
+            OnWantsOpenGraph?.Invoke(graphLayer.Guid);
         }
 
-        private void OnWantsToDeleteGraph(Graph.Graph graph)
+        private void OnWantsToDeleteGraph(Graph.GraphLayer graphLayer)
         {
             Debug.LogError("TODO: OnWantsToDeleteGraph");
         }

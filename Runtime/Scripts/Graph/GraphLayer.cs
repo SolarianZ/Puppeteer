@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using GBG.AnimationGraph.Node;
+using GBG.AnimationGraph.Parameter;
 using UnityEngine;
+using UnityEngine.Playables;
 
 namespace GBG.AnimationGraph.Graph
 {
@@ -13,8 +15,10 @@ namespace GBG.AnimationGraph.Graph
     }
 
     [Serializable]
-    public class Graph
+    public class GraphLayer
     {
+        #region Serialization Data
+
         public string Name
         {
             get => _name;
@@ -67,14 +71,40 @@ namespace GBG.AnimationGraph.Graph
         private Vector2 _editorGraphRootNodePosition;
 
         // TODO: Isolated nodes(Editor only) 
-
 #endif
 
-        public Graph(string guid, string name, GraphType type)
+        #endregion
+
+
+        #region Runtime Properties
+
+        #endregion
+
+
+        public GraphLayer(string guid, string name, GraphType type)
         {
             _guid = guid;
             _name = name;
             _graphType = type;
+        }
+
+        public void InitializeNodes(PlayableGraph playableGraph,
+            IReadOnlyDictionary<string, ParamInfo> paramGuidTable,
+            Dictionary<string, NodeBase> outNodeGuidTable)
+        {
+            foreach (var node in Nodes)
+            {
+                node.InitializePlayable(playableGraph, paramGuidTable);
+                outNodeGuidTable.Add(node.Guid, node);
+            }
+        }
+
+        public void InitializeConnections(IReadOnlyDictionary<string, NodeBase> nodeGuidTable)
+        {
+            foreach (var node in Nodes)
+            {
+                node.InitializeConnection(nodeGuidTable);
+            }
         }
     }
 }

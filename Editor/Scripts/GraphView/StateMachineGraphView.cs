@@ -18,19 +18,19 @@ namespace GBG.AnimationGraph.Editor.GraphView
         public StateMachineEntryEditorNode StateMachineEntryNode { get; }
 
 
-        public StateMachineGraphView(AnimationGraphAsset graphAsset, Graph.Graph graph)
-            : base(graphAsset, graph)
+        public StateMachineGraphView(AnimationGraphAsset graphAsset, Graph.GraphLayer graphLayer)
+            : base(graphAsset, graphLayer)
         {
             // Root node
-            StateMachineEntryNode = new StateMachineEntryEditorNode(GraphAsset, Graph);
+            StateMachineEntryNode = new StateMachineEntryEditorNode(GraphAsset, GraphLayer);
             AddElement(StateMachineEntryNode);
 
             // Nodes
-            var nodeTable = new Dictionary<string, StateEditorNode>(Graph.Nodes.Count + 1);
-            foreach (var nodeData in Graph.Nodes)
+            var nodeTable = new Dictionary<string, StateEditorNode>(GraphLayer.Nodes.Count + 1);
+            foreach (var nodeData in GraphLayer.Nodes)
             {
                 var stateNodeData = (StateNode)nodeData;
-                var stateNodeGraphData = GraphAsset.Graphs.Find(data => data.Guid.Equals(stateNodeData.MixerGraphGuid));
+                var stateNodeGraphData = GraphAsset.GraphLayers.Find(data => data.Guid.Equals(stateNodeData.MixerGraphGuid));
                 var node = StateEditorNodeFactory.CreateNode(GraphAsset, stateNodeData, stateNodeGraphData);
                 node.OnDoubleClicked += OnDoubleClickNode;
                 nodeTable.Add(node.Guid, node);
@@ -109,8 +109,8 @@ namespace GBG.AnimationGraph.Editor.GraphView
                 {
                     stateNode.OnDoubleClicked += OnDoubleClickNode;
 
-                    GraphAsset.Graphs.Add(stateNodeGraphData);
-                    Graph.Nodes.Add(stateNode.Node);
+                    GraphAsset.GraphLayers.Add(stateNodeGraphData);
+                    GraphLayer.Nodes.Add(stateNode.Node);
                     AddElement(stateNode);
                     RaiseContentChangedEvent(DataCategories.GraphData);
                 }
@@ -151,11 +151,11 @@ namespace GBG.AnimationGraph.Editor.GraphView
                     else if (element is StateEditorNode stateNode)
                     {
                         // Node table
-                        for (int j = 0; j < Graph.Nodes.Count; j++)
+                        for (int j = 0; j < GraphLayer.Nodes.Count; j++)
                         {
-                            if (Graph.Nodes[j].Guid == stateNode.Guid)
+                            if (GraphLayer.Nodes[j].Guid == stateNode.Guid)
                             {
-                                Graph.Nodes.RemoveAt(j);
+                                GraphLayer.Nodes.RemoveAt(j);
                                 break;
                             }
                         }
@@ -171,11 +171,11 @@ namespace GBG.AnimationGraph.Editor.GraphView
                         }
 
                         // Graphs
-                        for (int j = 0; j < GraphAsset.Graphs.Count; j++)
+                        for (int j = 0; j < GraphAsset.GraphLayers.Count; j++)
                         {
-                            if (GraphAsset.Graphs[j].Guid.Equals(stateNode.Guid))
+                            if (GraphAsset.GraphLayers[j].Guid.Equals(stateNode.Guid))
                             {
-                                GraphAsset.Graphs.RemoveAt(j);
+                                GraphAsset.GraphLayers.RemoveAt(j);
                                 break;
                             }
                         }

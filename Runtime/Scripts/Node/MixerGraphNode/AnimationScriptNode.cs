@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using GBG.AnimationGraph.Component;
 using UnityEngine;
 using UnityEngine.Animations;
@@ -17,6 +18,22 @@ namespace GBG.AnimationGraph.Node
     [Serializable]
     public class AnimationScriptNode : PlayableNodeBase
     {
+        #region Mixer Inputs
+
+        public List<MixerInputData> MixerInputs
+        {
+            get => _mixerInputs;
+            internal set => _mixerInputs = value;
+        }
+
+        [SerializeReference]
+        private List<MixerInputData> _mixerInputs = new List<MixerInputData>();
+
+        private string[] _inputGuids;
+
+        #endregion
+
+
         public AnimationScriptAsset ScriptAsset
         {
             get => _scriptAsset;
@@ -33,7 +50,16 @@ namespace GBG.AnimationGraph.Node
 
         public override IList<string> GetInputNodeGuids()
         {
-            return EmptyInputs;
+            if (Application.isPlaying)
+            {
+                _inputGuids ??= (from input in MixerInputs select input.InputNodeGuid).ToArray();
+            }
+            else
+            {
+                _inputGuids = (from input in MixerInputs select input.InputNodeGuid).ToArray();
+            }
+
+            return _inputGuids;
         }
     }
 }

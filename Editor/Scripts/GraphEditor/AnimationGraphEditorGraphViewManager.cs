@@ -69,7 +69,7 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
                 _viewContainer.Remove(activeGraphView);
             }
 
-            var graphData = _graphAsset.Graphs.Find(graph => graph.Guid.Equals(graphGuid));
+            var graphData = _graphAsset.GraphLayers.Find(graph => graph.Guid.Equals(graphGuid));
             GraphViewBase graphView = graphData.GraphType == GraphType.StateMachine
                 ? new StateMachineGraphView(_graphAsset, graphData)
                 : new MixerGraphView(_graphAsset, graphData);
@@ -85,7 +85,7 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             _graphViewBreadcrumbs[_graphViewBreadcrumbs.childCount - 1].style.overflow = Overflow.Hidden;
 
             // Notify active graph changed
-            OnActiveGraphChanged?.Invoke(_graphAsset.Graphs.IndexOf(graphData));
+            OnActiveGraphChanged?.Invoke(_graphAsset.GraphLayers.IndexOf(graphData));
 
             // Clear inspector target
             OnGraphViewSelectionChanged?.Invoke(null);

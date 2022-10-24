@@ -19,19 +19,19 @@ namespace GBG.AnimationGraph.Editor.Node
 
         public override string StateName
         {
-            get => Graph.Name;
+            get => GraphLayer.Name;
             internal set
             {
-                Graph.Name = value;
-                title = Graph.Name;
+                GraphLayer.Name = value;
+                title = GraphLayer.Name;
             }
         }
 
 
         public StateEditorNode(AnimationGraphAsset graphAsset, StateNode node,
-            Graph.Graph graph) : base(graphAsset, graph)
+            Graph.GraphLayer graphLayer) : base(graphAsset, graphLayer)
         {
-            Assert.AreEqual(node.MixerGraphGuid, graph.Guid);
+            Assert.AreEqual(node.MixerGraphGuid, graphLayer.Guid);
 
             Node = node;
 

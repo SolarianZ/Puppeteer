@@ -8,7 +8,7 @@ namespace GBG.AnimationGraph.Node
     [Serializable]
     public abstract class PlayableNodeBase : NodeBase
     {
-        #region Speed
+        #region Serialization Data
 
         public bool SpeedParamActive
         {
@@ -31,11 +31,6 @@ namespace GBG.AnimationGraph.Node
         #endregion
 
 
-        protected PlayableNodeBase(string guid) : base(guid)
-        {
-        }
-
-
         #region Non Serializable Input Data
 
         protected static string[] EmptyInputs = Array.Empty<string>();
@@ -43,5 +38,19 @@ namespace GBG.AnimationGraph.Node
         public abstract IList<string> GetInputNodeGuids();
 
         #endregion
+        
+
+        #region Runtime Properties
+
+        // internal abstract Playable AnimationPlayable { get; }
+
+        #endregion
+
+
+        protected PlayableNodeBase(string guid) : base(guid)
+        {
+        }
+
+
     }
 }

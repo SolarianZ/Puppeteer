@@ -19,16 +19,16 @@ namespace GBG.AnimationGraph.Editor.GraphView
         public PoseOutputEditorNode PoseOutputNode { get; }
 
 
-        public MixerGraphView(AnimationGraphAsset graphAsset, Graph.Graph graph)
-            : base(graphAsset, graph)
+        public MixerGraphView(AnimationGraphAsset graphAsset, Graph.GraphLayer graphLayer)
+            : base(graphAsset, graphLayer)
         {
             // Root node
-            PoseOutputNode = new PoseOutputEditorNode(GraphAsset, graph);
+            PoseOutputNode = new PoseOutputEditorNode(GraphAsset, graphLayer);
             AddElement(PoseOutputNode);
 
             // Nodes
-            var nodeTable = new Dictionary<string, MixerGraphEditorNode>(Graph.Nodes.Count + 1);
-            foreach (var nodeData in Graph.Nodes)
+            var nodeTable = new Dictionary<string, MixerGraphEditorNode>(GraphLayer.Nodes.Count + 1);
+            foreach (var nodeData in GraphLayer.Nodes)
             {
                 var node = PlayableEditorNodeFactory.CreateNode(GraphAsset, (PlayableNodeBase)nodeData, false);
                 node.OnDoubleClicked += OnDoubleClickNode;
@@ -71,10 +71,10 @@ namespace GBG.AnimationGraph.Editor.GraphView
                         {
                             node.OnDoubleClicked += OnDoubleClickNode;
 
-                            Graph.Nodes.Add(node.Node);
+                            GraphLayer.Nodes.Add(node.Node);
                             if (node is StateMachineEditorNode stateMachineNode)
                             {
-                                GraphAsset.Graphs.Add(new Graph.Graph(stateMachineNode.StateMachineGraphGuid,
+                                GraphAsset.GraphLayers.Add(new Graph.GraphLayer(stateMachineNode.StateMachineGraphGuid,
                                     $"SubGraph_{GuidTool.NewUniqueSuffix()}", GraphType.StateMachine));
                             }
 
@@ -131,11 +131,11 @@ namespace GBG.AnimationGraph.Editor.GraphView
             {
                 if (element is MixerGraphEditorNode playableNode)
                 {
-                    for (int i = 0; i < Graph.Nodes.Count; i++)
+                    for (int i = 0; i < GraphLayer.Nodes.Count; i++)
                     {
-                        if (Graph.Nodes[i].Guid == playableNode.Guid)
+                        if (GraphLayer.Nodes[i].Guid == playableNode.Guid)
                         {
-                            Graph.Nodes.RemoveAt(i);
+                            GraphLayer.Nodes.RemoveAt(i);
                             break;
                         }
                     }

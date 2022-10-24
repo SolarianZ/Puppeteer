@@ -23,23 +23,23 @@ namespace GBG.AnimationGraph.Editor.Node
         public static IEnumerable<Type> GetStateNodeTypes() => _nodeToDataType.Keys;
 
         public static StateEditorNode CreateNode(AnimationGraphAsset graphAsset, Type nodeType,
-            GraphType graphType, Vector2 position, out Graph.Graph nodeGraph)
+            GraphType graphType, Vector2 position, out Graph.GraphLayer graphLayer)
         {
-            nodeGraph = new Graph.Graph(GuidTool.NewGuid(),
+            graphLayer = new Graph.GraphLayer(GuidTool.NewGuid(),
                 $"SubGraph_{GuidTool.NewUniqueSuffix()}", graphType);
             var nodeDataType = _nodeToDataType[nodeType];
-            var nodeData = (StateNode)Activator.CreateInstance(nodeDataType, nodeGraph.Guid);
+            var nodeData = (StateNode)Activator.CreateInstance(nodeDataType, graphLayer.Guid);
             nodeData.EditorPosition = position;
 
-            return CreateNode(graphAsset, nodeData, nodeGraph);
+            return CreateNode(graphAsset, nodeData, graphLayer);
         }
 
         public static StateEditorNode CreateNode(AnimationGraphAsset graphAsset, StateNode node,
-            Graph.Graph graph)
+            Graph.GraphLayer graphLayer)
         {
             var nodeType = _dataToNodeType[node.GetType()];
-            var editorNode = (StateEditorNode)Activator.CreateInstance(nodeType, graphAsset, node, graph);
-            editorNode.title = graph.Name;
+            var editorNode = (StateEditorNode)Activator.CreateInstance(nodeType, graphAsset, node, graphLayer);
+            editorNode.title = graphLayer.Name;
 
             return editorNode;
         }

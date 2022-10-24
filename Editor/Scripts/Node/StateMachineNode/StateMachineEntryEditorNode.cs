@@ -25,16 +25,16 @@ namespace GBG.AnimationGraph.Editor.Node
 
         public string DestStateNodeGuid
         {
-            get => Graph.RootNodeGuid;
-            internal set => Graph.RootNodeGuid = value;
+            get => GraphLayer.RootNodeGuid;
+            internal set => GraphLayer.RootNodeGuid = value;
         }
 
 
         private readonly StateNode _node;
         
 
-        public StateMachineEntryEditorNode(AnimationGraphAsset graphAsset, Graph.Graph graph)
-            : base(graphAsset, graph)
+        public StateMachineEntryEditorNode(AnimationGraphAsset graphAsset, Graph.GraphLayer graphLayer)
+            : base(graphAsset, graphLayer)
         {
             _node = new StateNode(NODE_GUID);
             
@@ -45,7 +45,7 @@ namespace GBG.AnimationGraph.Editor.Node
             capabilities &= ~Capabilities.Deletable;
             capabilities &= ~Capabilities.Copiable;
 
-            SetPosition(new Rect(Graph.EditorGraphRootNodePosition, Vector2.zero));
+            SetPosition(new Rect(GraphLayer.EditorGraphRootNodePosition, Vector2.zero));
 
             RefreshPorts();
             RefreshExpandedState();
@@ -54,7 +54,7 @@ namespace GBG.AnimationGraph.Editor.Node
         public override void SetPosition(Rect newPos)
         {
             base.SetPosition(newPos);
-            Graph.EditorGraphRootNodePosition = newPos.position;
+            GraphLayer.EditorGraphRootNodePosition = newPos.position;
         }
 
         public override IInspector<GraphEditorNode> GetInspector()
@@ -84,7 +84,7 @@ namespace GBG.AnimationGraph.Editor.Node
             edge.IsEntryEdge = true;
 
             // Transition data
-            Graph.RootNodeGuid = destNode.Guid;
+            GraphLayer.RootNodeGuid = destNode.Guid;
             dataDirty = true;
 
             return edge;

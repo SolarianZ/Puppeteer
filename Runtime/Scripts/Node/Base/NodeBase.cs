@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using GBG.AnimationGraph.Parameter;
 using UnityEngine;
 using UnityEngine.Playables;
 
@@ -16,22 +18,15 @@ namespace GBG.AnimationGraph.Node
 
 
 #if UNITY_EDITOR
-        public Vector2 EditorPosition
+        internal Vector2 EditorPosition
         {
             get => _editorPosition;
-            internal set => _editorPosition = value;
+            set => _editorPosition = value;
         }
 
         [SerializeField]
         private Vector2 _editorPosition;
 #endif
-
-        #endregion
-
-
-        #region Runtime Properties
-
-        // internal abstract Playable AnimationPlayable { get; }
 
         #endregion
 
@@ -42,8 +37,20 @@ namespace GBG.AnimationGraph.Node
         }
 
 
-        public void Initialize(PlayableGraph playableGraph)
+        internal void InitializePlayable(PlayableGraph playableGraph,
+            IReadOnlyDictionary<string, ParamInfo> paramGuidTable)
         {
         }
+
+        internal void InitializeConnection(IReadOnlyDictionary<string, NodeBase> nodeGuidTable)
+        {
+        }
+
+        internal virtual void PrepareFrame(float deltaTime)
+        {
+        }
+
+        // TODO: This method should be abstract
+        internal Playable GetPlayable() => Playable.Null;
     }
 }

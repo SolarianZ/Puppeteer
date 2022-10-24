@@ -14,15 +14,15 @@ namespace GBG.AnimationGraph.Editor.Node
 
         internal abstract List<Transition> Transitions { get; }
 
-        internal Graph.Graph Graph { get; }
+        internal Graph.GraphLayer GraphLayer { get; }
 
 
         private const float _CONNECTION_HANDLER_WIDTH = 12;
 
 
-        protected StateGraphEditorNode(AnimationGraphAsset graphAsset, Graph.Graph graph) : base(graphAsset)
+        protected StateGraphEditorNode(AnimationGraphAsset graphAsset, Graph.GraphLayer graphLayer) : base(graphAsset)
         {
-            Graph = graph;
+            GraphLayer = graphLayer;
 
             // Styles
             mainContainer.style.backgroundColor = new Color(45 / 255f, 45 / 255f, 45 / 255f, 1.0f);

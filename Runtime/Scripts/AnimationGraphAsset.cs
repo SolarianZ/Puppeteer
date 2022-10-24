@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using GBG.AnimationGraph.Graph;
 using GBG.AnimationGraph.Parameter;
 using UnityEngine;
 #if UNITY_EDITOR
@@ -28,16 +29,16 @@ namespace GBG.AnimationGraph
         private string _rootGraphGuid;
 
 
-        public List<Graph.Graph> Graphs => _graphs;
+        public List<GraphLayer> GraphLayers => _graphLayers;
 
         [SerializeField]
-        private List<Graph.Graph> _graphs = new List<Graph.Graph>();
+        private List<GraphLayer> _graphLayers = new List<GraphLayer>();
 
 
 #if UNITY_EDITOR
-        
-        // TODO: Isolated graphs(Editor only) 
-        
+
+        // TODO: Isolated graph layers(Editor only) 
+
 #endif
 
 

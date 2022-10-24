@@ -10,18 +10,18 @@ namespace GBG.AnimationGraph.Editor.Blackboard
     {
         // public const string PARAM_NAME_MATCH_REGEX = "^[a-zA-Z_][a-zA-Z0-9_]*$";
 
-        public event Action<Graph.Graph> OnWantsToRenameGraph;
+        public event Action<Graph.GraphLayer> OnWantsToRenameGraph;
 
-        public event Action<Graph.Graph> OnWantsToOpenGraph;
+        public event Action<Graph.GraphLayer> OnWantsToOpenGraph;
 
-        public event Action<Graph.Graph> OnWantsToDeleteGraph;
+        public event Action<Graph.GraphLayer> OnWantsToDeleteGraph;
 
 
         private readonly Label _nameLabel;
 
         private readonly Label _typeLabel;
 
-        private Graph.Graph _graph;
+        private Graph.GraphLayer _graphLayer;
 
         private bool _deletable = true;
 
@@ -55,16 +55,16 @@ namespace GBG.AnimationGraph.Editor.Blackboard
             Add(_typeLabel);
         }
 
-        public void SetGraphData(Graph.Graph graph, bool deletable)
+        public void SetGraphData(Graph.GraphLayer graphLayer, bool deletable)
         {
-            _graph = graph;
+            _graphLayer = graphLayer;
             _deletable = deletable;
 
             // Name
-            _nameLabel.text = _graph.Name;
+            _nameLabel.text = _graphLayer.Name;
 
             // Type
-            _typeLabel.text = _graph.GraphType.ToString().Substring(0, 1);
+            _typeLabel.text = _graphLayer.GraphType.ToString().Substring(0, 1);
         }
 
 
@@ -73,7 +73,7 @@ namespace GBG.AnimationGraph.Editor.Blackboard
             // Left mouse button double click to open graph
             if (evt.button == 0 && evt.clickCount > 1)
             {
-                OnWantsToOpenGraph?.Invoke(_graph);
+                OnWantsToOpenGraph?.Invoke(_graphLayer);
                 return;
             }
 
@@ -84,10 +84,10 @@ namespace GBG.AnimationGraph.Editor.Blackboard
                 var menu = new GenericDropdownMenu();
 
                 // Rename
-                menu.AddItem("Rename", false, () => { OnWantsToRenameGraph?.Invoke(_graph); });
+                menu.AddItem("Rename", false, () => { OnWantsToRenameGraph?.Invoke(_graphLayer); });
 
                 // Delete
-                if (_deletable) menu.AddItem("Delete", false, () => { OnWantsToDeleteGraph?.Invoke(_graph); });
+                if (_deletable) menu.AddItem("Delete", false, () => { OnWantsToDeleteGraph?.Invoke(_graphLayer); });
                 else menu.AddDisabledItem("Delete", false);
 
                 menu.DropDown(new Rect(menuPos, Vector2.zero), this);
