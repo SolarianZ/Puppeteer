@@ -67,11 +67,11 @@ namespace GBG.AnimationGraph.Editor.Node
             // Add two inputs for new created node
             if (ExtraInfo.IsCreateFromContextualMenu)
             {
-                Node.MixerInputs.Add(new LayerMixerInputData
+                Node.MixerInputs.Add(new LayeredNodeInput
                 {
                     InputWeightParam = new ParamGuidOrValue(null, 1), // Base layer
                 });
-                Node.MixerInputs.Add(new LayerMixerInputData());
+                Node.MixerInputs.Add(new LayeredNodeInput());
             }
 
             for (var i = 0; i < Node.MixerInputs.Count; i++)

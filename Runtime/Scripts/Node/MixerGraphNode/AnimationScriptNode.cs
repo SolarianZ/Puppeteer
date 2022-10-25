@@ -20,14 +20,14 @@ namespace GBG.AnimationGraph.Node
     {
         #region Mixer Inputs
 
-        public List<MixerInputData> MixerInputs
+        public List<WeightedNodeInput> MixerInputs
         {
             get => _mixerInputs;
             internal set => _mixerInputs = value;
         }
 
         [SerializeReference]
-        private List<MixerInputData> _mixerInputs = new List<MixerInputData>();
+        private List<WeightedNodeInput> _mixerInputs = new List<WeightedNodeInput>();
 
         private string[] _inputGuids;
 

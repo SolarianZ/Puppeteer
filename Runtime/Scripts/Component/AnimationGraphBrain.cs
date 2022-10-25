@@ -132,14 +132,16 @@ namespace GBG.AnimationGraph
 }
 
 /*************************************************************************************************************
- * For the same type playable trees, they're processed in the same order that they were added.
- * 
- * Unity always processes **ScriptPlayable** trees after `Update` message.
+ * Unity always processes **ScriptPlayableOutput** trees after `Update` message.
  * 
  * When `Animator.updateMode==AnimatorUpdateMode.AnimatePhysics` , 
- * Unity processes **AnimationScriptPlayable** trees after `FixedUpdate` message and before `Update` message, 
- * otherwise Unity processes **AnimationScriptPlayable** trees after all **ScriptPlayable** trees.
+ * Unity processes **AnimationPlayableOutput** tree after `FixedUpdate` message and before `Update` message, 
+ * otherwise Unity processes **AnimationPlayableOutput** tree after all **ScriptPlayableOutput** trees.
  *
+ * Nodes in same tree will be processed in the same order as they were added.
+ * If a ScriptPlayable node is NOT in **ScriptPlayableOutput** hierarchy,
+ * its **ProcessFrame** method won't be called.
+ * 
  * ***********************************************************************************************************
  * 
  * Tree nodes traversal order:

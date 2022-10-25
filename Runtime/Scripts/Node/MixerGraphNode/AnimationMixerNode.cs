@@ -1,37 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using GBG.AnimationGraph.Parameter;
 using UnityEngine;
 
 namespace GBG.AnimationGraph.Node
 {
     [Serializable]
-    public class MixerInputData : NodeInputBase
-    {
-        public ParamGuidOrValue InputWeightParam
-        {
-            get => _inputWeightParam;
-            internal set => _inputWeightParam = value;
-        }
-
-        [SerializeField]
-        private ParamGuidOrValue _inputWeightParam = new ParamGuidOrValue(null, 0);
-    }
-    
-    [Serializable]
     public class AnimationMixerNode : PlayableNodeBase
     {
         #region Mixer Inputs
 
-        public List<MixerInputData> MixerInputs
+        public List<WeightedNodeInput> MixerInputs
         {
             get => _mixerInputs;
             internal set => _mixerInputs = value;
         }
 
         [SerializeReference]
-        private List<MixerInputData> _mixerInputs = new List<MixerInputData>();
+        private List<WeightedNodeInput> _mixerInputs = new List<WeightedNodeInput>();
 
         private string[] _inputGuids;
 

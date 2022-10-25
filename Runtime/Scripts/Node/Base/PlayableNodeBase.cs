@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using GBG.AnimationGraph.Parameter;
-using UnityEngine;
 
 namespace GBG.AnimationGraph.Node
 {
@@ -9,24 +7,6 @@ namespace GBG.AnimationGraph.Node
     public abstract class PlayableNodeBase : NodeBase
     {
         #region Serialization Data
-
-        public bool SpeedParamActive
-        {
-            get => _speedParamActive;
-            internal set => _speedParamActive = value;
-        }
-
-        [SerializeField]
-        private bool _speedParamActive;
-
-        public ParamGuidOrValue SpeedParam
-        {
-            get => _speedParam;
-            internal set => _speedParam = value;
-        }
-
-        [SerializeField]
-        private ParamGuidOrValue _speedParam = new ParamGuidOrValue(null, 1.0f);
 
         #endregion
 
@@ -38,7 +18,7 @@ namespace GBG.AnimationGraph.Node
         public abstract IList<string> GetInputNodeGuids();
 
         #endregion
-        
+
 
         #region Runtime Properties
 
@@ -50,7 +30,5 @@ namespace GBG.AnimationGraph.Node
         protected PlayableNodeBase(string guid) : base(guid)
         {
         }
-
-
     }
 }

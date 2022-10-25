@@ -28,7 +28,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
 
         private readonly ListView _inputListView;
 
-        private List<MixerInputData> _mixerInputs;
+        private List<WeightedNodeInput> _mixerInputs;
 
 
         public AnimationScriptNodeInspector(List<ParamInfo> paramTable, Action<int> addInputPortElement,
@@ -66,7 +66,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
             {
                 reorderable = true,
                 reorderMode = ListViewReorderMode.Animated,
-                fixedItemHeight = MixerInputDataDrawer.DRAWER_HEIGHT,
+                fixedItemHeight = WeightedNodeInputDrawer.DRAWER_HEIGHT,
                 makeItem = MakeInputListItem,
                 bindItem = BindInputListItem,
                 selectionType = SelectionType.Single,
@@ -105,7 +105,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
 
         private VisualElement MakeInputListItem()
         {
-            var drawer = new MixerInputDataDrawer(ParamTable, FieldLabelWidth);
+            var drawer = new WeightedNodeInputDrawer(ParamTable, FieldLabelWidth);
             drawer.OnDataChanged += () => RaiseDataChangedEvent(DataCategories.NodeData);
 
             return drawer;
@@ -113,7 +113,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
 
         private void BindInputListItem(VisualElement element, int index)
         {
-            var drawer = (MixerInputDataDrawer)element;
+            var drawer = (WeightedNodeInputDrawer)element;
             drawer.SetMixerInputData(_mixerInputs[index], index);
         }
 
@@ -126,7 +126,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
         private void OnInputItemAdded(IEnumerable<int> indices)
         {
             var index = indices.First();
-            _mixerInputs[index] = new MixerInputData();
+            _mixerInputs[index] = new WeightedNodeInput();
             _addInputPortElement(index);
             RaiseDataChangedEvent(DataCategories.NodeData);
         }

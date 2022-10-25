@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 
 namespace GBG.AnimationGraph.Editor.Inspector
 {
-    public class LayerMixerInputDataDrawer : MixerInputDataDrawer
+    public class LayeredNodeInputDrawer : WeightedNodeInputDrawer
     {
         public new const float DRAWER_HEIGHT = 88;
 
@@ -15,10 +15,10 @@ namespace GBG.AnimationGraph.Editor.Inspector
 
         private readonly ObjectField _avatarMaskField;
 
-        private LayerMixerInputData _layerMixerInputData;
+        private LayeredNodeInput _layerMixerInputData;
 
 
-        public LayerMixerInputDataDrawer(List<ParamInfo> paramTable, Length nameLabelWidth)
+        public LayeredNodeInputDrawer(List<ParamInfo> paramTable, Length nameLabelWidth)
             : base(paramTable, nameLabelWidth)
         {
             style.height = DRAWER_HEIGHT;
@@ -43,11 +43,11 @@ namespace GBG.AnimationGraph.Editor.Inspector
             Add(_avatarMaskField);
         }
 
-        public override void SetMixerInputData(MixerInputData mixerInputData, int mixerInputDataIndex)
+        public override void SetMixerInputData(WeightedNodeInput mixerInputData, int mixerInputDataIndex)
         {
             base.SetMixerInputData(mixerInputData, mixerInputDataIndex);
 
-            _layerMixerInputData = (LayerMixerInputData)mixerInputData;
+            _layerMixerInputData = (LayeredNodeInput)mixerInputData;
 
             _isAdditiveField.SetValueWithoutNotify(_layerMixerInputData.IsAdditive);
 

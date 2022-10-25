@@ -22,6 +22,7 @@ namespace GBG.AnimationGraph.Node
         // public bool Mirror;
     }
 
+    // TODO: Add Speed Param & Only Accept AnimationClip as Inputs
     [Serializable]
     public class BlendSpace2DNode : PlayableNodeBase
     {

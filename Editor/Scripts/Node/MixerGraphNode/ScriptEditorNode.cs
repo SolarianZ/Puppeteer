@@ -5,14 +5,14 @@ using UnityEditor.Experimental.GraphView;
 
 namespace GBG.AnimationGraph.Editor.Node
 {
-    public sealed class AnimationScriptEditorNode : MixerGraphEditorNode
+    public sealed class ScriptEditorNode : MixerGraphEditorNode
     {
-        internal new AnimationScriptNode Node => (AnimationScriptNode)base.Node;
+        internal new ScriptNode Node => (ScriptNode)base.Node;
 
-        private AnimationScriptNodeInspector _inspector;
+        private ScriptNodeInspector _inspector;
 
 
-        public AnimationScriptEditorNode(AnimationGraphAsset graphAsset, AnimationScriptNode node,
+        public ScriptEditorNode(AnimationGraphAsset graphAsset, ScriptNode node,
             EditorNodeExtraInfo extraInfo) : base(graphAsset, node, extraInfo)
         {
             title = "Animation Script";
@@ -25,7 +25,7 @@ namespace GBG.AnimationGraph.Editor.Node
 
         public override IInspector<GraphEditorNode> GetInspector()
         {
-            _inspector ??= new AnimationScriptNodeInspector(GraphAsset.Parameters,
+            _inspector ??= new ScriptNodeInspector(GraphAsset.Parameters,
                 AddInputPortElement, RemoveInputPortElement, ReorderInputPortElement);
             _inspector.SetTarget(this);
 
@@ -39,7 +39,7 @@ namespace GBG.AnimationGraph.Editor.Node
             if (graphEdge.InputPort.OwnerNode == this)
             {
                 var portIndex = InputPorts.IndexOf(graphEdge.InputPort);
-                Node.MixerInputs[portIndex].InputNodeGuid = graphEdge.OutputPort.OwnerNode.Guid;
+                Node.Inputs[portIndex].InputNodeGuid = graphEdge.OutputPort.OwnerNode.Guid;
                 _inspector?.RefreshMixerInputList();
             }
 
@@ -52,7 +52,7 @@ namespace GBG.AnimationGraph.Editor.Node
             if (graphEdge.InputPort.OwnerNode == this)
             {
                 var portIndex = InputPorts.IndexOf(graphEdge.InputPort);
-                Node.MixerInputs[portIndex].InputNodeGuid = null;
+                Node.Inputs[portIndex].InputNodeGuid = null;
                 _inspector?.RefreshMixerInputList();
             }
 
@@ -65,10 +65,10 @@ namespace GBG.AnimationGraph.Editor.Node
             // Add one input for new created node
             if (ExtraInfo.IsCreateFromContextualMenu)
             {
-                Node.MixerInputs.Add(new WeightedNodeInput());
+                Node.Inputs.Add(new WeightedNodeInput());
             }
 
-            for (var i = 0; i < Node.MixerInputs.Count; i++)
+            for (var i = 0; i < Node.Inputs.Count; i++)
             {
                 AddInputPortElement(i);
             }

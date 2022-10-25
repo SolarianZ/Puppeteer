@@ -9,6 +9,8 @@ namespace GBG.AnimationGraph.Node
     [Serializable]
     public class AnimationClipNode : PlayableNodeBase
     {
+        #region Serialization Data
+
         public AnimationClip Clip
         {
             get => _animationClip;
@@ -18,7 +20,26 @@ namespace GBG.AnimationGraph.Node
         [SerializeField]
         private AnimationClip _animationClip;
 
+        
+        public bool SpeedParamActive
+        {
+            get => _speedParamActive;
+            internal set => _speedParamActive = value;
+        }
 
+        [SerializeField]
+        private bool _speedParamActive;
+
+        public ParamGuidOrValue SpeedParam
+        {
+            get => _speedParam;
+            internal set => _speedParam = value;
+        }
+
+        [SerializeField]
+        private ParamGuidOrValue _speedParam = new ParamGuidOrValue(null, 1.0f);
+
+        
         public bool MotionTimeParamActive
         {
             get => _motionTimeParamActive;
@@ -77,6 +98,8 @@ namespace GBG.AnimationGraph.Node
 
         [SerializeField]
         private bool _applyPlayableIK;
+
+        #endregion
 
 
         public AnimationClipNode(string guid) : base(guid)

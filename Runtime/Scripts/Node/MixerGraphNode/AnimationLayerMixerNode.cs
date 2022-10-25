@@ -6,40 +6,18 @@ using UnityEngine;
 namespace GBG.AnimationGraph.Node
 {
     [Serializable]
-    public class LayerMixerInputData : MixerInputData
-    {
-        public bool IsAdditive
-        {
-            get => _isAdditive;
-            internal set => _isAdditive = value;
-        }
-
-        [SerializeField]
-        private bool _isAdditive;
-
-        public AvatarMask AvatarMask
-        {
-            get => _avatarMask;
-            internal set => _avatarMask = value;
-        }
-
-        [SerializeField]
-        private AvatarMask _avatarMask;
-    }
-
-    [Serializable]
     public class AnimationLayerMixerNode : PlayableNodeBase
     {
         #region Mixer Inputs
 
-        public List<MixerInputData> MixerInputs
+        public List<WeightedNodeInput> MixerInputs
         {
             get => _mixerInputs;
             internal set => _mixerInputs = value;
         }
 
         [SerializeReference]
-        private List<MixerInputData> _mixerInputs = new List<MixerInputData>();
+        private List<WeightedNodeInput> _mixerInputs = new List<WeightedNodeInput>();
 
         private string[] _inputGuids;
 

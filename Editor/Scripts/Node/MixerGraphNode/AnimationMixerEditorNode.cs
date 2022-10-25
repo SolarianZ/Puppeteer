@@ -67,8 +67,8 @@ namespace GBG.AnimationGraph.Editor.Node
             // Add two inputs for new created node
             if (ExtraInfo.IsCreateFromContextualMenu)
             {
-                Node.MixerInputs.Add(new MixerInputData());
-                Node.MixerInputs.Add(new MixerInputData());
+                Node.MixerInputs.Add(new WeightedNodeInput());
+                Node.MixerInputs.Add(new WeightedNodeInput());
             }
 
             for (var i = 0; i < Node.MixerInputs.Count; i++)

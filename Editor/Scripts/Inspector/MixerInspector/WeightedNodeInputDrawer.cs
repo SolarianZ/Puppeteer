@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 
 namespace GBG.AnimationGraph.Editor.Inspector
 {
-    public class MixerInputDataDrawer : VisualElement
+    public class WeightedNodeInputDrawer : VisualElement
     {
         public const float DRAWER_HEIGHT = 44;
 
@@ -21,7 +21,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
         private readonly ParamField _inputWeightParamField;
 
 
-        public MixerInputDataDrawer(List<ParamInfo> paramTable, Length nameLabelWidth)
+        public WeightedNodeInputDrawer(List<ParamInfo> paramTable, Length nameLabelWidth)
         {
             _paramTable = paramTable;
 
@@ -41,7 +41,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
             Add(_inputWeightParamField);
         }
 
-        public virtual void SetMixerInputData(MixerInputData mixerInputData, int mixerInputDataIndex)
+        public virtual void SetMixerInputData(WeightedNodeInput mixerInputData, int mixerInputDataIndex)
         {
             _inputNodeField.label = $"Input Node {mixerInputDataIndex.ToString()}";
             _inputNodeField.SetValueWithoutNotify(mixerInputData.InputNodeGuid);

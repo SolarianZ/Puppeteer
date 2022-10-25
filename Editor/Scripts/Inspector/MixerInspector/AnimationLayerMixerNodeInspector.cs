@@ -10,25 +10,25 @@ namespace GBG.AnimationGraph.Editor.Inspector
     {
         public AnimationLayerMixerNodeInspector(List<ParamInfo> paramTable, Action<int> addInputPortElement,
             Action<int> removeInputPortElement, Action<int, int> reorderInputPortElement,
-            float inputDrawerHeight = LayerMixerInputDataDrawer.DRAWER_HEIGHT)
+            float inputDrawerHeight = LayeredNodeInputDrawer.DRAWER_HEIGHT)
             : base(paramTable, addInputPortElement, removeInputPortElement, reorderInputPortElement, inputDrawerHeight)
         {
         }
 
 
-        protected override List<MixerInputData> GetMixerInputs()
+        protected override List<WeightedNodeInput> GetMixerInputs()
         {
             return ((AnimationLayerMixerEditorNode)Target).Node.MixerInputs;
         }
 
-        protected override MixerInputDataDrawer CreateMixerInputDataDrawer()
+        protected override WeightedNodeInputDrawer CreateMixerInputDataDrawer()
         {
-            return new LayerMixerInputDataDrawer(ParamTable, FieldLabelWidth);
+            return new LayeredNodeInputDrawer(ParamTable, FieldLabelWidth);
         }
 
-        protected override MixerInputData CreateMixerInputData()
+        protected override WeightedNodeInput CreateMixerInputData()
         {
-            return new LayerMixerInputData();
+            return new LayeredNodeInput();
         }
     }
 }

@@ -16,6 +16,7 @@ namespace GBG.AnimationGraph.Node
         public float PlaybackSpeed = 1.0f;
     }
 
+    // TODO: Add Speed Param & Only Accept AnimationClip as Inputs
     [Serializable]
     public class BlendSpace1DNode : PlayableNodeBase
     {

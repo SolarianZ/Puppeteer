@@ -15,6 +15,8 @@ namespace GBG.AnimationGraph.Editor.Inspector
 
         private readonly ObjectField _clipField;
 
+        protected ParamField SpeedParamField { get; }
+
         private readonly ParamField _motionTimeParamField;
 
         // private readonly ParamField _cycleOffsetParamField;
@@ -26,6 +28,23 @@ namespace GBG.AnimationGraph.Editor.Inspector
 
         public AnimationClipNodeInspector()
         {
+            // Clip
+            _clipField = new ObjectField("Clip")
+            {
+                objectType = typeof(AnimationClip),
+            };
+            _clipField.labelElement.style.minWidth = StyleKeyword.Auto;
+            _clipField.labelElement.style.maxWidth = StyleKeyword.Auto;
+            _clipField.labelElement.style.width = FieldLabelWidth;
+            _clipField.RegisterValueChangedCallback(OnClipChanged);
+            Add(_clipField);
+
+            // Speed
+            SpeedParamField = new ParamField(FieldLabelWidth);
+            SpeedParamField.OnParamChanged += OnSpeedChanged;
+            SpeedParamField.OnActivityChanged += OnSpeedActiveChanged;
+            Add(SpeedParamField);
+
             // Motion Time
             _motionTimeParamField = new ParamField(FieldLabelWidth);
             _motionTimeParamField.OnParamChanged += OnMotionTimeChanged;
@@ -37,17 +56,6 @@ namespace GBG.AnimationGraph.Editor.Inspector
             // _cycleOffsetParamField.OnParamChanged += OnCycleOffsetChanged;
             // _cycleOffsetParamField.OnActivityChanged += OnCycleOffsetActivityChanged;
             // Add(_cycleOffsetParamField);
-
-            // Clip
-            _clipField = new ObjectField("Clip")
-            {
-                objectType = typeof(AnimationClip),
-            };
-            _clipField.labelElement.style.minWidth = StyleKeyword.Auto;
-            _clipField.labelElement.style.maxWidth = StyleKeyword.Auto;
-            _clipField.labelElement.style.width = FieldLabelWidth;
-            _clipField.RegisterValueChangedCallback(OnClipChanged);
-            Add(_clipField);
 
             // FootIK
             _footIKField = new Toggle("Foot IK");
@@ -70,6 +78,15 @@ namespace GBG.AnimationGraph.Editor.Inspector
         {
             base.SetTarget(target);
 
+            // Clip
+            _clipField.SetValueWithoutNotify(Node.Clip);
+
+            // Speed
+            SpeedParamField.SetParamTarget("Speed", Node.SpeedParam,
+                ParamType.Float, Target.GraphAsset.Parameters,
+                Node.SpeedParam.IsValue ? ParamLinkState.Unlinked : ParamLinkState.Linked,
+                Node.SpeedParamActive ? ParamActiveState.Active : ParamActiveState.Inactive, null);
+
             // Motion Time
             _motionTimeParamField.SetParamTarget("Motion Time", Node.MotionTimeParam,
                 ParamType.Float, Target.GraphAsset.Parameters,
@@ -80,9 +97,6 @@ namespace GBG.AnimationGraph.Editor.Inspector
             // _cycleOffsetParamField.SetParamTarget("Cycle Offset", ClipNodeData.CycleOffsetParam, ParamType.Float,
             //     TargetNode.GraphAsset.Parameters, true, ClipNodeData.CycleOffsetParamActive, new Vector2(0, 1));
 
-            // Clip
-            _clipField.SetValueWithoutNotify(Node.Clip);
-
             // FootIK
             _footIKField.SetValueWithoutNotify(Node.ApplyFootIK);
 
@@ -90,6 +104,17 @@ namespace GBG.AnimationGraph.Editor.Inspector
             _playableIKField.SetValueWithoutNotify(Node.ApplyPlayableIK);
         }
 
+
+        private void OnSpeedChanged(ParamGuidOrValue _)
+        {
+            RaiseDataChangedEvent(DataCategories.NodeData);
+        }
+
+        private void OnSpeedActiveChanged(bool isActive)
+        {
+            Node.SpeedParamActive = isActive;
+            RaiseDataChangedEvent(DataCategories.NodeData);
+        }
 
         private void OnMotionTimeChanged(ParamGuidOrValue _)
         {

@@ -18,6 +18,7 @@ namespace GBG.AnimationGraph.Editor.Node
             { typeof(AnimationScriptEditorNode), typeof(AnimationScriptNode) },
             { typeof(BlendSpace1DEditorNode), typeof(BlendSpace1DNode) },
             { typeof(BlendSpace2DEditorNode), typeof(BlendSpace2DNode) },
+            { typeof(ScriptEditorNode), typeof(ScriptNode) },
         };
 
         private static readonly IReadOnlyDictionary<Type, Type> _dataToNodeType = new Dictionary<Type, Type>
@@ -30,6 +31,7 @@ namespace GBG.AnimationGraph.Editor.Node
             { typeof(AnimationScriptNode), typeof(AnimationScriptEditorNode) },
             { typeof(BlendSpace1DNode), typeof(BlendSpace1DEditorNode) },
             { typeof(BlendSpace2DNode), typeof(BlendSpace2DEditorNode) },
+            { typeof(ScriptNode), typeof(ScriptEditorNode) },
         };
 
 
