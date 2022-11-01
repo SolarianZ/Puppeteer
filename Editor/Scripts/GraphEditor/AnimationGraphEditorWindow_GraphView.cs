@@ -1,13 +1,10 @@
-﻿using UnityEngine;
-
-namespace GBG.AnimationGraph.Editor.GraphEditor
+﻿namespace GBG.AnimationGraph.Editor.GraphEditor
 {
     public partial class AnimationGraphEditorWindow
     {
-        // Ensure this filed is serializable as thus we can keep this field's value after re-compile codes
-        [SerializeField]
-        [HideInInspector]
         private AnimationGraphEditorGraphViewManager _graphViewManager;
+
+        private string[] _openedGraphGuids;
 
 
         private void CreateGraphViewPanel()

@@ -4,15 +4,11 @@ using GBG.AnimationGraph.Editor.GraphView;
 using GBG.AnimationGraph.Graph;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
-using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.UIElements;
 
 namespace GBG.AnimationGraph.Editor.GraphEditor
 {
-    // TODO FIXME: Seems that Unity can't keep the value of a custom type!
-    // Ensure this type is serializable as thus we can keep its instance value after re-compile codes
-    [Serializable]
     public class AnimationGraphEditorGraphViewManager
     {
         public event Action<int> OnActiveGraphChanged;
@@ -32,10 +28,7 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
 
         private readonly Stack<GraphViewBase> _openedGraphViews = new Stack<GraphViewBase>();
 
-        // Ensure this filed is serializable as thus we can keep this field's value after re-compile codes
-        [SerializeField]
-        [HideInInspector]
-        private List<string> _openedGraphGuids = new List<string>();
+        private readonly List<string> _openedGraphGuids = new List<string>();
 
 
         public AnimationGraphEditorGraphViewManager(AnimationGraphEditorMode mode, VisualElement viewContainer)
@@ -113,24 +106,6 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             }
         }
 
-        public void RestoreGraphViews()
-        {
-            if (_openedGraphGuids.Count == 0)
-            {
-                return;
-            }
-
-            var graphGuids = _openedGraphGuids.ToArray();
-            _openedGraphViews.Clear();
-            _openedGraphGuids.Clear();
-
-            for (int i = 0; i < graphGuids.Length; i++)
-            {
-                var graphGuid = graphGuids[i];
-                OpenGraphView(_graphAsset, graphGuid, false);
-            }
-        }
-
         public void RefreshBreadcrumbs()
         {
             Assert.AreEqual(_graphViewBreadcrumbs.childCount, _openedGraphGuids.Count);
@@ -157,6 +132,11 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
         // TODO: Update graph view
         public void Update(DataCategories changedDataCategories)
         {
+        }
+
+        public string[] GetOpenedGraphGuids()
+        {
+            return _openedGraphGuids.ToArray();
         }
 
 

@@ -137,6 +137,7 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
 
         #endregion
 
+
         private AnimationGraphEditorMode _editorMode = AnimationGraphEditorMode.Editor;
 
         private TripleSplitterRowView _layoutContainer;
@@ -173,6 +174,8 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
 
         private void OnEnable()
         {
+            AssemblyReloadEvents.beforeAssemblyReload += OnBeforeAssemblyReload;
+
             // Toolbar
             CreateToolbar();
 
@@ -217,6 +220,8 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
 
         private void OnDisable()
         {
+            AssemblyReloadEvents.beforeAssemblyReload -= OnBeforeAssemblyReload;
+
             DestroyImmediate(_graphAssetSnapshot);
         }
 
@@ -243,6 +248,11 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             }
 
             titleContent.text = _graphAsset.name;
+        }
+
+        private void OnBeforeAssemblyReload()
+        {
+            _openedGraphGuids = _graphViewManager.GetOpenedGraphGuids();
         }
 
         private void OnDataChanged(DataCategories changedDataCategories)
@@ -278,6 +288,7 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
                 _graphAsset.GraphLayers.Add(rootGraph);
             }
 
+
             OpenGraphFromGraphList(_graphAsset.RootGraphGuid);
         }
 
@@ -290,7 +301,14 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             _blackboardManager.Initialize(_graphAsset);
 
             // GraphView
-            _graphViewManager.RestoreGraphViews();
+            if (_openedGraphGuids != null)
+            {
+                for (int i = 0; i < _openedGraphGuids.Length; i++)
+                {
+                    var graphGuid = _openedGraphGuids[i];
+                    _graphViewManager.OpenGraphView(_graphAsset, graphGuid, false);
+                }
+            }
         }
     }
 }
