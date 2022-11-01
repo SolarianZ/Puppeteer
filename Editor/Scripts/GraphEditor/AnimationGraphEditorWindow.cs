@@ -253,6 +253,20 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
         private void OnBeforeAssemblyReload()
         {
             _openedGraphGuids = _graphViewManager.GetOpenedGraphGuids();
+          
+            if (hasUnsavedChanges && _graphAsset)
+            {
+                var msg = "Unity is going to reload assemblies, " +
+                          $"do you want to save your modifications to the animation graph '{_graphAsset.name}'?";
+                if (EditorUtility.DisplayDialog("Warning", msg, "Save", "Discard"))
+                {
+                    SaveChanges();
+                }
+                else
+                {
+                    DiscardChanges();
+                }
+            }
         }
 
         private void OnDataChanged(DataCategories changedDataCategories)
