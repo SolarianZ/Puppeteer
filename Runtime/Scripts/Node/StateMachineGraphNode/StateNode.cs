@@ -36,15 +36,18 @@ namespace GBG.AnimationGraph.Node
         {
             return EmptyInputs;
         }
+        
+        // TODO: PrepareFrame
+        protected internal override void PrepareFrame(float deltaTime)=> throw new NotImplementedException();
 
-        protected internal override void PrepareFrame(float deltaTime) => throw new NotImplementedException();
+        
+        // TODO: InitializeParams
+        protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable)=> throw new NotImplementedException();
 
+        // TODO: CreatePlayable
+        protected override Playable CreatePlayable(PlayableGraph playableGraph)=> throw new NotImplementedException();
 
-        protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable) =>
-            throw new NotImplementedException();
-
-        protected override Playable CreatePlayable(PlayableGraph playableGraph) => throw new NotImplementedException();
-
-        protected override float GetInputWeight(int inputIndex) => throw new NotImplementedException();
+        // TODO: GetInputWeight
+        protected override float GetInputWeight(int inputIndex)=> throw new NotImplementedException();
     }
 }

@@ -122,6 +122,7 @@ namespace GBG.AnimationGraph.Node
 
         protected internal override IList<string> GetInputNodeGuids() => EmptyInputs;
 
+        // TODO: PrepareFrame
         protected internal override void PrepareFrame(float deltaTime) => throw new NotImplementedException();
 
         protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable)

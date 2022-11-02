@@ -88,6 +88,7 @@ namespace GBG.AnimationGraph.Node
             }
         }
 
+        // TODO: PrepareFrame
         protected internal override void PrepareFrame(float deltaTime) => throw new NotImplementedException();
 
 
