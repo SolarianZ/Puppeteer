@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using GBG.AnimationGraph.Parameter;
 using UnityEngine;
+using UnityEngine.Animations;
 using UnityEngine.Playables;
 
 namespace GBG.AnimationGraph.Node
@@ -125,7 +126,19 @@ namespace GBG.AnimationGraph.Node
 
         protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable)
         {
-            if (!SpeedParamActive)
+            // Motion time
+            if (MotionTimeParamActive)
+            {
+                if (!MotionTimeParam.IsValue)
+                {
+                    _runtimeMotionTimeParam = paramGuidTable[MotionTimeParam.Guid];
+                    _runtimeMotionTimeParam.OnValueChanged += OnRuntimeMotionTimeParamChanged;
+                }
+
+                BaseSpeed = 0;
+            }
+            // Speed
+            else if (!SpeedParamActive)
             {
                 BaseSpeed = 1;
             }
@@ -141,7 +154,28 @@ namespace GBG.AnimationGraph.Node
             }
         }
 
-        protected override Playable CreatePlayable(PlayableGraph playableGraph) => throw new NotImplementedException();
+        protected override Playable CreatePlayable(PlayableGraph playableGraph)
+        {
+            var playable = AnimationClipPlayable.Create(playableGraph, Clip);
+
+            // Motion time
+            if (MotionTimeParamActive)
+            {
+                if (MotionTimeParam.IsValue)
+                {
+                    playable.SetTime(MotionTimeParam.GetFloat());
+                }
+                else
+                {
+                    playable.SetTime(_runtimeMotionTimeParam.GetFloat());
+                }
+            }
+
+            // Speed
+            playable.SetSpeed(BaseSpeed);
+
+            return playable;
+        }
 
         protected override float GetInputWeight(int inputIndex) => throw new InvalidOperationException();
 
