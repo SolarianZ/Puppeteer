@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using GBG.AnimationGraph.Graph;
 using GBG.AnimationGraph.Parameter;
 using UnityEngine;
+using UnityEngine.Animations;
 using UnityEngine.Playables;
 
 namespace GBG.AnimationGraph.Node
@@ -28,6 +30,8 @@ namespace GBG.AnimationGraph.Node
 
         private string[] _inputGuids;
 
+        private ParamInfo[] _runtimeInputWeightParams;
+
         #endregion
 
 
@@ -49,13 +53,57 @@ namespace GBG.AnimationGraph.Node
             return _inputGuids;
         }
 
-        protected internal override void PrepareFrame(float deltaTime)=> throw new NotImplementedException();
+        protected internal override void InitializeConnection(IReadOnlyDictionary<string, GraphLayer> graphGuidTable,
+            IReadOnlyDictionary<string, NodeBase> nodeGuidTable)
+        {
+            base.InitializeConnection(graphGuidTable, nodeGuidTable);
 
-        
-        protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable)=> throw new NotImplementedException();
+            for (int i = 0; i < MixerInputs.Count; i++)
+            {
+                Playable.SetInputWeight(i, GetInputWeight(i));
+            }
+        }
 
-        protected override Playable CreatePlayable(PlayableGraph playableGraph)=> throw new NotImplementedException();
+        protected internal override void PrepareFrame(float deltaTime) => throw new NotImplementedException();
 
-        protected override float GetInputWeight(int inputIndex)=> throw new NotImplementedException();
+
+        protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable)
+        {
+            // Input weights
+            _runtimeInputWeightParams = new ParamInfo[MixerInputs.Count];
+            for (int i = 0; i < _runtimeInputWeightParams.Length; i++)
+            {
+                var index = i;
+                var weightParam = MixerInputs[index].InputWeightParam;
+                if (!weightParam.IsValue)
+                {
+                    var runtimeInputWeightParam = paramGuidTable[weightParam.Guid];
+                    _runtimeInputWeightParams[index] = runtimeInputWeightParam;
+
+                    runtimeInputWeightParam.OnValueChanged += p => OnInputWeightChanged(index, p.GetFloat());
+                }
+            }
+        }
+
+        protected override Playable CreatePlayable(PlayableGraph playableGraph)
+        {
+            var playable = AnimationMixerPlayable.Create(playableGraph, MixerInputs.Count);
+            return playable;
+        }
+
+        protected override float GetInputWeight(int inputIndex)
+        {
+            var runtimeInputWeightParam = _runtimeInputWeightParams[inputIndex];
+            if (runtimeInputWeightParam != null)
+            {
+                return runtimeInputWeightParam.GetFloat();
+            }
+
+            return MixerInputs[inputIndex].InputWeightParam.GetFloat();
+        }
+
+
+        // TODO: OnInputWeightChanged
+        private void OnInputWeightChanged(int index, float weight) => throw new NotImplementedException();
     }
 }
