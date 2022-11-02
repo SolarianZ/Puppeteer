@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using GBG.AnimationGraph.Parameter;
 using UnityEngine;
+using UnityEngine.Playables;
 
 namespace GBG.AnimationGraph.Node
 {
@@ -20,7 +21,7 @@ namespace GBG.AnimationGraph.Node
         [SerializeField]
         private AnimationClip _animationClip;
 
-        
+
         public bool SpeedParamActive
         {
             get => _speedParamActive;
@@ -39,7 +40,7 @@ namespace GBG.AnimationGraph.Node
         [SerializeField]
         private ParamGuidOrValue _speedParam = new ParamGuidOrValue(null, 1.0f);
 
-        
+
         public bool MotionTimeParamActive
         {
             get => _motionTimeParamActive;
@@ -106,9 +107,15 @@ namespace GBG.AnimationGraph.Node
         {
         }
 
-        public override IList<string> GetInputNodeGuids()
-        {
-            return EmptyInputs;
-        }
+        protected internal override IList<string> GetInputNodeGuids() => EmptyInputs;
+
+        protected internal override void PrepareFrame(float deltaTime) => throw new NotImplementedException();
+
+        protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable) =>
+            throw new NotImplementedException();
+
+        protected override Playable CreatePlayable(PlayableGraph playableGraph) => throw new NotImplementedException();
+
+        protected override float GetInputWeight(int inputIndex) => throw new InvalidOperationException();
     }
 }

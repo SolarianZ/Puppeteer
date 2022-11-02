@@ -104,7 +104,7 @@ namespace GBG.AnimationGraph.Graph
             
             foreach (var node in Nodes)
             {
-                node.InitializePlayable(playableGraph, paramGuidTable);
+                node.InitializeData(playableGraph, paramGuidTable);
                 _nodeGuidTable.Add(node.Guid, node);
 
                 if (node.Guid.Equals(RootNodeGuid))

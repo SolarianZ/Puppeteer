@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using GBG.AnimationGraph.Parameter;
 using UnityEngine;
+using UnityEngine.Playables;
 
 namespace GBG.AnimationGraph.Node
 {
@@ -33,7 +35,7 @@ namespace GBG.AnimationGraph.Node
         {
         }
 
-        public override IList<string> GetInputNodeGuids()
+        protected internal override IList<string> GetInputNodeGuids()
         {
             if (Application.isPlaying)
             {
@@ -43,8 +45,17 @@ namespace GBG.AnimationGraph.Node
             {
                 _inputGuids = (from input in MixerInputs select input.InputNodeGuid).ToArray();
             }
-            
+
             return _inputGuids;
         }
+
+        protected internal override void PrepareFrame(float deltaTime)=> throw new NotImplementedException();
+
+        
+        protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable)=> throw new NotImplementedException();
+
+        protected override Playable CreatePlayable(PlayableGraph playableGraph)=> throw new NotImplementedException();
+
+        protected override float GetInputWeight(int inputIndex)=> throw new NotImplementedException();
     }
 }

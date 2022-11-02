@@ -36,8 +36,7 @@ namespace GBG.AnimationGraph.Node
 
         protected static string[] EmptyInputs = Array.Empty<string>();
 
-        // TODO: This property should be abstract
-        protected internal virtual Playable Playable { get; protected set; } = Playable.Null;
+        protected internal Playable Playable { get; private set; }
 
         #endregion
 
@@ -48,20 +47,39 @@ namespace GBG.AnimationGraph.Node
         }
 
 
-        public abstract IList<string> GetInputNodeGuids();
+        protected internal abstract IList<string> GetInputNodeGuids();
 
-        internal void InitializePlayable(PlayableGraph playableGraph,
+        internal void InitializeData(PlayableGraph playableGraph,
             IReadOnlyDictionary<string, ParamInfo> paramGuidTable)
         {
+            InitializeParams(paramGuidTable);
+            Playable = CreatePlayable(playableGraph);
         }
 
-        internal void InitializeConnection(IReadOnlyDictionary<string, GraphLayer> graphGuidTable,
+        protected internal virtual void InitializeConnection(IReadOnlyDictionary<string, GraphLayer> graphGuidTable,
             IReadOnlyDictionary<string, NodeBase> nodeGuidTable)
         {
+            var inputGuids = GetInputNodeGuids();
+            for (int i = 0; i < inputGuids.Count; i++)
+            {
+                var inputGuid = inputGuids[i];
+                if (string.IsNullOrEmpty(inputGuid))
+                {
+                    continue;
+                }
+
+                var inputNode = nodeGuidTable[inputGuid];
+                Playable.ConnectInput(i, inputNode.Playable, 0, GetInputWeight(i));
+            }
         }
 
-        internal virtual void PrepareFrame(float deltaTime)
-        {
-        }
+        protected internal abstract void PrepareFrame(float deltaTime);
+
+
+        protected abstract void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable);
+
+        protected abstract Playable CreatePlayable(PlayableGraph playableGraph);
+
+        protected abstract float GetInputWeight(int inputIndex);
     }
 }
