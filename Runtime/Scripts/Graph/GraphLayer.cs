@@ -84,9 +84,8 @@ namespace GBG.AnimationGraph.Graph
 
         internal NodeBase RootNode { get; private set; }
 
-        
-        private readonly Dictionary<string, NodeBase> _nodeGuidTable = new();
-        
+        internal IReadOnlyDictionary<string, NodeBase> NodeGuidTable { get; private set; }
+
         #endregion
 
 
@@ -98,27 +97,29 @@ namespace GBG.AnimationGraph.Graph
         }
 
         public void InitializeNodes(PlayableGraph playableGraph,
+            IReadOnlyDictionary<string, GraphLayer> graphGuidTable,
             IReadOnlyDictionary<string, ParamInfo> paramGuidTable)
         {
-            _nodeGuidTable.Clear();
-            
+            var nodeGuidTable = new Dictionary<string, NodeBase>(Nodes.Count);
             foreach (var node in Nodes)
             {
-                node.InitializeData(playableGraph, paramGuidTable);
-                _nodeGuidTable.Add(node.Guid, node);
+                node.InitializeData(playableGraph, graphGuidTable, paramGuidTable);
+                nodeGuidTable.Add(node.Guid, node);
 
                 if (node.Guid.Equals(RootNodeGuid))
                 {
                     RootNode = node;
                 }
             }
+
+            NodeGuidTable = nodeGuidTable;
         }
 
-        public void InitializeConnections(IReadOnlyDictionary<string, GraphLayer> graphGuidTable)
+        public void InitializeConnections()
         {
             foreach (var node in Nodes)
             {
-                node.InitializeConnection(graphGuidTable, _nodeGuidTable);
+                node.InitializeConnection(NodeGuidTable);
             }
         }
     }

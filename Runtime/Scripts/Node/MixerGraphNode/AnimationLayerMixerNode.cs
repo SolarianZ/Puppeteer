@@ -54,16 +54,15 @@ namespace GBG.AnimationGraph.Node
             return _inputGuids;
         }
 
-        protected internal override void InitializeConnection(IReadOnlyDictionary<string, GraphLayer> graphGuidTable,
-            IReadOnlyDictionary<string, NodeBase> nodeGuidTable)
+        protected internal override void InitializeConnection(IReadOnlyDictionary<string, NodeBase> nodeGuidTable)
         {
-            base.InitializeConnection(graphGuidTable, nodeGuidTable);
+            base.InitializeConnection(nodeGuidTable);
 
             var layerMixerPlayable = (AnimationLayerMixerPlayable)Playable;
             for (int i = 0; i < MixerInputs.Count; i++)
             {
                 var layeredNodeInput = (LayeredNodeInput)MixerInputs[i];
-                layerMixerPlayable.SetInputWeight(i, GetInputWeight(i));
+                layerMixerPlayable.SetInputWeight(i, GetLogicInputWeight(i));
                 layerMixerPlayable.SetLayerAdditive((uint)i, layeredNodeInput.IsAdditive);
                 if (layeredNodeInput.AvatarMask)
                 {
@@ -100,7 +99,7 @@ namespace GBG.AnimationGraph.Node
             return playable;
         }
 
-        protected override float GetInputWeight(int inputIndex)
+        protected override float GetLogicInputWeight(int inputIndex)
         {
             var runtimeInputWeightParam = _runtimeInputWeightParams[inputIndex];
             if (runtimeInputWeightParam != null)

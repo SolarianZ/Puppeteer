@@ -70,15 +70,14 @@ namespace GBG.AnimationGraph.Node
             return _inputGuids;
         }
 
-        protected internal override void InitializeConnection(IReadOnlyDictionary<string, GraphLayer> graphGuidTable,
-            IReadOnlyDictionary<string, NodeBase> nodeGuidTable)
+        protected internal override void InitializeConnection(IReadOnlyDictionary<string, NodeBase> nodeGuidTable)
         {
-            base.InitializeConnection(graphGuidTable, nodeGuidTable);
+            base.InitializeConnection(nodeGuidTable);
 
             // TODO FIXME: Input weight of AnimationScriptPlayable input should be always 1! Process weight in AnimationJob!
             for (int i = 0; i < MixerInputs.Count; i++)
             {
-                Playable.SetInputWeight(i, GetInputWeight(i));
+                Playable.SetInputWeight(i, GetLogicInputWeight(i));
             }
         }
 
@@ -116,7 +115,7 @@ namespace GBG.AnimationGraph.Node
             return playable;
         }
 
-        protected override float GetInputWeight(int inputIndex)
+        protected override float GetLogicInputWeight(int inputIndex)
         {
             var runtimeInputWeightParam = _runtimeInputWeightParams[inputIndex];
             if (runtimeInputWeightParam != null)

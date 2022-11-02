@@ -34,7 +34,7 @@ namespace GBG.AnimationGraph.Node
 
         [SerializeField]
         [Range(0f, 1f)]
-        [InspectorName("Exit Time(%)")]
+        [InspectorName("Exit Time(%)")] // of input clip which has the highest weight 
         private float _exitTime; // In percentage terms
 
         public float FadeTime

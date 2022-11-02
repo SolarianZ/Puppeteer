@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using GBG.AnimationGraph.Graph;
 using GBG.AnimationGraph.Parameter;
+using UnityEngine.Animations;
 using UnityEngine.Playables;
 
 namespace GBG.AnimationGraph.Node
@@ -17,6 +19,13 @@ namespace GBG.AnimationGraph.Node
 
         public string StateMachineGraphGuid => Guid;
 
+
+        private GraphLayer _stateMachineGraph;
+
+        private string[] _inputGuids;
+
+        private Dictionary<string, int> _stateGuidToIndexTable;
+
         #endregion
 
 
@@ -26,20 +35,54 @@ namespace GBG.AnimationGraph.Node
 
         protected internal override IList<string> GetInputNodeGuids()
         {
-            return EmptyInputs;
+            _inputGuids ??= EmptyInputs; // Editor only
+
+            return _inputGuids;
         }
-        
+
+        protected internal override void InitializeConnection(IReadOnlyDictionary<string, NodeBase> nodeGuidTable)
+        {
+            // Linked to external graph, so here we use node guid table of linked graph
+            base.InitializeConnection(_stateMachineGraph?.NodeGuidTable);
+
+            // Activate entry state
+            if (!string.IsNullOrEmpty(_stateMachineGraph!.RootNodeGuid))
+            {
+                Playable.SetInputWeight(_stateGuidToIndexTable[_stateMachineGraph.RootNodeGuid], 1);
+            }
+        }
+
         // TODO: PrepareFrame
-        protected internal override void PrepareFrame(float deltaTime)=> throw new NotImplementedException();
+        protected internal override void PrepareFrame(float deltaTime) => throw new NotImplementedException();
 
-        
-        // TODO: InitializeParams
-        protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable)=> throw new NotImplementedException();
 
-        // TODO: CreatePlayable
-        protected override Playable CreatePlayable(PlayableGraph playableGraph)=> throw new NotImplementedException();
+        protected override void InitializeGraphLink(IReadOnlyDictionary<string, GraphLayer> graphGuidTable)
+        {
+            base.InitializeGraphLink(graphGuidTable);
+
+            _stateMachineGraph = graphGuidTable[StateMachineGraphGuid];
+
+            _inputGuids = new string[_stateMachineGraph.Nodes.Count];
+            _stateGuidToIndexTable = new Dictionary<string, int>(_stateMachineGraph.Nodes.Count);
+            for (int i = 0; i < _stateMachineGraph.Nodes.Count; i++)
+            {
+                var stateNode = (StateNode)_stateMachineGraph.Nodes[i];
+                _inputGuids[i] = stateNode.Guid;
+                _stateGuidToIndexTable.Add(stateNode.Guid, i);
+            }
+        }
+
+        protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable)
+        {
+        }
+
+        protected override Playable CreatePlayable(PlayableGraph playableGraph)
+        {
+            var playable = AnimationMixerPlayable.Create(playableGraph, _stateMachineGraph.Nodes.Count);
+            return playable;
+        }
 
         // TODO: GetInputWeight
-        protected override float GetInputWeight(int inputIndex)=> throw new NotImplementedException();
+        protected override float GetLogicInputWeight(int inputIndex) => throw new NotImplementedException();
     }
 }

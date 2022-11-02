@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using GBG.AnimationGraph.Graph;
 using GBG.AnimationGraph.Parameter;
 using UnityEngine;
+using UnityEngine.Animations;
+using UnityEngine.Assertions;
 using UnityEngine.Playables;
 
 namespace GBG.AnimationGraph.Node
@@ -25,6 +28,11 @@ namespace GBG.AnimationGraph.Node
 
         public string LinkedGraphGuid => Guid;
 
+
+        private GraphLayer _linkedGraph;
+
+        private string[] _inputGuids;
+
         #endregion
 
 
@@ -34,20 +42,47 @@ namespace GBG.AnimationGraph.Node
 
         protected internal override IList<string> GetInputNodeGuids()
         {
-            return EmptyInputs;
+            _inputGuids ??= EmptyInputs; // Editor only
+
+            return _inputGuids;
         }
-        
+
+        protected internal override void InitializeConnection(IReadOnlyDictionary<string, NodeBase> nodeGuidTable)
+        {
+            // Linked to external graph, so here we use node guid table of linked graph
+            base.InitializeConnection(_linkedGraph.NodeGuidTable);
+
+            // State node has and only has one input
+            Playable.SetInputWeight(0, 1);
+        }
+
         // TODO: PrepareFrame
-        protected internal override void PrepareFrame(float deltaTime)=> throw new NotImplementedException();
+        protected internal override void PrepareFrame(float deltaTime) => throw new NotImplementedException();
 
-        
-        // TODO: InitializeParams
-        protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable)=> throw new NotImplementedException();
 
-        // TODO: CreatePlayable
-        protected override Playable CreatePlayable(PlayableGraph playableGraph)=> throw new NotImplementedException();
+        protected override void InitializeGraphLink(IReadOnlyDictionary<string, GraphLayer> graphGuidTable)
+        {
+            base.InitializeGraphLink(graphGuidTable);
 
-        // TODO: GetInputWeight
-        protected override float GetInputWeight(int inputIndex)=> throw new NotImplementedException();
+            _linkedGraph = graphGuidTable[LinkedGraphGuid];
+            _inputGuids = new[] { _linkedGraph.RootNodeGuid };
+        }
+
+        // TODO: InitializeParams(Transitions)
+        protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable) =>
+            throw new NotImplementedException();
+
+        protected override Playable CreatePlayable(PlayableGraph playableGraph)
+        {
+            // State node has and only has one input
+            var playable = AnimationMixerPlayable.Create(playableGraph, 1);
+            return playable;
+        }
+
+        protected override float GetLogicInputWeight(int inputIndex)
+        {
+            Assert.AreEqual(inputIndex, 0, "Input index is not 0.");
+            return 1;
+        }
     }
 }

@@ -178,7 +178,7 @@ namespace GBG.AnimationGraph.Node
             return playable;
         }
 
-        protected override float GetInputWeight(int inputIndex) => throw new InvalidOperationException();
+        protected override float GetLogicInputWeight(int inputIndex) => throw new InvalidOperationException();
 
 
         private void OnRuntimeSpeedParamChanged(ParamInfo paramInfo)

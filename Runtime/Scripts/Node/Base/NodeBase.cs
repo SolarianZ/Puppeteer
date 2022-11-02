@@ -50,14 +50,15 @@ namespace GBG.AnimationGraph.Node
         protected internal abstract IList<string> GetInputNodeGuids();
 
         internal void InitializeData(PlayableGraph playableGraph,
+            IReadOnlyDictionary<string, GraphLayer> graphGuidTable,
             IReadOnlyDictionary<string, ParamInfo> paramGuidTable)
         {
+            InitializeGraphLink(graphGuidTable);
             InitializeParams(paramGuidTable);
             Playable = CreatePlayable(playableGraph);
         }
 
-        protected internal virtual void InitializeConnection(IReadOnlyDictionary<string, GraphLayer> graphGuidTable,
-            IReadOnlyDictionary<string, NodeBase> nodeGuidTable)
+        protected internal virtual void InitializeConnection(IReadOnlyDictionary<string, NodeBase> nodeGuidTable)
         {
             var inputGuids = GetInputNodeGuids();
             for (int i = 0; i < inputGuids.Count; i++)
@@ -69,17 +70,21 @@ namespace GBG.AnimationGraph.Node
                 }
 
                 var inputNode = nodeGuidTable[inputGuid];
-                Playable.ConnectInput(i, inputNode.Playable, 0, GetInputWeight(i));
+                Playable.ConnectInput(i, inputNode.Playable, 0, GetLogicInputWeight(i));
             }
         }
 
         protected internal abstract void PrepareFrame(float deltaTime);
 
 
+        protected virtual void InitializeGraphLink(IReadOnlyDictionary<string, GraphLayer> graphGuidTable)
+        {
+        }
+
         protected abstract void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable);
 
         protected abstract Playable CreatePlayable(PlayableGraph playableGraph);
 
-        protected abstract float GetInputWeight(int inputIndex);
+        protected abstract float GetLogicInputWeight(int inputIndex);
     }
 }

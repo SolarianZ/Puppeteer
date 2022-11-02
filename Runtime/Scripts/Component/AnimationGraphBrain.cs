@@ -86,12 +86,16 @@ namespace GBG.AnimationGraph
             foreach (var graphLayer in _graphAsset.GraphLayers)
             {
                 graphGuidTable.Add(graphLayer.Guid, graphLayer);
-                graphLayer.InitializeNodes(_playableGraph, paramGuidTable);
             }
 
             foreach (var graphLayer in _graphAsset.GraphLayers)
             {
-                graphLayer.InitializeConnections(graphGuidTable);
+                graphLayer.InitializeNodes(_playableGraph, graphGuidTable, paramGuidTable);
+            }
+
+            foreach (var graphLayer in _graphAsset.GraphLayers)
+            {
+                graphLayer.InitializeConnections();
             }
 
             // Root node
