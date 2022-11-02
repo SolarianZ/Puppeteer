@@ -41,6 +41,8 @@ namespace GBG.AnimationGraph.Node
     [Serializable]
     public class BlendSpace1DNode : MixerNodeBase
     {
+        #region Serialization Data
+
         // public ParamGuidOrValue SpeedParam;
 
         public ParamGuidOrValue PositionParam
@@ -60,6 +62,8 @@ namespace GBG.AnimationGraph.Node
 
         [SerializeField]
         private List<BlendSpace1DSample> _samples = new List<BlendSpace1DSample>();
+
+        #endregion
 
 
         public BlendSpace1DNode(string guid) : base(guid)

@@ -44,6 +44,8 @@ namespace GBG.AnimationGraph.Node
     [Serializable]
     public class BlendSpace2DNode : MixerNodeBase
     {
+        #region Serialization Data
+
         // public ParamGuidOrValue SpeedParam;
 
         public ParamGuidOrValue PositionXParam
@@ -82,7 +84,7 @@ namespace GBG.AnimationGraph.Node
         [SerializeField]
         private int[] _triangles = Array.Empty<int>();
 
-        private string[] _inputGuids;
+        #endregion
 
 
         public BlendSpace2DNode(string guid) : base(guid)

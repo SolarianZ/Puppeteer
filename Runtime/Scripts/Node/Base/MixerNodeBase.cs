@@ -11,14 +11,9 @@ namespace GBG.AnimationGraph.Node
         #endregion
 
 
-        #region Non Serializable Input Data
+        #region Runtime Properties
 
         protected static string[] EmptyInputs = Array.Empty<string>();
-
-        #endregion
-
-
-        #region Runtime Properties
 
         // internal abstract Playable Playable { get; }
 

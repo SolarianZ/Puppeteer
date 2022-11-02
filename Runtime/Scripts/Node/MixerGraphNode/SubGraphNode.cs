@@ -8,6 +8,8 @@ namespace GBG.AnimationGraph.Node
     [Serializable]
     public class SubGraphNode : MixerNodeBase
     {
+        #region Serialization Data
+
         public AnimationGraphAsset SubGraph
         {
             get => _subGraph;
@@ -25,6 +27,8 @@ namespace GBG.AnimationGraph.Node
 
         [SerializeField]
         private List<ParamBindingGuidOrValue> _paramBindings = new List<ParamBindingGuidOrValue>();
+
+        #endregion
 
 
         public SubGraphNode(string guid) : base(guid)

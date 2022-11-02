@@ -8,7 +8,7 @@ namespace GBG.AnimationGraph.Node
     [Serializable]
     public class AnimationMixerNode : MixerNodeBase
     {
-        #region Mixer Inputs
+        #region Serialization Data
 
         public List<WeightedNodeInput> MixerInputs
         {
@@ -18,6 +18,11 @@ namespace GBG.AnimationGraph.Node
 
         [SerializeReference]
         private List<WeightedNodeInput> _mixerInputs = new List<WeightedNodeInput>();
+
+        #endregion
+
+
+        #region Runtime Properties
 
         private string[] _inputGuids;
 

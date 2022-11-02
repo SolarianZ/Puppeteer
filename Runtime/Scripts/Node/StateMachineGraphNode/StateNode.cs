@@ -27,7 +27,11 @@ namespace GBG.AnimationGraph.Node
         #endregion
 
 
+        #region Runtime Properties
+
         public string MixerGraphGuid => Guid;
+
+        #endregion
 
 
         public StateNode(string graphGuid) : base(graphGuid)

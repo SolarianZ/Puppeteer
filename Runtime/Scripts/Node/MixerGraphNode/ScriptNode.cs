@@ -23,7 +23,7 @@ namespace GBG.AnimationGraph.Node
     [Serializable]
     public class ScriptNode : MixerNodeBase
     {
-        #region Mixer Inputs
+        #region Serialization Data
 
         public List<WeightedNodeInput> Inputs
         {
@@ -34,11 +34,7 @@ namespace GBG.AnimationGraph.Node
         [SerializeReference]
         private List<WeightedNodeInput> _inputs = new List<WeightedNodeInput>();
 
-        private string[] _inputGuids;
-
-        #endregion
-
-
+       
         public ScriptAsset ScriptAsset
         {
             get => _scriptAsset;
@@ -48,6 +44,15 @@ namespace GBG.AnimationGraph.Node
         [SerializeField]
         private ScriptAsset _scriptAsset;
 
+        #endregion
+
+
+        #region Runtime Properties
+
+        private string[] _inputGuids;
+
+        #endregion
+        
 
         public ScriptNode(string guid) : base(guid)
         {
