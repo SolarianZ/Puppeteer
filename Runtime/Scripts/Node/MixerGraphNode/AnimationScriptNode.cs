@@ -75,6 +75,7 @@ namespace GBG.AnimationGraph.Node
         {
             base.InitializeConnection(graphGuidTable, nodeGuidTable);
 
+            // TODO FIXME: Input weight of AnimationScriptPlayable input should be always 1! Process weight in AnimationJob!
             for (int i = 0; i < MixerInputs.Count; i++)
             {
                 Playable.SetInputWeight(i, GetInputWeight(i));

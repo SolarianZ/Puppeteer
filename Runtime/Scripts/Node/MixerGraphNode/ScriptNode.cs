@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using GBG.AnimationGraph.Component;
+using GBG.AnimationGraph.Graph;
 using GBG.AnimationGraph.Parameter;
 using UnityEngine;
 using UnityEngine.Playables;
@@ -10,11 +10,10 @@ namespace GBG.AnimationGraph.Node
 {
     public abstract class ScriptAsset : ScriptableObject
     {
-        public abstract string Tag { get; }
+        public abstract Playable CreateScriptPlayable(GameObject gameObject,
+            PlayableGraph playableGraph, int inputCount);
 
-
-        public abstract Playable CreateScriptPlayable<T>(Animator animator, Skeleton skeleton)
-            where T : ScriptBehaviour;
+        public abstract ScriptBehaviour GetScriptBehaviour();
     }
 
     public abstract class ScriptBehaviour : PlayableBehaviour
@@ -53,6 +52,10 @@ namespace GBG.AnimationGraph.Node
 
         private string[] _inputGuids;
 
+        private ParamInfo[] _runtimeInputWeightParams;
+
+        private ScriptBehaviour _scriptBehaviour;
+
         #endregion
 
 
@@ -73,14 +76,67 @@ namespace GBG.AnimationGraph.Node
 
             return _inputGuids;
         }
-        
-        protected internal override void PrepareFrame(float deltaTime)=> throw new NotImplementedException();
 
-        
-        protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable)=> throw new NotImplementedException();
+        protected internal override void InitializeConnection(IReadOnlyDictionary<string, GraphLayer> graphGuidTable,
+            IReadOnlyDictionary<string, NodeBase> nodeGuidTable)
+        {
+            base.InitializeConnection(graphGuidTable, nodeGuidTable);
 
-        protected override Playable CreatePlayable(PlayableGraph playableGraph)=> throw new NotImplementedException();
+            for (int i = 0; i < Inputs.Count; i++)
+            {
+                Playable.SetInputWeight(i, GetInputWeight(i));
+            }
+        }
 
-        protected override float GetInputWeight(int inputIndex)=> throw new NotImplementedException();
+        protected internal override void PrepareFrame(float deltaTime) => throw new NotImplementedException();
+
+
+        protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable)
+        {
+            // Input weights
+            _runtimeInputWeightParams = new ParamInfo[Inputs.Count];
+            for (int i = 0; i < _runtimeInputWeightParams.Length; i++)
+            {
+                var index = i;
+                var weightParam = Inputs[index].InputWeightParam;
+                if (!weightParam.IsValue)
+                {
+                    var runtimeInputWeightParam = paramGuidTable[weightParam.Guid];
+                    _runtimeInputWeightParams[index] = runtimeInputWeightParam;
+
+                    runtimeInputWeightParam.OnValueChanged += p => OnInputWeightChanged(index, p.GetFloat());
+                }
+            }
+        }
+
+
+        protected override Playable CreatePlayable(PlayableGraph playableGraph)
+        {
+            if (!Script)
+            {
+                return Playable.Null;
+            }
+
+            // TODO: Need GameObject argument.
+            var playable = Script.CreateScriptPlayable(null, playableGraph, Inputs.Count);
+            _scriptBehaviour = Script.GetScriptBehaviour();
+
+            return playable;
+        }
+
+        protected override float GetInputWeight(int inputIndex)
+        {
+            var runtimeInputWeightParam = _runtimeInputWeightParams[inputIndex];
+            if (runtimeInputWeightParam != null)
+            {
+                return runtimeInputWeightParam.GetFloat();
+            }
+
+            return Inputs[inputIndex].InputWeightParam.GetFloat();
+        }
+
+
+        // TODO: OnInputWeightChanged
+        private void OnInputWeightChanged(int index, float weight) => throw new NotImplementedException();
     }
 }
