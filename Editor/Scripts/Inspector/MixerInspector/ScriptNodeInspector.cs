@@ -83,7 +83,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
             base.SetTarget(target);
 
             // Script asset
-            _scriptAssetField.SetValueWithoutNotify(Node.ScriptAsset);
+            _scriptAssetField.SetValueWithoutNotify(Node.Script);
 
             // Inputs
             _mixerInputs = ((ScriptEditorNode)Target).Node.Inputs;
@@ -99,7 +99,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
 
         private void OnScriptAssetChanged(ChangeEvent<UObject> evt)
         {
-            Node.ScriptAsset = (ScriptAsset)evt.newValue;
+            Node.Script = (ScriptAsset)evt.newValue;
             RaiseDataChangedEvent(DataCategories.NodeData);
         }
 

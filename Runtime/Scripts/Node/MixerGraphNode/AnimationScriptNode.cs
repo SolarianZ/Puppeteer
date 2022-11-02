@@ -16,7 +16,7 @@ namespace GBG.AnimationGraph.Node
     }
 
     [Serializable]
-    public class AnimationScriptNode : MixerNodeBase
+    public class AnimationScriptNode : NodeBase
     {
         #region Serialization Data
 

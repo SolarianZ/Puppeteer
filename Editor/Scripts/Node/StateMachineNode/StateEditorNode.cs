@@ -13,7 +13,7 @@ namespace GBG.AnimationGraph.Editor.Node
 
         internal override List<Transition> Transitions => Node.Transitions;
 
-        public string MixerGraphGuid => Node.MixerGraphGuid;
+        public string MixerGraphGuid => Node.LinkedGraphGuid;
 
         internal StateNode Node { get; }
 
@@ -31,7 +31,7 @@ namespace GBG.AnimationGraph.Editor.Node
         public StateEditorNode(AnimationGraphAsset graphAsset, StateNode node,
             Graph.GraphLayer graphLayer) : base(graphAsset, graphLayer)
         {
-            Assert.AreEqual(node.MixerGraphGuid, graphLayer.Guid);
+            Assert.AreEqual(node.LinkedGraphGuid, graphLayer.Guid);
 
             Node = node;
 

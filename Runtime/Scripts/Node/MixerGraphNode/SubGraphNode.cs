@@ -6,7 +6,7 @@ using UnityEngine;
 namespace GBG.AnimationGraph.Node
 {
     [Serializable]
-    public class SubGraphNode : MixerNodeBase
+    public class SubGraphNode : NodeBase
     {
         #region Serialization Data
 

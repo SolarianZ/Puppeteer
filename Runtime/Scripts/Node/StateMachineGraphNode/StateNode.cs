@@ -9,15 +9,7 @@ namespace GBG.AnimationGraph.Node
     {
         #region Serialization Data
 
-        public string StateName
-        {
-            get => _stateName;
-            internal set => _stateName = value;
-        }
-
-        [SerializeField]
-        private string _stateName;
-
+        // public string StateName;
 
         public List<Transition> Transitions => _transitions;
 
@@ -29,13 +21,18 @@ namespace GBG.AnimationGraph.Node
 
         #region Runtime Properties
 
-        public string MixerGraphGuid => Guid;
+        public string LinkedGraphGuid => Guid;
 
         #endregion
 
 
         public StateNode(string graphGuid) : base(graphGuid)
         {
+        }
+
+        public override IList<string> GetInputNodeGuids()
+        {
+            return EmptyInputs;
         }
     }
 }

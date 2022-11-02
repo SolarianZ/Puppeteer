@@ -20,8 +20,9 @@ namespace GBG.AnimationGraph.Node
     {
     }
 
+    // TODO: Parameter binding?
     [Serializable]
-    public class ScriptNode : MixerNodeBase
+    public class ScriptNode : NodeBase
     {
         #region Serialization Data
 
@@ -34,15 +35,15 @@ namespace GBG.AnimationGraph.Node
         [SerializeReference]
         private List<WeightedNodeInput> _inputs = new List<WeightedNodeInput>();
 
-       
-        public ScriptAsset ScriptAsset
+
+        public ScriptAsset Script
         {
-            get => _scriptAsset;
-            internal set => _scriptAsset = value;
+            get => _script;
+            internal set => _script = value;
         }
 
         [SerializeField]
-        private ScriptAsset _scriptAsset;
+        private ScriptAsset _script;
 
         #endregion
 
@@ -52,7 +53,7 @@ namespace GBG.AnimationGraph.Node
         private string[] _inputGuids;
 
         #endregion
-        
+
 
         public ScriptNode(string guid) : base(guid)
         {

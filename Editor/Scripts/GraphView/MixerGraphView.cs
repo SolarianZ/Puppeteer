@@ -30,7 +30,7 @@ namespace GBG.AnimationGraph.Editor.GraphView
             var nodeTable = new Dictionary<string, MixerGraphEditorNode>(GraphLayer.Nodes.Count + 1);
             foreach (var nodeData in GraphLayer.Nodes)
             {
-                var node = PlayableEditorNodeFactory.CreateNode(GraphAsset, (MixerNodeBase)nodeData, false);
+                var node = PlayableEditorNodeFactory.CreateNode(GraphAsset, nodeData, false);
                 node.OnDoubleClicked += OnDoubleClickNode;
                 AddElement(node);
                 nodeTable.Add(node.Guid, node);

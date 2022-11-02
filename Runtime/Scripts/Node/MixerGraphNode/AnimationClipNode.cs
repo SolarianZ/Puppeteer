@@ -7,7 +7,7 @@ namespace GBG.AnimationGraph.Node
 {
     // https://docs.unity3d.com/ScriptReference/Animations.AnimatorState.html
     [Serializable]
-    public class AnimationClipNode : MixerNodeBase
+    public class AnimationClipNode : NodeBase
     {
         #region Serialization Data
 

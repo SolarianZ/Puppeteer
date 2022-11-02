@@ -39,7 +39,7 @@ namespace GBG.AnimationGraph.Node
     }
 
     [Serializable]
-    public class BlendSpace1DNode : MixerNodeBase
+    public class BlendSpace1DNode : NodeBase
     {
         #region Serialization Data
 

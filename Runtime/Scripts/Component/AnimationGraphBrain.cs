@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using GBG.AnimationGraph.Graph;
 using GBG.AnimationGraph.Node;
 using GBG.AnimationGraph.Parameter;
 using UnityEngine;
@@ -19,10 +20,6 @@ namespace GBG.AnimationGraph
         private Animator _animator;
 
         private PlayableGraph _playableGraph;
-
-        // private readonly Dictionary<string, Graph.GraphLayer> _graphGuidTable = new();
-
-        private readonly Dictionary<string, NodeBase> _nodeGuidTable = new();
 
         private NodeBase _rootNode;
 
@@ -78,36 +75,34 @@ namespace GBG.AnimationGraph
 
         private void BuildAnimationPlayableGraph(Dictionary<string, ParamInfo> paramGuidTable)
         {
-            // _graphGuidTable.Clear();
-            _nodeGuidTable.Clear();
-
             var animOutput = AnimationPlayableOutput.Create(_playableGraph, "Animation Output", _animator);
             if (!_graphAsset)
             {
                 return;
             }
 
-            var rootGraph = _graphAsset.GraphLayers.First(g => g.Guid.Equals(_graphAsset.RootGraphGuid));
-            if (string.IsNullOrEmpty(rootGraph.RootNodeGuid))
+            // Graph layer
+            var graphGuidTable = new Dictionary<string, GraphLayer>(_graphAsset.GraphLayers.Count);
+            foreach (var graphLayer in _graphAsset.GraphLayers)
+            {
+                graphGuidTable.Add(graphLayer.Guid, graphLayer);
+                graphLayer.InitializeNodes(_playableGraph, paramGuidTable);
+            }
+
+            foreach (var graphLayer in _graphAsset.GraphLayers)
+            {
+                graphLayer.InitializeConnections(graphGuidTable);
+            }
+
+            // Root node
+            var rootGraph = _graphAsset.GraphLayers.FirstOrDefault(g => g.Guid.Equals(_graphAsset.RootGraphGuid));
+            _rootNode = rootGraph?.RootNode;
+            if (_rootNode == null)
             {
                 return;
             }
 
-            // Graph layer
-            foreach (var graphLayer in _graphAsset.GraphLayers)
-            {
-                // _graphGuidTable.Add(graphLayer.Guid, graphLayer);
-                graphLayer.InitializeNodes(_playableGraph, paramGuidTable, _nodeGuidTable);
-            }
-
-            foreach (var graphLayer in _graphAsset.GraphLayers)
-            {
-                graphLayer.InitializeConnections(_nodeGuidTable);
-            }
-
-            // Root node
-            _rootNode = _nodeGuidTable[rootGraph.RootNodeGuid];
-            animOutput.SetSourcePlayable(_rootNode.GetPlayable());
+            animOutput.SetSourcePlayable(_rootNode.Playable);
         }
 
 

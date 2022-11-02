@@ -30,7 +30,7 @@ namespace GBG.AnimationGraph.Editor.GraphView
             foreach (var nodeData in GraphLayer.Nodes)
             {
                 var stateNodeData = (StateNode)nodeData;
-                var stateNodeGraphData = GraphAsset.GraphLayers.Find(data => data.Guid.Equals(stateNodeData.MixerGraphGuid));
+                var stateNodeGraphData = GraphAsset.GraphLayers.Find(data => data.Guid.Equals(stateNodeData.LinkedGraphGuid));
                 var node = StateEditorNodeFactory.CreateNode(GraphAsset, stateNodeData, stateNodeGraphData);
                 node.OnDoubleClicked += OnDoubleClickNode;
                 nodeTable.Add(node.Guid, node);
