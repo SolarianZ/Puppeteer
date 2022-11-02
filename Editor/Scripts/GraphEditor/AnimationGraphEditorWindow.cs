@@ -297,7 +297,7 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             if (_graphAsset.GraphLayers.Count == 0)
             {
                 // Add a default node
-                var rootGraph = new Graph.GraphLayer(GuidTool.NewGuid(), "RootGraph", GraphType.Mixer);
+                var rootGraph = new GraphLayer(GuidTool.NewGuid(), "RootGraph", GraphType.Mixer);
                 _graphAsset.RootGraphGuid = rootGraph.Guid;
                 _graphAsset.GraphLayers.Add(rootGraph);
             }

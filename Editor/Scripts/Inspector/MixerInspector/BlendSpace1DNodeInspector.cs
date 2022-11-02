@@ -19,25 +19,27 @@ namespace GBG.AnimationGraph.Editor.Inspector
         public event Action OnDataChanged;
 
 
-        private readonly TextField _inputNodeField;
+        private readonly ObjectField _clipField;
 
         private readonly FloatField _positionField;
 
         private readonly FloatField _playbackSpeedField;
 
-        private BlendSpace1DInput _target;
+        private BlendSpace1DSample _target;
 
 
         public BlendSpace1DSampleDrawer(Length nameLabelWidth)
         {
-            // Input
-            _inputNodeField = new TextField("Input Node");
-            _inputNodeField.labelElement.style.minWidth = StyleKeyword.Auto;
-            _inputNodeField.labelElement.style.maxWidth = StyleKeyword.Auto;
-            _inputNodeField.labelElement.style.width = nameLabelWidth;
-            _inputNodeField.labelElement.style.overflow = Overflow.Hidden;
-            _inputNodeField.SetEnabled(false);
-            Add(_inputNodeField);
+            // Clip
+            _clipField = new ObjectField("Clip")
+            {
+                objectType = typeof(AnimationClip),
+            };
+            _clipField.labelElement.style.minWidth = StyleKeyword.Auto;
+            _clipField.labelElement.style.maxWidth = StyleKeyword.Auto;
+            _clipField.labelElement.style.width = nameLabelWidth;
+            _clipField.RegisterValueChangedCallback(OnClipChanged);
+            Add(_clipField);
 
             // Position
             _positionField = new FloatField("Position");
@@ -56,15 +58,21 @@ namespace GBG.AnimationGraph.Editor.Inspector
             Add(_playbackSpeedField);
         }
 
-        public void SetTarget(BlendSpace1DInput target, int targetIndex)
+        public void SetTarget(BlendSpace1DSample target, int targetIndex)
         {
             _target = target;
 
-            _inputNodeField.label = $"Input Node {targetIndex.ToString()}";
+            _clipField.SetValueWithoutNotify(_target.Clip);
             _positionField.SetValueWithoutNotify(_target.Position);
-            _playbackSpeedField.SetValueWithoutNotify(_target.PlaybackSpeed);
+            _playbackSpeedField.SetValueWithoutNotify(_target.Speed);
         }
 
+
+        private void OnClipChanged(ChangeEvent<UObject> evt)
+        {
+            _target.Clip = (AnimationClip)evt.newValue; 
+            OnDataChanged?.Invoke();
+        }
 
         private void OnPositionChanged(ChangeEvent<float> evt)
         {
@@ -74,7 +82,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
 
         private void OnPlaybackSpeedChanged(ChangeEvent<float> evt)
         {
-            _target.PlaybackSpeed = evt.newValue;
+            _target.Speed = evt.newValue;
             OnDataChanged?.Invoke();
         }
     }
@@ -187,7 +195,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
         private void OnSampleItemAdded(IEnumerable<int> indices)
         {
             var index = indices.First();
-            _node.Samples[index] = new BlendSpace1DInput();
+            _node.Samples[index] = new BlendSpace1DSample();
             _addInputPortElement(index);
             RaiseDataChangedEvent(DataCategories.NodeData);
         }

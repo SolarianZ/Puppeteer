@@ -38,6 +38,10 @@ namespace GBG.AnimationGraph
 #if UNITY_EDITOR
 
         // TODO: Isolated graph layers(Editor only) 
+        public List<GraphLayer> IsolatedGraphLayers => _isolatedGraphLayers;
+
+        [SerializeField]
+        private List<GraphLayer> _isolatedGraphLayers = new List<GraphLayer>();
 
 #endif
 

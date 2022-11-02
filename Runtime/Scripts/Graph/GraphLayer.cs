@@ -71,6 +71,10 @@ namespace GBG.AnimationGraph.Graph
         private Vector2 _editorGraphRootNodePosition;
 
         // TODO: Isolated nodes(Editor only) 
+        public List<NodeBase> IsolatedNodes => _isolatedNodes;
+
+        [SerializeReference]
+        private List<NodeBase> _isolatedNodes = new List<NodeBase>();
 #endif
 
         #endregion
