@@ -103,6 +103,18 @@ namespace GBG.AnimationGraph.Node
         #endregion
 
 
+        #region Runtime Properties
+
+        public float BaseSpeed { get; private set; }
+
+
+        private ParamInfo _runtimeSpeedParam;
+
+        private ParamInfo _runtimeMotionTimeParam;
+
+        #endregion
+
+
         public AnimationClipNode(string guid) : base(guid)
         {
         }
@@ -111,11 +123,40 @@ namespace GBG.AnimationGraph.Node
 
         protected internal override void PrepareFrame(float deltaTime) => throw new NotImplementedException();
 
-        protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable) =>
-            throw new NotImplementedException();
+        protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable)
+        {
+            if (!SpeedParamActive)
+            {
+                BaseSpeed = 1;
+            }
+            else if (SpeedParam.IsValue)
+            {
+                BaseSpeed = SpeedParam.GetFloat();
+            }
+            else
+            {
+                _runtimeSpeedParam = paramGuidTable[SpeedParam.Guid];
+                _runtimeSpeedParam.OnValueChanged += OnRuntimeSpeedParamChanged;
+                BaseSpeed = _runtimeSpeedParam.GetFloat();
+            }
+        }
 
         protected override Playable CreatePlayable(PlayableGraph playableGraph) => throw new NotImplementedException();
 
         protected override float GetInputWeight(int inputIndex) => throw new InvalidOperationException();
+
+
+        private void OnRuntimeSpeedParamChanged(ParamInfo paramInfo)
+        {
+            BaseSpeed = _runtimeSpeedParam.GetFloat();
+
+            // TODO: Update Animation Speed
+            // TODO: Update Sync Group
+        }
+
+        private void OnRuntimeMotionTimeParamChanged(ParamInfo paramInfo)
+        {
+            Playable.SetTime(paramInfo.GetFloat());
+        }
     }
 }
