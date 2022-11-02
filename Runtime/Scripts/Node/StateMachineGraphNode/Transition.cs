@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using GBG.AnimationGraph.Parameter;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace GBG.AnimationGraph.Node
 {
@@ -53,6 +55,24 @@ namespace GBG.AnimationGraph.Node
 
         [SerializeField]
         private ConditionOperator _operator;
+
+
+        [Conditional("UNITY_ASSERTIONS")]
+        public void AssertCheck()
+        {
+            Assert.IsNotNull(LeftParam, "Left operand is null.");
+            Assert.IsNotNull(RightParam, "Right operand is null.");
+            // Assert.AreEqual(LeftParam.ParamType, ParamType,
+            //     $"Left operand is not the type of {ParamType}.");
+            // Assert.AreEqual(RightParam.ParamType, ParamType,
+            //     $"Right operand is not the type of {ParamType}.");
+
+            if (Operator == ConditionOperator.Greater || Operator == ConditionOperator.Less)
+            {
+                Assert.AreNotEqual(ParamType.Bool, ParamType,
+                    $"Use {ConditionOperator.Greater} or {ConditionOperator.Less} on {ParamType.Bool} operands.");
+            }
+        }
 
 
         public static bool CheckCondition(ConditionOperator op, float left, float right)

@@ -4,9 +4,37 @@ namespace GBG.AnimationGraph.Editor.Utility
 {
     public static class CurveTool
     {
+        public static bool IsConstant(this AnimationCurve curve)
+        {
+            if (curve.length == 0)
+            {
+                return true;
+            }
+
+            var value = curve[0].value;
+            for (int i = 1; i < curve.length; i++)
+            {
+                if (!Mathf.Approximately(value, curve[i].value))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public static bool IsNormalized(this AnimationCurve curve)
+        {
+            return curve.length == 2 &&
+                   Mathf.Approximately(curve[0].time, 0) &&
+                   Mathf.Approximately(curve[0].value, 0) &&
+                   Mathf.Approximately(curve[1].time, 1) &&
+                   Mathf.Approximately(curve[1].value, 1);
+        }
+
         public static void Normalize(this AnimationCurve curve)
         {
-            if (curve.IsConstantCurve())
+            if (curve.IsConstant())
             {
                 curve.ClearKeys();
                 curve.AddKey(new Keyframe(0, 0, 0, 1));
@@ -31,32 +59,12 @@ namespace GBG.AnimationGraph.Editor.Utility
             curve.keys = keys;
         }
 
-
         public static void ClearKeys(this AnimationCurve curve)
         {
             for (int i = curve.length - 1; i >= 0; i--)
             {
                 curve.RemoveKey(i);
             }
-        }
-
-        public static bool IsConstantCurve(this AnimationCurve curve)
-        {
-            if (curve.length == 0)
-            {
-                return true;
-            }
-
-            var value = curve[0].value;
-            for (int i = 1; i < curve.length; i++)
-            {
-                if (!Mathf.Approximately(value, curve[i].value))
-                {
-                    return false;
-                }
-            }
-
-            return true;
         }
     }
 }

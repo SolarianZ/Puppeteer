@@ -23,6 +23,11 @@ namespace GBG.AnimationGraph
             return _paramNameTable[paramName].GetBool();
         }
 
+        public float GetRawValue(string paramName)
+        {
+            return _paramNameTable[paramName].RawValue;
+        }
+
         public void SetFloat(string paramName, float value)
         {
             _paramNameTable[paramName].SetFloat(value);
@@ -36,6 +41,11 @@ namespace GBG.AnimationGraph
         public void SetBool(string paramName, bool value)
         {
             _paramNameTable[paramName].SetBool(value);
+        }
+
+        public void SetRawValue(string paramName, float value)
+        {
+            _paramNameTable[paramName].SetRawValue(value);
         }
     }
 }

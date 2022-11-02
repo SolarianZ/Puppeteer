@@ -21,7 +21,7 @@ namespace GBG.AnimationGraph.Node
     }
 
     [Serializable]
-    public class ScriptNode : PlayableNodeBase
+    public class ScriptNode : MixerNodeBase
     {
         #region Mixer Inputs
 

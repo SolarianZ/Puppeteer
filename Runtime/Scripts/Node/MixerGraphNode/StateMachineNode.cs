@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace GBG.AnimationGraph.Node
 {
     [Serializable]
-    public class StateMachineNode : PlayableNodeBase
+    public class StateMachineNode : MixerNodeBase
     {
         public string StateMachineGraphGuid => Guid;
 

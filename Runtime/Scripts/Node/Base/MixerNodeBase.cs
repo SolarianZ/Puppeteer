@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace GBG.AnimationGraph.Node
 {
     [Serializable]
-    public abstract class PlayableNodeBase : NodeBase
+    public abstract class MixerNodeBase : NodeBase
     {
         #region Serialization Data
 
@@ -15,20 +15,21 @@ namespace GBG.AnimationGraph.Node
 
         protected static string[] EmptyInputs = Array.Empty<string>();
 
-        public abstract IList<string> GetInputNodeGuids();
-
         #endregion
 
 
         #region Runtime Properties
 
-        // internal abstract Playable AnimationPlayable { get; }
+        // internal abstract Playable Playable { get; }
 
         #endregion
 
 
-        protected PlayableNodeBase(string guid) : base(guid)
+        protected MixerNodeBase(string guid) : base(guid)
         {
         }
+
+
+        public abstract IList<string> GetInputNodeGuids();
     }
 }

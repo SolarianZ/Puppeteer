@@ -6,7 +6,7 @@ using UnityEngine;
 namespace GBG.AnimationGraph.Node
 {
     [Serializable]
-    public class AnimationLayerMixerNode : PlayableNodeBase
+    public class AnimationLayerMixerNode : MixerNodeBase
     {
         #region Mixer Inputs
 

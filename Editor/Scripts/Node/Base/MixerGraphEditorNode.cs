@@ -23,12 +23,12 @@ namespace GBG.AnimationGraph.Editor.Node
 
         internal GraphPort OutputPort { get; }
 
-        internal PlayableNodeBase Node { get; }
+        internal MixerNodeBase Node { get; }
 
         protected EditorNodeExtraInfo ExtraInfo { get; }
 
 
-        protected MixerGraphEditorNode(AnimationGraphAsset graphAsset, PlayableNodeBase node,
+        protected MixerGraphEditorNode(AnimationGraphAsset graphAsset, MixerNodeBase node,
             EditorNodeExtraInfo extraInfo) : base(graphAsset)
         {
             Node = node;

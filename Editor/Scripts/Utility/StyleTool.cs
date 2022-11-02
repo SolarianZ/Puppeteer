@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine.UIElements;
+using EditorUIEToolbar = UnityEditor.UIElements.Toolbar;
 
 namespace GBG.AnimationGraph.Editor.Utility
 {
@@ -37,7 +37,7 @@ namespace GBG.AnimationGraph.Editor.Utility
 
         private static MethodInfo GetUIElementsEditorUtilityMethod(string methodName)
         {
-            var uieEditorUtilType = typeof(Toolbar).Assembly
+            var uieEditorUtilType = typeof(EditorUIEToolbar).Assembly
                 .GetType("UnityEditor.UIElements.UIElementsEditorUtility");
             var methodInfo = uieEditorUtilType.GetMethod(methodName, BindingFlags.Static | BindingFlags.NonPublic);
 

@@ -42,7 +42,7 @@ namespace GBG.AnimationGraph.Node
     }
 
     [Serializable]
-    public class BlendSpace2DNode : PlayableNodeBase
+    public class BlendSpace2DNode : MixerNodeBase
     {
         // public ParamGuidOrValue SpeedParam;
 

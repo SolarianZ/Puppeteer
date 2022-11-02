@@ -6,7 +6,7 @@ using UnityEngine;
 namespace GBG.AnimationGraph.Node
 {
     [Serializable]
-    public class SubGraphNode : PlayableNodeBase
+    public class SubGraphNode : MixerNodeBase
     {
         public AnimationGraphAsset SubGraph
         {

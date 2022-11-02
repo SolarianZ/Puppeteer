@@ -5,7 +5,7 @@ using UnityEngine;
 namespace GBG.AnimationGraph.Node
 {
     [Serializable]
-    public abstract class NodeInputBase
+    public abstract class NodeInput
     {
         public string InputNodeGuid
         {
@@ -18,7 +18,7 @@ namespace GBG.AnimationGraph.Node
     }
 
     [Serializable]
-    public class WeightedNodeInput : NodeInputBase
+    public class WeightedNodeInput : NodeInput
     {
         public ParamGuidOrValue InputWeightParam
         {
