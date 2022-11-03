@@ -47,7 +47,7 @@ namespace GBG.AnimationGraph.Node
         }
 
 
-        protected internal abstract IList<string> GetInputNodeGuids();
+        protected internal abstract IReadOnlyList<string> GetInputNodeGuids();
 
         internal void InitializeData(PlayableGraph playableGraph,
             IReadOnlyDictionary<string, GraphLayer> graphGuidTable,
@@ -74,7 +74,7 @@ namespace GBG.AnimationGraph.Node
             }
         }
 
-        protected internal abstract void PrepareFrame(float deltaTime);
+        protected internal abstract void PrepareFrame(FrameData frameData);
 
 
         protected virtual void InitializeGraphLink(IReadOnlyDictionary<string, GraphLayer> graphGuidTable)

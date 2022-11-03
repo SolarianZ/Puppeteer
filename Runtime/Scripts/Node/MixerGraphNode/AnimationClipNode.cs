@@ -9,7 +9,7 @@ namespace GBG.AnimationGraph.Node
 {
     // https://docs.unity3d.com/ScriptReference/Animations.AnimatorState.html
     [Serializable]
-    public class AnimationClipNode : NodeBase
+    public class AnimationClipNode : AnimationAssetPlayerNodeBase
     {
         #region Serialization Data
 
@@ -21,45 +21,6 @@ namespace GBG.AnimationGraph.Node
 
         [SerializeField]
         private AnimationClip _animationClip;
-
-
-        public bool SpeedParamActive
-        {
-            get => _speedParamActive;
-            internal set => _speedParamActive = value;
-        }
-
-        [SerializeField]
-        private bool _speedParamActive;
-
-        public ParamGuidOrValue SpeedParam
-        {
-            get => _speedParam;
-            internal set => _speedParam = value;
-        }
-
-        [SerializeField]
-        private ParamGuidOrValue _speedParam = new ParamGuidOrValue(null, 1.0f);
-
-
-        public bool MotionTimeParamActive
-        {
-            get => _motionTimeParamActive;
-            internal set => _motionTimeParamActive = value;
-        }
-
-        [SerializeField]
-        private bool _motionTimeParamActive;
-
-
-        public ParamGuidOrValue MotionTimeParam
-        {
-            get => _motionTimeParam;
-            internal set => _motionTimeParam = value;
-        }
-
-        [SerializeField]
-        private ParamGuidOrValue _motionTimeParam = new ParamGuidOrValue(null, 0f);
 
 
         // public bool CycleOffsetParamActive
@@ -106,9 +67,6 @@ namespace GBG.AnimationGraph.Node
 
         #region Runtime Properties
 
-        public float BaseSpeed { get; private set; }
-
-
         private ParamInfo _runtimeSpeedParam;
 
         private ParamInfo _runtimeMotionTimeParam;
@@ -120,10 +78,10 @@ namespace GBG.AnimationGraph.Node
         {
         }
 
-        protected internal override IList<string> GetInputNodeGuids() => EmptyInputs;
+        protected internal override IReadOnlyList<string> GetInputNodeGuids() => EmptyInputs;
 
         // TODO: PrepareFrame
-        protected internal override void PrepareFrame(float deltaTime) => throw new NotImplementedException();
+        protected internal override void PrepareFrame(FrameData frameData) => throw new NotImplementedException();
 
         protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable)
         {

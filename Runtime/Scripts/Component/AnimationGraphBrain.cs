@@ -7,6 +7,8 @@ using GBG.AnimationGraph.Parameter;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
+using FrameData = GBG.AnimationGraph.Node.FrameData;
+using UFrameData = UnityEngine.Playables.FrameData;
 
 namespace GBG.AnimationGraph
 {
@@ -43,7 +45,7 @@ namespace GBG.AnimationGraph
 
                 // State driver
                 var driverPlayable = ScriptPlayable<AnimationGraphStateDriver>.Create(_playableGraph);
-                driverPlayable.GetBehaviour().Initialize(deltaTime => _rootNode?.PrepareFrame(deltaTime));
+                driverPlayable.GetBehaviour().Initialize(frameData => _rootNode?.PrepareFrame(frameData));
                 var scriptOutput = ScriptPlayableOutput.Create(_playableGraph, "Script Output");
                 scriptOutput.SetSourcePlayable(driverPlayable);
 
@@ -112,19 +114,19 @@ namespace GBG.AnimationGraph
 
         class AnimationGraphStateDriver : PlayableBehaviour
         {
-            private Action<float> _onPrepareFrame;
+            private Action<FrameData> _onPrepareFrame;
 
 
-            public void Initialize(Action<float> onPrepareFrame)
+            public void Initialize(Action<FrameData> onPrepareFrame)
             {
                 _onPrepareFrame = onPrepareFrame;
             }
 
-            public override void PrepareFrame(Playable playable, FrameData info)
+            public override void PrepareFrame(Playable playable, UFrameData info)
             {
                 base.PrepareFrame(playable, info);
 
-                _onPrepareFrame(info.deltaTime);
+                _onPrepareFrame(info);
             }
         }
     }

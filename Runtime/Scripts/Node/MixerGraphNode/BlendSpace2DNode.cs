@@ -43,11 +43,10 @@ namespace GBG.AnimationGraph.Node
     }
 
     [Serializable]
-    public class BlendSpace2DNode : NodeBase
+    public class BlendSpace2DNode : AnimationAssetPlayerNodeBase
     {
+        // TODO: Speed
         #region Serialization Data
-
-        // public ParamGuidOrValue SpeedParam;
 
         public ParamGuidOrValue PositionXParam
         {
@@ -92,13 +91,13 @@ namespace GBG.AnimationGraph.Node
         {
         }
 
-        protected internal override IList<string> GetInputNodeGuids()
+        protected internal override IReadOnlyList<string> GetInputNodeGuids()
         {
             return EmptyInputs;
         }
          
         // TODO: PrepareFrame
-        protected internal override void PrepareFrame(float deltaTime)=> throw new NotImplementedException();
+        protected internal override void PrepareFrame(FrameData frameData)=> throw new NotImplementedException();
 
         
         // TODO: InitializeParams

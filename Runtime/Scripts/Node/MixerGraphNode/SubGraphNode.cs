@@ -36,13 +36,13 @@ namespace GBG.AnimationGraph.Node
         {
         }
 
-        protected internal override IList<string> GetInputNodeGuids()
+        protected internal override IReadOnlyList<string> GetInputNodeGuids()
         {
             return EmptyInputs;
         }
         
         // TODO: PrepareFrame
-        protected internal override void PrepareFrame(float deltaTime)=> throw new NotImplementedException();
+        protected internal override void PrepareFrame(FrameData frameData)=> throw new NotImplementedException();
 
         
         // TODO: InitializeParams

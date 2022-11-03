@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using GBG.AnimationGraph.Graph;
 using GBG.AnimationGraph.Parameter;
 using UnityEngine;
 using UnityEngine.Playables;
+using UFrameData = UnityEngine.Playables.FrameData;
 
 namespace GBG.AnimationGraph.Node
 {
@@ -18,6 +18,14 @@ namespace GBG.AnimationGraph.Node
 
     public abstract class ScriptBehaviour : PlayableBehaviour
     {
+        // Called by PlayableGraph
+        public sealed override void PrepareFrame(Playable playable, UFrameData info)
+        {
+            base.PrepareFrame(playable, info);
+        }
+
+        // Called by AnimationGraphDriver
+        public abstract void PrepareFrame(Playable playable, FrameData info, IReadOnlyList<NodeBase> inputNodes);
     }
 
     // TODO: Parameter binding?
@@ -63,7 +71,7 @@ namespace GBG.AnimationGraph.Node
         {
         }
 
-        protected internal override IList<string> GetInputNodeGuids()
+        protected internal override IReadOnlyList<string> GetInputNodeGuids()
         {
             if (Application.isPlaying)
             {
@@ -88,7 +96,7 @@ namespace GBG.AnimationGraph.Node
         }
 
         // TODO: PrepareFrame
-        protected internal override void PrepareFrame(float deltaTime) => throw new NotImplementedException();
+        protected internal override void PrepareFrame(FrameData frameData) => throw new NotImplementedException();
 
 
         protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable)

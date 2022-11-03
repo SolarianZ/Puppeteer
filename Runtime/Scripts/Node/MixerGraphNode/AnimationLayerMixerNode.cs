@@ -40,7 +40,7 @@ namespace GBG.AnimationGraph.Node
         {
         }
 
-        protected internal override IList<string> GetInputNodeGuids()
+        protected internal override IReadOnlyList<string> GetInputNodeGuids()
         {
             if (Application.isPlaying)
             {
@@ -72,7 +72,7 @@ namespace GBG.AnimationGraph.Node
         }
 
         // TODO: PrepareFrame
-        protected internal override void PrepareFrame(float deltaTime) => throw new NotImplementedException();
+        protected internal override void PrepareFrame(FrameData frameData) => throw new NotImplementedException();
 
 
         protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable)
