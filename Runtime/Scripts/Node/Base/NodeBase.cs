@@ -4,6 +4,7 @@ using GBG.AnimationGraph.Graph;
 using GBG.AnimationGraph.Parameter;
 using UnityEngine;
 using UnityEngine.Playables;
+using UPlayableExtensions = UnityEngine.Playables.PlayableExtensions;
 
 namespace GBG.AnimationGraph.Node
 {
@@ -38,6 +39,13 @@ namespace GBG.AnimationGraph.Node
 
         protected internal Playable Playable { get; private set; }
 
+        protected NodeBase[] RuntimeInputNodes { get; private set; }
+
+
+        private bool _isPaused;
+
+        private double _speedCache;
+
         #endregion
 
 
@@ -61,6 +69,8 @@ namespace GBG.AnimationGraph.Node
         protected internal virtual void InitializeConnection(IReadOnlyDictionary<string, NodeBase> nodeGuidTable)
         {
             var inputGuids = GetInputNodeGuids();
+            RuntimeInputNodes = new NodeBase[inputGuids.Count];
+
             for (int i = 0; i < inputGuids.Count; i++)
             {
                 var inputGuid = inputGuids[i];
@@ -70,11 +80,55 @@ namespace GBG.AnimationGraph.Node
                 }
 
                 var inputNode = nodeGuidTable[inputGuid];
+                RuntimeInputNodes[i] = inputNode;
                 Playable.ConnectInput(i, inputNode.Playable, 0, GetLogicInputWeight(i));
             }
         }
 
         protected internal abstract void PrepareFrame(FrameData frameData);
+
+
+        #region Speed & Play & Pause // See APIMask.cs
+
+        protected internal double GetSpeed()
+        {
+            if (_isPaused)
+            {
+                return _speedCache;
+            }
+
+            return UPlayableExtensions.GetSpeed(Playable);
+        }
+
+        protected internal void SetSpeed(double speed)
+        {
+            _speedCache = speed;
+            if (!_isPaused)
+            {
+                UPlayableExtensions.SetSpeed(Playable, speed);
+            }
+        }
+
+        protected internal void Play()
+        {
+            if (_isPaused)
+            {
+                _isPaused = false;
+                UPlayableExtensions.SetSpeed(Playable, _speedCache);
+            }
+        }
+
+        protected internal void Pause()
+        {
+            if (!_isPaused)
+            {
+                _isPaused = true;
+                _speedCache = UPlayableExtensions.GetSpeed(Playable);
+                UPlayableExtensions.SetSpeed(Playable, 0);
+            }
+        }
+
+        #endregion
 
 
         protected virtual void InitializeGraphLink(IReadOnlyDictionary<string, GraphLayer> graphGuidTable)

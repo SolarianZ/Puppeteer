@@ -42,7 +42,6 @@ namespace GBG.AnimationGraph.Node
     [Serializable]
     public class BlendSpace1DNode : AnimationAssetPlayerNodeBase
     {
-        // TODO: Speed
         #region Serialization Data
 
         public ParamGuidOrValue PositionParam
@@ -66,26 +65,48 @@ namespace GBG.AnimationGraph.Node
         #endregion
 
 
+        #region Runtime Properties
+
+        public override float BaseSpeed { get; protected set; }
+
+        public override FrameData FrameData { get; protected set; }
+
+
+        private ParamInfo _runtimeSpeedParam;
+
+        private bool _runtimeSpeedDirty;
+
+        private ParamInfo _runtimeMotionTimeParam;
+
+        private bool _runtimeMotionTimeDirty;
+
+        #endregion
+
+
         public BlendSpace1DNode(string guid) : base(guid)
         {
         }
 
-        protected internal override IReadOnlyList<string> GetInputNodeGuids()
-        {
-            return EmptyInputs;
-        }
-        
-        // TODO: PrepareFrame
-        protected internal override void PrepareFrame(FrameData frameData)=> throw new NotImplementedException();
+        protected internal override IReadOnlyList<string> GetInputNodeGuids() => EmptyInputs;
 
-        
+        // TODO: GetUnscaledAnimationLength
+        public override double GetUnscaledAnimationLength()
+        {
+            throw new NotImplementedException();
+        }
+
+        // TODO: PrepareFrame
+        protected internal override void PrepareFrame(FrameData frameData) => throw new NotImplementedException();
+
+
         // TODO: InitializeParams
-        protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable)=> throw new NotImplementedException();
+        protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable) =>
+            throw new NotImplementedException();
 
         // TODO: CreatePlayable
-        protected override Playable CreatePlayable(PlayableGraph playableGraph)=> throw new NotImplementedException();
+        protected override Playable CreatePlayable(PlayableGraph playableGraph) => throw new NotImplementedException();
 
         // TODO: GetInputWeight
-        protected override float GetLogicInputWeight(int inputIndex)=> throw new NotImplementedException();
+        protected override float GetLogicInputWeight(int inputIndex) => throw new NotImplementedException();
     }
 }

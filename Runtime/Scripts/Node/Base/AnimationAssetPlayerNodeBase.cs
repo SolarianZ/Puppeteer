@@ -80,9 +80,9 @@ namespace GBG.AnimationGraph.Node
 
         #region Runtime Properties
 
-        public float BaseSpeed { get; protected set; }
+        public abstract float BaseSpeed { get; protected set; }
 
-        public FrameData FrameData { get; protected set; }
+        public abstract FrameData FrameData { get; protected set; }
 
         #endregion
 
@@ -97,6 +97,6 @@ namespace GBG.AnimationGraph.Node
             return GetUnscaledAnimationLength() / BaseSpeed;
         }
 
-        public virtual double GetUnscaledAnimationLength() => throw new NotImplementedException();
+        public abstract double GetUnscaledAnimationLength();
     }
 }

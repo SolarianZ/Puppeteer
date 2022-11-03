@@ -67,9 +67,18 @@ namespace GBG.AnimationGraph.Node
 
         #region Runtime Properties
 
+        public override float BaseSpeed { get; protected set; }
+
+        public override FrameData FrameData { get; protected set; }
+
+
         private ParamInfo _runtimeSpeedParam;
 
+        private bool _runtimeSpeedDirty;
+
         private ParamInfo _runtimeMotionTimeParam;
+
+        private bool _runtimeMotionTimeDirty;
 
         #endregion
 
@@ -80,8 +89,28 @@ namespace GBG.AnimationGraph.Node
 
         protected internal override IReadOnlyList<string> GetInputNodeGuids() => EmptyInputs;
 
-        // TODO: PrepareFrame
-        protected internal override void PrepareFrame(FrameData frameData) => throw new NotImplementedException();
+        public override double GetUnscaledAnimationLength()
+        {
+            if (Clip) return Clip.length;
+            return 0;
+        }
+
+        protected internal override void PrepareFrame(FrameData frameData)
+        {
+            FrameData = frameData;
+
+            if (_runtimeSpeedDirty)
+            {
+                SetSpeed(BaseSpeed);
+                _runtimeSpeedDirty = false;
+            }
+
+            if (_runtimeMotionTimeDirty)
+            {
+                Playable.SetTime(_runtimeMotionTimeParam.GetFloat());
+                _runtimeMotionTimeDirty = false;
+            }
+        }
 
         protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable)
         {
@@ -143,13 +172,15 @@ namespace GBG.AnimationGraph.Node
         {
             BaseSpeed = _runtimeSpeedParam.GetFloat();
 
-            // TODO: Update Animation Speed
-            // TODO: Update Sync Group
+            if (SyncMethod == SyncMethod.DoNotSync)
+            {
+                _runtimeSpeedDirty = true;
+            }
         }
 
         private void OnRuntimeMotionTimeParamChanged(ParamInfo paramInfo)
         {
-            Playable.SetTime(paramInfo.GetFloat());
+            _runtimeMotionTimeDirty = true;
         }
     }
 }

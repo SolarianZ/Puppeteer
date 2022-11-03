@@ -1,5 +1,4 @@
-﻿using UnityEngine.Playables;
-using UFrameData = UnityEngine.Playables.FrameData;
+﻿using UFrameData = UnityEngine.Playables.FrameData;
 
 namespace GBG.AnimationGraph.Node
 {
@@ -11,7 +10,18 @@ namespace GBG.AnimationGraph.Node
         public float EffectiveWeight;
         public float EffectiveParentSpeed;
         public float EffectiveSpeed;
-        public PlayState EffectivePlayState;
+
+
+        public FrameData(in FrameData parentFrameData, in float weight, in float speed)
+        {
+            FrameId = parentFrameData.FrameId;
+            DeltaTime = parentFrameData.DeltaTime;
+            Weight = parentFrameData.Weight;
+            EffectiveWeight = parentFrameData.EffectiveWeight * weight;
+            EffectiveParentSpeed = parentFrameData.EffectiveSpeed;
+            EffectiveSpeed = parentFrameData.EffectiveSpeed * speed;
+        }
+
 
         public static implicit operator FrameData(UFrameData frameData)
         {
@@ -23,7 +33,6 @@ namespace GBG.AnimationGraph.Node
                 EffectiveWeight = frameData.effectiveWeight,
                 EffectiveParentSpeed = frameData.effectiveParentSpeed,
                 EffectiveSpeed = frameData.effectiveSpeed,
-                EffectivePlayState = frameData.effectivePlayState,
             };
         }
     }
