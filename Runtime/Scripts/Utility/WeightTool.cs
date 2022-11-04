@@ -8,7 +8,8 @@ namespace GBG.AnimationGraph.Utility
     {
         public static void NormalizeWeights(IList<float> originalWeights, IList<float> normalizedWeights)
         {
-            Assert.AreEqual(originalWeights.Count, normalizedWeights.Count);
+            Assert.AreEqual(originalWeights.Count, normalizedWeights.Count,
+                "Original weight count not match with normalized weight count.");
 
             // Normalize input weights
             var totalWeight = 0f;

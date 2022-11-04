@@ -31,7 +31,8 @@ namespace GBG.AnimationGraph.Editor.Node
         public StateEditorNode(AnimationGraphAsset graphAsset, StateNode node,
             Graph.GraphLayer graphLayer) : base(graphAsset, graphLayer)
         {
-            Assert.AreEqual(node.LinkedGraphGuid, graphLayer.Guid);
+            Assert.AreEqual(node.LinkedGraphGuid, graphLayer.Guid,
+                $"Node guid not match with linked graph guid. Node type: {GetType().Name}, node guid: {Guid}.");
 
             Node = node;
 

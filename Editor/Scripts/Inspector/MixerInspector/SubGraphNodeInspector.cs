@@ -124,7 +124,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
             srcParamField.SetParamTarget(destParamInfo.Name,
                 Node.ParamBindings[index].SrcParamGuidOrValue,
                 destParamInfo.Type, ParamTable,
-                Node.ParamBindings[index].IsValue() ? ParamLinkState.Unlinked : ParamLinkState.Linked,
+                Node.ParamBindings[index].IsLiteral() ? ParamLinkState.Unlinked : ParamLinkState.Linked,
                 ParamActiveState.ActiveLocked, null);
         }
     }

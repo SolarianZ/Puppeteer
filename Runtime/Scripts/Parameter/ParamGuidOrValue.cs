@@ -31,7 +31,7 @@ namespace GBG.AnimationGraph.Parameter
         private float _rawValue = 1f;
 
 
-        public bool IsValue => string.IsNullOrEmpty(Guid);
+        public bool IsLiteral => string.IsNullOrEmpty(Guid);
 
 
         public ParamGuidOrValue(string guid, float rawValue)
@@ -47,21 +47,21 @@ namespace GBG.AnimationGraph.Parameter
 
         public float GetFloat()
         {
-            Assert.IsTrue(IsValue);
+            Assert.IsTrue(IsLiteral, $"Param is not a literal. Param guid: {Guid}.");
 
             return _rawValue;
         }
 
         public int GetInt()
         {
-            Assert.IsTrue(IsValue);
+            Assert.IsTrue(IsLiteral, $"Param is not a literal. Param guid: {Guid}.");
 
             return (int)Math.Round(_rawValue);
         }
 
         public bool GetBool()
         {
-            Assert.IsTrue(IsValue);
+            Assert.IsTrue(IsLiteral, $"Param is not a literal. Param guid: {Guid}.");
 
             return Mathf.Approximately(_rawValue, 1);
         }
@@ -69,20 +69,21 @@ namespace GBG.AnimationGraph.Parameter
 
         public ParamInfo GetParamInfo(IDictionary<string, ParamInfo> paramTable, ParamType paramType)
         {
-            if (IsValue)
+            if (IsLiteral)
             {
                 return new ParamInfo(null, null, paramType, RawValue);
             }
 
             var paramInfo = paramTable[Guid];
-            Assert.IsTrue(paramInfo.Type == paramType);
+            Assert.IsTrue(paramInfo.Type == paramType,
+                $"Param type not match. Expect type: {paramType}, got type: {paramInfo.Type}.");
 
             return paramInfo;
         }
 
         public ParamInfo GetParamInfo(IList<ParamInfo> paramTable, ParamType paramType)
         {
-            if (IsValue)
+            if (IsLiteral)
             {
                 return new ParamInfo(null, null, paramType, RawValue);
             }
@@ -92,7 +93,8 @@ namespace GBG.AnimationGraph.Parameter
                 if (paramTable[i].Name.Equals(Guid))
                 {
                     var paramInfo = paramTable[i];
-                    Assert.IsTrue(paramInfo.Type == paramType);
+                    Assert.IsTrue(paramInfo.Type == paramType,
+                        $"Param type not match. Expect type: {paramType}, got type: {paramInfo.Type}.");
                     return paramInfo;
                 }
             }

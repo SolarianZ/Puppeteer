@@ -48,7 +48,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
 
             _inputWeightParamField.SetParamTarget($"Input Weight {mixerInputDataIndex.ToString()}",
                 mixerInputData.InputWeightParam, ParamType.Float, _paramTable,
-                mixerInputData.InputWeightParam.IsValue ? ParamLinkState.Unlinked : ParamLinkState.Linked,
+                mixerInputData.InputWeightParam.IsLiteral ? ParamLinkState.Unlinked : ParamLinkState.Linked,
                 ParamActiveState.ActiveLocked, new Vector2(0, 1));
         }
 

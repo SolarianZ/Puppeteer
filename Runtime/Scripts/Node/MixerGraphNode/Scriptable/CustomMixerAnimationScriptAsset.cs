@@ -27,14 +27,15 @@ namespace GBG.AnimationGraph.Node
         {
             var inputCount = stream.inputStreamCount;
             if (inputCount == 0) return;
-            Assert.AreEqual(inputCount, InputWeights.Length);
+            Assert.AreEqual(inputCount, InputWeights.Length, "Input playable count not match with input weight count.");
 
             var velocity = Vector3.zero;
             var angularVelocity = Vector3.zero;
             var weightAccum = 0f;
             for (int i = 0; i < inputCount; i++)
             {
-                Assert.IsTrue(stream.GetInputWeight(i) > 1 - _EPSILON && stream.GetInputWeight(i) < 1 + _EPSILON);
+                Assert.IsTrue(stream.GetInputWeight(i) > 1 - _EPSILON && stream.GetInputWeight(i) < 1 + _EPSILON,
+                    $"Input weight out of range [0,1]. Index = {i}.");
 
                 var inputWeight = InputWeights[i];
                 if (inputWeight < _EPSILON) continue;
@@ -54,7 +55,7 @@ namespace GBG.AnimationGraph.Node
         {
             var inputCount = stream.inputStreamCount;
             if (inputCount == 0) return;
-            Assert.AreEqual(inputCount, InputWeights.Length);
+            // Assert.AreEqual(inputCount, InputWeights.Length); // Checked in ProcessRootMotion
 
             // AnimationStream.GetInputStream() is expensive!
             // var streams = new NativeArray<AnimationStream>(Weights.Length, Allocator.Temp,
@@ -62,7 +63,8 @@ namespace GBG.AnimationGraph.Node
             Span<AnimationStream> streams = stackalloc AnimationStream[InputWeights.Length];
             for (int i = 0; i < inputCount; i++)
             {
-                Assert.IsTrue(stream.GetInputWeight(i) > 1 - _EPSILON && stream.GetInputWeight(i) < 1 + _EPSILON);
+                // Assert.IsTrue(stream.GetInputWeight(i) > 1 - _EPSILON && stream.GetInputWeight(i) < 1 + _EPSILON,
+                //     $"Input weight out of range [0,1]. Index = {i}."); // Checked in ProcessRootMotion
 
                 streams[i] = stream.GetInputStream(i);
             }

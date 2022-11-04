@@ -116,7 +116,7 @@ namespace GBG.AnimationGraph.Node
             // Motion time
             if (MotionTimeParamActive)
             {
-                if (!MotionTimeParam.IsValue)
+                if (!MotionTimeParam.IsLiteral)
                 {
                     _runtimeMotionTimeParam = paramGuidTable[MotionTimeParam.Guid];
                     _runtimeMotionTimeParam.OnValueChanged += OnRuntimeMotionTimeParamChanged;
@@ -126,7 +126,7 @@ namespace GBG.AnimationGraph.Node
             // Speed
             if (SpeedParamActive)
             {
-                if (!SpeedParam.IsValue)
+                if (!SpeedParam.IsLiteral)
                 {
                     _runtimeSpeedParam = paramGuidTable[SpeedParam.Guid];
                     _runtimeSpeedParam.OnValueChanged += OnRuntimeSpeedParamChanged;

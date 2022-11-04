@@ -4,7 +4,6 @@ using GBG.AnimationGraph.Editor.GraphEditor;
 using GBG.AnimationGraph.Editor.Node;
 using GBG.AnimationGraph.Editor.Utility;
 using GBG.AnimationGraph.Graph;
-using GBG.AnimationGraph.Node;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.Assertions;
 using UnityEngine.UIElements;
@@ -19,7 +18,7 @@ namespace GBG.AnimationGraph.Editor.GraphView
         public PoseOutputEditorNode PoseOutputNode { get; }
 
 
-        public MixerGraphView(AnimationGraphAsset graphAsset, Graph.GraphLayer graphLayer)
+        public MixerGraphView(AnimationGraphAsset graphAsset, GraphLayer graphLayer)
             : base(graphAsset, graphLayer)
         {
             // Root node
@@ -74,7 +73,7 @@ namespace GBG.AnimationGraph.Editor.GraphView
                             GraphLayer.Nodes.Add(node.Node);
                             if (node is StateMachineEditorNode stateMachineNode)
                             {
-                                GraphAsset.GraphLayers.Add(new Graph.GraphLayer(stateMachineNode.StateMachineGraphGuid,
+                                GraphAsset.GraphLayers.Add(new GraphLayer(stateMachineNode.StateMachineGraphGuid,
                                     $"SubGraph_{GuidTool.NewUniqueSuffix()}", GraphType.StateMachine));
                             }
 
@@ -105,10 +104,12 @@ namespace GBG.AnimationGraph.Editor.GraphView
         }
 
 
-        private void ConnectNodeChildren(MixerGraphEditorNode parentNode, Dictionary<string, MixerGraphEditorNode> nodeTable)
+        private void ConnectNodeChildren(MixerGraphEditorNode parentNode,
+            Dictionary<string, MixerGraphEditorNode> nodeTable)
         {
             var parentNodeInputGuids = parentNode.Node.GetInputNodeGuids();
-            Assert.AreEqual(parentNodeInputGuids.Count, parentNode.InputPorts.Count);
+            Assert.AreEqual(parentNodeInputGuids.Count, parentNode.InputPorts.Count,
+                $"Input guid count not match with input port count. Graph guid: {Guid}");
 
             for (var i = 0; i < parentNode.InputPorts.Count; i++)
             {

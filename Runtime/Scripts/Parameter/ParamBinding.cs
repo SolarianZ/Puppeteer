@@ -15,7 +15,8 @@ namespace GBG.AnimationGraph.Parameter
 
         public ParamBinding(ParamInfo srcParam, ParamInfo destParam, bool syncParamValue)
         {
-            Assert.IsTrue((srcParam == null) || (srcParam.Type == destParam.Type));
+            Assert.IsTrue((srcParam == null) || (srcParam.Type == destParam.Type),
+                $"Param type not match. Source type: {srcParam!.Type}, destination type: {destParam.Type}.");
 
             SrcParam = srcParam;
             DestParam = destParam;

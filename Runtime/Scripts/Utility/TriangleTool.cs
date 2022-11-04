@@ -12,7 +12,8 @@ namespace GBG.AnimationGraph.Utility
 
             if (pointInsideTriangle)
             {
-                Assert.IsTrue(IsPointInTriangle(point, vertex0, vertex1, vertex2));
+                Assert.IsTrue(IsPointInTriangle(point, vertex0, vertex1, vertex2),
+                    $"Point{point.ToString()} is not inside triangle({vertex0.ToString()},{vertex1.ToString()},{vertex2.ToString()}).");
 
                 // Use area proportion of sub triangles
                 weights.x = ((vertex1.y - vertex2.y) * (point.x - vertex2.x) +

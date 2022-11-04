@@ -153,7 +153,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
             // Position param
             _positionParamField.SetParamTarget("Position", _node.PositionParam,
                 ParamType.Float, Target.GraphAsset.Parameters,
-                _node.PositionParam.IsValue ? ParamLinkState.Unlinked : ParamLinkState.Linked,
+                _node.PositionParam.IsLiteral ? ParamLinkState.Unlinked : ParamLinkState.Linked,
                 ParamActiveState.ActiveLocked, null);
 
             // Samples

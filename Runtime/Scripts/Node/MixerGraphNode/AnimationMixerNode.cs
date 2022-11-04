@@ -55,7 +55,7 @@ namespace GBG.AnimationGraph.Node
             for (int i = 0; i < inputCount; i++)
             {
                 var weightParam = MixerInputs[i].InputWeightParam;
-                if (!weightParam.IsValue)
+                if (!weightParam.IsLiteral)
                 {
                     var runtimeInputWeightParam = paramGuidTable[weightParam.Guid];
                     _runtimeInputWeightParams[i] = runtimeInputWeightParam;

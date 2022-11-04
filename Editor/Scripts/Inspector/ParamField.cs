@@ -125,7 +125,8 @@ namespace GBG.AnimationGraph.Editor.Inspector
             _linkedParam = IsLinked()
                 ? _paramTable.FirstOrDefault(p => p.Guid.Equals(_serializedTarget.Guid))
                 : null;
-            Assert.IsTrue(valueRange == null || valueRange.Value.x <= valueRange.Value.y);
+            Assert.IsTrue(valueRange == null || valueRange.Value.x <= valueRange.Value.y,
+                $"Value range in param field is negative({valueRange!.Value.ToString()}).");
 
             if (_linkedParam != null)
             {

@@ -51,8 +51,8 @@ namespace GBG.AnimationGraph.Editor.ViewElement
 
         public static void Open(string name, IEnumerable<Vector2> vertices, IEnumerable<Delaunay2D.Triangle> triangles)
         {
-            Assert.IsTrue(vertices != null);
-            Assert.IsTrue(triangles != null);
+            Assert.IsTrue(vertices != null, "Vertices is null.");
+            Assert.IsTrue(triangles != null, "Triangles is null.");
 
             var window = GetWindow<BlendSpace2DPreviewWindow>(name);
             window.Initialize(vertices, triangles);

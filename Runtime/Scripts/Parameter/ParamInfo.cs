@@ -87,8 +87,8 @@ namespace GBG.AnimationGraph.Parameter
 
         public void SetFloat(float value)
         {
-            Assert.IsFalse(IsLiteral);
-            Assert.IsTrue(Type == ParamType.Float);
+            Assert.IsFalse(IsLiteral, $"Set value to literal param. Param guid: {Guid}.");
+            Assert.IsTrue(Type == ParamType.Float, $"Set float value to {Type} param. Param guid: {Guid}.");
 
             if (!Mathf.Approximately(_rawValue, value))
             {
@@ -99,15 +99,15 @@ namespace GBG.AnimationGraph.Parameter
 
         public float GetFloat()
         {
-            Assert.IsTrue(Type == ParamType.Float);
+            Assert.IsTrue(Type == ParamType.Float, $"Get float value from {Type} param. Param guid: {Guid}.");
 
             return _rawValue;
         }
 
         public void SetInt(int value)
         {
-            Assert.IsFalse(IsLiteral);
-            Assert.IsTrue(Type == ParamType.Int);
+            Assert.IsFalse(IsLiteral, $"Set value to literal param. Param guid: {Guid}.");
+            Assert.IsTrue(Type == ParamType.Int, $"Set int value to {Type} param. Param guid: {Guid}.");
 
             if (!Mathf.Approximately(_rawValue, value))
             {
@@ -118,15 +118,15 @@ namespace GBG.AnimationGraph.Parameter
 
         public int GetInt()
         {
-            Assert.IsTrue(Type == ParamType.Int);
+            Assert.IsTrue(Type == ParamType.Int, $"Get int value from {Type} param. Param guid: {Guid}.");
 
             return (int)Math.Round(_rawValue);
         }
 
         public void SetBool(bool value)
         {
-            Assert.IsFalse(IsLiteral);
-            Assert.IsTrue(Type == ParamType.Bool);
+            Assert.IsFalse(IsLiteral, $"Set value to literal param. Param guid: {Guid}.");
+            Assert.IsTrue(Type == ParamType.Bool, $"Set bool value to {Type} param. Param guid: {Guid}.");
 
             var newValue = value ? 1 : 0;
             if (!Mathf.Approximately(_rawValue, newValue))
@@ -138,14 +138,14 @@ namespace GBG.AnimationGraph.Parameter
 
         public bool GetBool()
         {
-            Assert.IsTrue(Type == ParamType.Bool);
+            Assert.IsTrue(Type == ParamType.Bool, $"Get bool value from {Type} param. Param guid: {Guid}.");
 
             return !Mathf.Approximately(_rawValue, 0);
         }
 
         public void SetRawValue(float value)
         {
-            Assert.IsFalse(IsLiteral);
+            Assert.IsFalse(IsLiteral, $"Set value to literal param. Param guid: {Guid}.");
 
             if (!Mathf.Approximately(_rawValue, value))
             {
@@ -172,7 +172,7 @@ namespace GBG.AnimationGraph.Parameter
 
         public void EditorSetName(string name)
         {
-            Assert.IsFalse(string.IsNullOrEmpty(name));
+            Assert.IsFalse(string.IsNullOrEmpty(name), $"Param name is null. Param guid: {Guid}.");
 
             if (!name.Equals(_name))
             {

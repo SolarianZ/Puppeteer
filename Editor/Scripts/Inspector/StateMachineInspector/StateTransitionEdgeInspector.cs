@@ -60,7 +60,7 @@ namespace GBG.AnimationGraph.Editor.Inspector
 
             _rightParam.SetParamTarget("Right Operand", _condition.RightParam,
                 _condition.ParamType, _paramTable,
-                _condition.RightParam.IsValue ? ParamLinkState.Unlinked : ParamLinkState.Linked,
+                _condition.RightParam.IsLiteral ? ParamLinkState.Unlinked : ParamLinkState.Linked,
                 ParamActiveState.ActiveLocked, null);
         }
 

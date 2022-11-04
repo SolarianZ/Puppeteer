@@ -108,7 +108,8 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
 
         public void RefreshBreadcrumbs()
         {
-            Assert.AreEqual(_graphViewBreadcrumbs.childCount, _openedGraphGuids.Count);
+            Assert.AreEqual(_graphViewBreadcrumbs.childCount, _openedGraphGuids.Count,
+                "Graph view breadcrumbs count not match with opened graph guid count.");
 
             var openedGraphViews = _openedGraphViews.ToArray();
             for (int i = 0; i < _openedGraphGuids.Count; i++)

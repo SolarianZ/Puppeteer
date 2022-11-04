@@ -32,7 +32,7 @@ namespace GBG.Puppeteer.Tests.Editor
                     // The left most motion
                     if (position < target.vertices[i])
                     {
-                        Assert.AreEqual(i, 0);
+                        Assert.AreEqual(i, 0, "This shouldn't happen.");
                         Handles.Label(target.points[i].position, "1");
 
                         leftIndex = -1;
@@ -49,7 +49,8 @@ namespace GBG.Puppeteer.Tests.Editor
                         }
 
                         // In the interval
-                        var rightWeight = (position - target.vertices[i]) / (target.vertices[i + 1] - target.vertices[i]);
+                        var rightWeight = (position - target.vertices[i]) /
+                                          (target.vertices[i + 1] - target.vertices[i]);
                         var leftWeight = 1 - rightWeight;
                         Handles.Label(target.points[i].position, leftWeight.ToString("F3"));
                         Handles.Label(target.points[i + 1].position, rightWeight.ToString("F3"));
@@ -58,7 +59,7 @@ namespace GBG.Puppeteer.Tests.Editor
                     }
 
                     // The most right motion
-                    Assert.AreEqual(i, target.vertices.Length - 1);
+                    Assert.AreEqual(i, target.vertices.Length - 1, "This shouldn't happen.");
                     Handles.Label(target.points[i].position, "1");
                     leftIndex = i;
                 }

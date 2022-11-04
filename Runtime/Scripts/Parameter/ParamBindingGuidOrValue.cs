@@ -41,20 +41,20 @@ namespace GBG.AnimationGraph.Parameter
             DestParamGuid = destParamGuid;
         }
 
-        public bool IsValue()
+        public bool IsLiteral()
         {
-            return SrcParamGuidOrValue.IsValue;
+            return SrcParamGuidOrValue.IsLiteral;
         }
 
         public string GetSrcParamGuid()
         {
-            Assert.IsFalse(IsValue());
+            Assert.IsFalse(IsLiteral(), "Source param is literal.");
             return SrcParamGuidOrValue.Guid;
         }
 
         public float GetRawValue()
         {
-            Assert.IsTrue(IsValue());
+            Assert.IsTrue(IsLiteral(), "Source param is not literal.");
             return SrcParamGuidOrValue.RawValue;
         }
     }

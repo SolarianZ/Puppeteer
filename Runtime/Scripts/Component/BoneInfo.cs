@@ -44,8 +44,9 @@ namespace GBG.AnimationGraph.Component
             for (int i = 0; i < bones.Length; i++)
             {
                 // Editor only assertions
-                Assert.IsTrue(bones[i]);
-                Assert.IsTrue(IsInHierarchy(animator.transform, bones[i]));
+                Assert.IsTrue(bones[i], $"Bone transform is null. Index = {i}.");
+                Assert.IsTrue(IsInHierarchy(animator.transform, bones[i]),
+                    $"Bone transform is not a child of Animator. Index = {i}.");
 
                 if (bones[i])
                 {

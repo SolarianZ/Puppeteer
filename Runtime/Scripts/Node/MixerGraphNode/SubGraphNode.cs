@@ -86,7 +86,7 @@ namespace GBG.AnimationGraph.Node
             {
                 var bindingInfo = ParamBindings[i];
                 var destParam = _linkedGraphAsset.FindParameterByGuid(bindingInfo.DestParamGuid);
-                if (bindingInfo.IsValue())
+                if (bindingInfo.IsLiteral())
                 {
                     destParam.SetRawValue(bindingInfo.GetRawValue());
                 }

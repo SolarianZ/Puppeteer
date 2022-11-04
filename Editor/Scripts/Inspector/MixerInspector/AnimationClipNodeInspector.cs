@@ -84,13 +84,13 @@ namespace GBG.AnimationGraph.Editor.Inspector
             // Speed
             SpeedParamField.SetParamTarget("Speed", Node.SpeedParam,
                 ParamType.Float, Target.GraphAsset.Parameters,
-                Node.SpeedParam.IsValue ? ParamLinkState.Unlinked : ParamLinkState.Linked,
+                Node.SpeedParam.IsLiteral ? ParamLinkState.Unlinked : ParamLinkState.Linked,
                 Node.SpeedParamActive ? ParamActiveState.Active : ParamActiveState.Inactive, null);
 
             // Motion Time
             _motionTimeParamField.SetParamTarget("Motion Time", Node.MotionTimeParam,
                 ParamType.Float, Target.GraphAsset.Parameters,
-                Node.MotionTimeParam.IsValue ? ParamLinkState.Unlinked : ParamLinkState.Linked,
+                Node.MotionTimeParam.IsLiteral ? ParamLinkState.Unlinked : ParamLinkState.Linked,
                 Node.MotionTimeParamActive ? ParamActiveState.Active : ParamActiveState.Inactive, null);
 
             // Cycle Offset

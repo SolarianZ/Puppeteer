@@ -20,7 +20,8 @@ namespace GBG.AnimationGraph.Editor.ViewElement
 
         public DoubleSplitterColumnView(Vector2 upPaneMinMaxHeightPercent, float splitterHeight = 2f)
         {
-            Assert.IsTrue(upPaneMinMaxHeightPercent.x <= upPaneMinMaxHeightPercent.y);
+            Assert.IsTrue(upPaneMinMaxHeightPercent.x <= upPaneMinMaxHeightPercent.y,
+                $"Height range of up pane is negative({upPaneMinMaxHeightPercent.ToString()}).");
 
             style.flexGrow = 1;
             style.flexDirection = FlexDirection.Column;
