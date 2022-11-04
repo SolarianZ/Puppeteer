@@ -80,9 +80,12 @@ namespace GBG.AnimationGraph.Node
 
         #region Runtime Properties
 
-        public abstract float BaseSpeed { get; protected set; }
+        public abstract float BaseSpeed { get; }
 
         public abstract FrameData FrameData { get; protected set; }
+
+
+        protected abstract float MotionTime { get; }
 
         #endregion
 

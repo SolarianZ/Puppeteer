@@ -81,7 +81,7 @@ namespace GBG.AnimationGraph.Node
 
                 var inputNode = nodeGuidTable[inputGuid];
                 RuntimeInputNodes[i] = inputNode;
-                Playable.ConnectInput(i, inputNode.Playable, 0, GetLogicInputWeight(i));
+                Playable.ConnectInput(i, inputNode.Playable, 0);
             }
         }
 
@@ -138,7 +138,5 @@ namespace GBG.AnimationGraph.Node
         protected abstract void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable);
 
         protected abstract Playable CreatePlayable(PlayableGraph playableGraph);
-
-        protected abstract float GetLogicInputWeight(int inputIndex);
     }
 }

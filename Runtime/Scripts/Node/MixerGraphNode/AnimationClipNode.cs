@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using GBG.AnimationGraph.Parameter;
 using UnityEngine;
 using UnityEngine.Animations;
+using UnityEngine.Assertions;
 using UnityEngine.Playables;
 
 namespace GBG.AnimationGraph.Node
@@ -67,9 +68,26 @@ namespace GBG.AnimationGraph.Node
 
         #region Runtime Properties
 
-        public override float BaseSpeed { get; protected set; }
+        public override float BaseSpeed
+        {
+            get
+            {
+                if (!SpeedParamActive) return 1;
+                return _runtimeSpeedParam?.GetFloat() ?? SpeedParam.GetFloat();
+            }
+        }
 
         public override FrameData FrameData { get; protected set; }
+
+
+        protected override float MotionTime
+        {
+            get
+            {
+                if (!MotionTimeParamActive) return 0;
+                return _runtimeMotionTimeParam?.GetFloat() ?? MotionTimeParam.GetFloat();
+            }
+        }
 
 
         private ParamInfo _runtimeSpeedParam;
@@ -111,13 +129,16 @@ namespace GBG.AnimationGraph.Node
 
             if (_runtimeMotionTimeDirty)
             {
-                Playable.SetTime(_runtimeMotionTimeParam.GetFloat());
+                Playable.SetTime(MotionTime);
                 _runtimeMotionTimeDirty = false;
             }
         }
 
         protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable)
         {
+            Assert.AreNotEqual(MotionTimeParamActive, SpeedParamActive,
+                $"Use explicit motion time and speed at the same time. Node type: {GetType().Name}, node guid: {Guid}.");
+
             // Motion time
             if (MotionTimeParamActive)
             {
@@ -126,55 +147,31 @@ namespace GBG.AnimationGraph.Node
                     _runtimeMotionTimeParam = paramGuidTable[MotionTimeParam.Guid];
                     _runtimeMotionTimeParam.OnValueChanged += OnRuntimeMotionTimeParamChanged;
                 }
+            }
 
-                BaseSpeed = 0;
-            }
             // Speed
-            else if (!SpeedParamActive)
+            if (SpeedParamActive)
             {
-                BaseSpeed = 1;
+                if (!SpeedParam.IsValue)
+                {
+                    _runtimeSpeedParam = paramGuidTable[SpeedParam.Guid];
+                    _runtimeSpeedParam.OnValueChanged += OnRuntimeSpeedParamChanged;
+                }
             }
-            else if (SpeedParam.IsValue)
-            {
-                BaseSpeed = SpeedParam.GetFloat();
-            }
-            else
-            {
-                _runtimeSpeedParam = paramGuidTable[SpeedParam.Guid];
-                _runtimeSpeedParam.OnValueChanged += OnRuntimeSpeedParamChanged;
-                BaseSpeed = _runtimeSpeedParam.GetFloat();
-            }
+
+            _runtimeMotionTimeDirty = true;
+            _runtimeSpeedDirty = true;
         }
 
         protected override Playable CreatePlayable(PlayableGraph playableGraph)
         {
             var playable = AnimationClipPlayable.Create(playableGraph, Clip);
-
-            // Motion time
-            if (MotionTimeParamActive)
-            {
-                if (MotionTimeParam.IsValue)
-                {
-                    playable.SetTime(MotionTimeParam.GetFloat());
-                }
-                else
-                {
-                    playable.SetTime(_runtimeMotionTimeParam.GetFloat());
-                }
-            }
-
-            // Speed
-            playable.SetSpeed(BaseSpeed);
-
             return playable;
         }
-
-        protected override float GetLogicInputWeight(int inputIndex) => throw new InvalidOperationException();
 
 
         private void OnRuntimeSpeedParamChanged(ParamInfo paramInfo)
         {
-            BaseSpeed = _runtimeSpeedParam.GetFloat();
             _runtimeSpeedDirty = true;
         }
 

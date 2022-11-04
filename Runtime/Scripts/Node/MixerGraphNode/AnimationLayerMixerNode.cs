@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using GBG.AnimationGraph.Graph;
 using GBG.AnimationGraph.Parameter;
+using GBG.AnimationGraph.Utility;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
@@ -13,6 +13,16 @@ namespace GBG.AnimationGraph.Node
     public class AnimationLayerMixerNode : NodeBase
     {
         #region Serialization Data
+
+        public bool NormalizeInputWeights
+        {
+            get => _normalizeInputWeights;
+            internal set => _normalizeInputWeights = value;
+        }
+
+        [SerializeField]
+        private bool _normalizeInputWeights;
+
 
         // TODO: Should use LayeredNodeInput here!
         public List<WeightedNodeInput> MixerInputs
@@ -32,6 +42,10 @@ namespace GBG.AnimationGraph.Node
         private string[] _inputGuids;
 
         private ParamInfo[] _runtimeInputWeightParams;
+
+        private float[] _runtimeInputWeights;
+
+        private bool _isInputWeightDirty;
 
         #endregion
 
@@ -62,7 +76,6 @@ namespace GBG.AnimationGraph.Node
             for (int i = 0; i < MixerInputs.Count; i++)
             {
                 var layeredNodeInput = (LayeredNodeInput)MixerInputs[i];
-                layerMixerPlayable.SetInputWeight(i, GetLogicInputWeight(i));
                 layerMixerPlayable.SetLayerAdditive((uint)i, layeredNodeInput.IsAdditive);
                 if (layeredNodeInput.AvatarMask)
                 {
@@ -71,24 +84,36 @@ namespace GBG.AnimationGraph.Node
             }
         }
 
-        // TODO: PrepareFrame
-        protected internal override void PrepareFrame(FrameData frameData) => throw new NotImplementedException();
+        protected internal override void PrepareFrame(FrameData frameData)
+        {
+            for (int i = 0; i < RuntimeInputNodes.Length; i++)
+            {
+                var inputWeight = GetLogicInputWeight(i);
+                if (_isInputWeightDirty) Playable.SetInputWeight(i, inputWeight);
+
+                var inputNode = RuntimeInputNodes[i];
+                inputNode?.PrepareFrame(new FrameData(frameData, inputWeight));
+            }
+
+            _isInputWeightDirty = false;
+        }
 
 
         protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable)
         {
             // Input weights
-            _runtimeInputWeightParams = new ParamInfo[MixerInputs.Count];
-            for (int i = 0; i < _runtimeInputWeightParams.Length; i++)
+            var inputCount = MixerInputs.Count;
+            _runtimeInputWeights = new float[inputCount];
+            _runtimeInputWeightParams = new ParamInfo[inputCount];
+            for (int i = 0; i < inputCount; i++)
             {
-                var index = i;
-                var weightParam = MixerInputs[index].InputWeightParam;
+                var weightParam = MixerInputs[i].InputWeightParam;
                 if (!weightParam.IsValue)
                 {
                     var runtimeInputWeightParam = paramGuidTable[weightParam.Guid];
-                    _runtimeInputWeightParams[index] = runtimeInputWeightParam;
+                    _runtimeInputWeightParams[i] = runtimeInputWeightParam;
 
-                    runtimeInputWeightParam.OnValueChanged += p => OnInputWeightChanged(index, p.GetFloat());
+                    runtimeInputWeightParam.OnValueChanged += OnInputWeightChanged;
                 }
             }
         }
@@ -99,19 +124,30 @@ namespace GBG.AnimationGraph.Node
             return playable;
         }
 
-        protected override float GetLogicInputWeight(int inputIndex)
+
+        private float GetLogicInputWeight(int inputIndex)
         {
-            var runtimeInputWeightParam = _runtimeInputWeightParams[inputIndex];
-            if (runtimeInputWeightParam != null)
+            if (_isInputWeightDirty)
             {
-                return runtimeInputWeightParam.GetFloat();
+                for (int i = 0; i < _runtimeInputWeightParams.Length; i++)
+                {
+                    var weightParam = _runtimeInputWeightParams[i];
+                    var weight = weightParam?.GetFloat() ?? MixerInputs[i].InputWeightParam.GetFloat();
+                    _runtimeInputWeights[i] = weight;
+                }
+
+                if (NormalizeInputWeights)
+                {
+                    WeightTool.NormalizeWeights(_runtimeInputWeights, _runtimeInputWeights);
+                }
             }
 
-            return MixerInputs[inputIndex].InputWeightParam.GetFloat();
+            return _runtimeInputWeights[inputIndex];
         }
 
-
-        // TODO: OnInputWeightChanged
-        private void OnInputWeightChanged(int index, float weight) => throw new NotImplementedException();
+        private void OnInputWeightChanged(ParamInfo paramInfo)
+        {
+            _isInputWeightDirty = true;
+        }
     }
 }

@@ -81,8 +81,5 @@ namespace GBG.AnimationGraph.Node
             var playable = AnimationMixerPlayable.Create(playableGraph, _stateMachineGraph.Nodes.Count);
             return playable;
         }
-
-        // TODO: GetInputWeight
-        protected override float GetLogicInputWeight(int inputIndex) => throw new NotImplementedException();
     }
 }

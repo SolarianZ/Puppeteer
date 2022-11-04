@@ -66,15 +66,16 @@ namespace GBG.AnimationGraph.Node
 
         protected internal override void PrepareFrame(FrameData frameData)
         {
-            var needUpdatePlayableInputWeight = _isInputWeightDirty;
             for (int i = 0; i < RuntimeInputNodes.Length; i++)
             {
                 var inputWeight = GetLogicInputWeight(i);
-                if (needUpdatePlayableInputWeight) Playable.SetInputWeight(i, inputWeight);
+                if (_isInputWeightDirty) Playable.SetInputWeight(i, inputWeight);
 
                 var inputNode = RuntimeInputNodes[i];
                 inputNode?.PrepareFrame(new FrameData(frameData, inputWeight));
             }
+
+            _isInputWeightDirty = false;
         }
 
 
@@ -103,8 +104,8 @@ namespace GBG.AnimationGraph.Node
             return playable;
         }
 
-        // TODO: Should GetLogicInputWeight calls Playable.SetInputWeight?
-        protected override float GetLogicInputWeight(int inputIndex)
+        
+        private float GetLogicInputWeight(int inputIndex)
         {
             if (_isInputWeightDirty)
             {
@@ -116,18 +117,11 @@ namespace GBG.AnimationGraph.Node
                 }
 
                 WeightTool.NormalizeWeights(_runtimeInputWeights, _runtimeInputWeights);
-                // for (int i = 0; i < _runtimeInputWeights.Length; i++)
-                // {
-                //     Playable.SetInputWeight(i, _runtimeInputWeights[i]);
-                // }
-
-                _isInputWeightDirty = false;
             }
 
             return _runtimeInputWeights[inputIndex];
         }
-
-
+        
         private void OnInputWeightChanged(ParamInfo paramInfo)
         {
             _isInputWeightDirty = true;

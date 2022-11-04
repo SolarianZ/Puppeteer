@@ -67,9 +67,26 @@ namespace GBG.AnimationGraph.Node
 
         #region Runtime Properties
 
-        public override float BaseSpeed { get; protected set; }
+        public override float BaseSpeed
+        {
+            get
+            {
+                if (!SpeedParamActive) return 1;
+                return _runtimeSpeedParam?.GetFloat() ?? SpeedParam.GetFloat();
+            }
+        }
 
         public override FrameData FrameData { get; protected set; }
+
+
+        protected override float MotionTime
+        {
+            get
+            {
+                if (!MotionTimeParamActive) return 0;
+                return _runtimeMotionTimeParam?.GetFloat() ?? MotionTimeParam.GetFloat();
+            }
+        }
 
 
         private ParamInfo _runtimeSpeedParam;
@@ -106,7 +123,15 @@ namespace GBG.AnimationGraph.Node
         // TODO: CreatePlayable
         protected override Playable CreatePlayable(PlayableGraph playableGraph) => throw new NotImplementedException();
 
-        // TODO: GetInputWeight
-        protected override float GetLogicInputWeight(int inputIndex) => throw new NotImplementedException();
+
+        private void OnRuntimeSpeedParamChanged(ParamInfo paramInfo)
+        {
+            _runtimeSpeedDirty = true;
+        }
+
+        private void OnRuntimeMotionTimeParamChanged(ParamInfo paramInfo)
+        {
+            _runtimeMotionTimeDirty = true;
+        }
     }
 }

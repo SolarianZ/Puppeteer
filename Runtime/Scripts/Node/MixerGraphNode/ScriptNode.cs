@@ -2,33 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using GBG.AnimationGraph.Parameter;
+using GBG.AnimationGraph.Utility;
 using UnityEngine;
 using UnityEngine.Playables;
-using UFrameData = UnityEngine.Playables.FrameData;
 
 namespace GBG.AnimationGraph.Node
 {
-    public abstract class ScriptAsset : ScriptableObject
-    {
-        public abstract Playable CreateScriptPlayable(GameObject gameObject,
-            PlayableGraph playableGraph, int inputCount);
-
-        public abstract ScriptBehaviour GetScriptBehaviour();
-    }
-
-    public abstract class ScriptBehaviour : PlayableBehaviour
-    {
-        // Called by PlayableGraph
-        public sealed override void PrepareFrame(Playable playable, UFrameData info)
-        {
-            base.PrepareFrame(playable, info);
-        }
-
-        // Called by AnimationGraphDriver
-        public abstract void PrepareFrame(Playable playable, FrameData info, IReadOnlyList<NodeBase> inputNodes);
-    }
-
-    // TODO: Parameter binding?
+    // TODO: Support parameter binding?
     [Serializable]
     public class ScriptNode : NodeBase
     {
@@ -58,11 +38,17 @@ namespace GBG.AnimationGraph.Node
 
         #region Runtime Properties
 
+        private ScriptBehaviour _scriptBehaviour;
+
         private string[] _inputGuids;
 
         private ParamInfo[] _runtimeInputWeightParams;
 
-        private ScriptBehaviour _scriptBehaviour;
+        private float[] _runtimeInputWeights;
+
+        private bool _isInputWeightDirty = true;
+
+        private PrepareFrameArgs _prepareFrameArgs;
 
         #endregion
 
@@ -85,34 +71,51 @@ namespace GBG.AnimationGraph.Node
             return _inputGuids;
         }
 
-        protected internal override void InitializeConnection(IReadOnlyDictionary<string, NodeBase> nodeGuidTable)
+        protected internal override void PrepareFrame(FrameData frameData)
         {
-            base.InitializeConnection(nodeGuidTable);
-
-            for (int i = 0; i < Inputs.Count; i++)
+            if (_scriptBehaviour == null)
             {
-                Playable.SetInputWeight(i, GetLogicInputWeight(i));
+                return;
             }
-        }
 
-        // TODO: PrepareFrame
-        protected internal override void PrepareFrame(FrameData frameData) => throw new NotImplementedException();
+            if (_isInputWeightDirty)
+            {
+                for (int i = 0; i < _runtimeInputWeightParams.Length; i++)
+                {
+                    var weightParam = _runtimeInputWeightParams[i];
+                    var weight = weightParam?.GetFloat() ?? Inputs[i].InputWeightParam.GetFloat();
+                    _runtimeInputWeights[i] = weight;
+                }
+
+                if (Script.NormalizeInputWeights)
+                {
+                    WeightTool.NormalizeWeights(_runtimeInputWeights, _runtimeInputWeights);
+                }
+            }
+
+            _prepareFrameArgs ??= new PrepareFrameArgs(RuntimeInputNodes, _runtimeInputWeights);
+            _prepareFrameArgs.IsInputWeightDirty = _isInputWeightDirty;
+            _scriptBehaviour.PrepareFrame(Playable, frameData, _prepareFrameArgs);
+
+            _isInputWeightDirty = false;
+        }
 
 
         protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable)
         {
             // Input weights
-            _runtimeInputWeightParams = new ParamInfo[Inputs.Count];
-            for (int i = 0; i < _runtimeInputWeightParams.Length; i++)
+            var inputCount = Inputs.Count;
+            _runtimeInputWeights = new float[inputCount];
+            _runtimeInputWeightParams = new ParamInfo[inputCount];
+            for (int i = 0; i < inputCount; i++)
             {
-                var index = i;
-                var weightParam = Inputs[index].InputWeightParam;
+                var weightParam = Inputs[i].InputWeightParam;
                 if (!weightParam.IsValue)
                 {
                     var runtimeInputWeightParam = paramGuidTable[weightParam.Guid];
-                    _runtimeInputWeightParams[index] = runtimeInputWeightParam;
+                    _runtimeInputWeightParams[i] = runtimeInputWeightParam;
 
-                    runtimeInputWeightParam.OnValueChanged += p => OnInputWeightChanged(index, p.GetFloat());
+                    runtimeInputWeightParam.OnValueChanged += OnInputWeightChanged;
                 }
             }
         }
@@ -132,19 +135,30 @@ namespace GBG.AnimationGraph.Node
             return playable;
         }
 
-        protected override float GetLogicInputWeight(int inputIndex)
+        
+        private float GetLogicInputWeight(int inputIndex)
         {
-            var runtimeInputWeightParam = _runtimeInputWeightParams[inputIndex];
-            if (runtimeInputWeightParam != null)
+            if (_isInputWeightDirty)
             {
-                return runtimeInputWeightParam.GetFloat();
+                for (int i = 0; i < _runtimeInputWeightParams.Length; i++)
+                {
+                    var weightParam = _runtimeInputWeightParams[i];
+                    var weight = weightParam?.GetFloat() ?? Inputs[i].InputWeightParam.GetFloat();
+                    _runtimeInputWeights[i] = weight;
+                }
+
+                if (Script && Script.NormalizeInputWeights)
+                {
+                    WeightTool.NormalizeWeights(_runtimeInputWeights, _runtimeInputWeights);
+                }
             }
 
-            return Inputs[inputIndex].InputWeightParam.GetFloat();
+            return _runtimeInputWeights[inputIndex];
         }
 
-
-        // TODO: OnInputWeightChanged
-        private void OnInputWeightChanged(int index, float weight) => throw new NotImplementedException();
+        private void OnInputWeightChanged(ParamInfo paramInfo)
+        {
+            _isInputWeightDirty = true;
+        }
     }
 }

@@ -50,8 +50,5 @@ namespace GBG.AnimationGraph.Node
 
         // TODO: CreatePlayable
         protected override Playable CreatePlayable(PlayableGraph playableGraph)=> throw new NotImplementedException();
-
-        // TODO: GetInputWeight
-        protected override float GetLogicInputWeight(int inputIndex)=> throw new NotImplementedException();
     }
 }

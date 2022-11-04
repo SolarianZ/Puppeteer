@@ -4,7 +4,6 @@ using GBG.AnimationGraph.Graph;
 using GBG.AnimationGraph.Parameter;
 using UnityEngine;
 using UnityEngine.Animations;
-using UnityEngine.Assertions;
 using UnityEngine.Playables;
 
 namespace GBG.AnimationGraph.Node
@@ -77,12 +76,6 @@ namespace GBG.AnimationGraph.Node
             // State node has and only has one input
             var playable = AnimationMixerPlayable.Create(playableGraph, 1);
             return playable;
-        }
-
-        protected override float GetLogicInputWeight(int inputIndex)
-        {
-            Assert.AreEqual(inputIndex, 0, "Input index is not 0.");
-            return 1;
         }
     }
 }
