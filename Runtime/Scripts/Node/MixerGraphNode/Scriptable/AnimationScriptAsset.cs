@@ -1,11 +1,12 @@
-﻿using GBG.AnimationGraph.Component;
+﻿using System;
+using GBG.AnimationGraph.Component;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
 
 namespace GBG.AnimationGraph.Node
 {
-    public abstract class AnimationScriptAsset : ScriptableObject
+    public abstract class AnimationScriptAsset : ScriptableObject, IDisposable
     {
         public abstract bool NormalizeInputWeights { get; }
 
@@ -14,21 +15,14 @@ namespace GBG.AnimationGraph.Node
             PlayableGraph playableGraph, int inputCount);
 
         // Called by ScriptNode
-        public void PrepareFrame(Playable playable, in FrameData info, PrepareFrameArgs args)
+        public abstract void PrepareFrame(Playable playable, in FrameData info, PrepareFrameArgs args);
+
+        public abstract void Dispose();
+
+
+        protected virtual void OnDestroy()
         {
-            BeforePrepareInputNodesFrame(playable, info, args);
-            PrepareInputNodesFrame(playable, info, args);
-            AfterPrepareInputNodesFrame(playable, info, args);
+            Dispose();
         }
-
-
-        protected abstract void BeforePrepareInputNodesFrame(Playable playable,
-            in FrameData info, PrepareFrameArgs args);
-
-        protected abstract void PrepareInputNodesFrame(Playable playable,
-            in FrameData info, PrepareFrameArgs args);
-
-        protected abstract void AfterPrepareInputNodesFrame(Playable playable,
-            in FrameData info, PrepareFrameArgs args);
     }
 }

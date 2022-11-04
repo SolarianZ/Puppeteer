@@ -15,6 +15,8 @@ namespace GBG.AnimationGraph.Component
         [NonReorderable]
         private Transform[] _bones = Array.Empty<Transform>();
 
+        private Animator _animator;
+
         private NativeArray<BoneInfo> _boneInfos;
 
 
@@ -45,14 +47,14 @@ namespace GBG.AnimationGraph.Component
         /// <summary>
         /// Get or allocate a instance of <see cref="NativeArray{BoneInfo}"/> of <see cref="BoneInfo"/>.
         /// </summary>
-        /// <param name="animator">Animator.</param>
         /// <param name="nameToHash">Method for calculate hash from name.</param>
         /// <returns>The instance of <see cref="NativeArray{BoneInfo}"/> of <see cref="BoneInfo"/>.</returns>
-        public NativeArray<BoneInfo> GetOrAllocateBoneInfos(Animator animator, Func<string, int> nameToHash = null)
+        public NativeArray<BoneInfo> GetOrAllocateBoneInfos(Func<string, int> nameToHash = null)
         {
             if (!_boneInfos.IsCreated)
             {
-                _boneInfos = BoneInfo.AllocateBoneInfos(animator, _bones, nameToHash);
+                if (!_animator) _animator = GetComponent<Animator>();
+                _boneInfos = BoneInfo.AllocateBoneInfos(_animator, _bones, nameToHash);
             }
 
             return _boneInfos;
