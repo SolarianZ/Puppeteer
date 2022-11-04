@@ -136,7 +136,7 @@ namespace GBG.AnimationGraph.Node
 
         protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable)
         {
-            Assert.AreNotEqual(MotionTimeParamActive, SpeedParamActive,
+            Assert.IsFalse(MotionTimeParamActive && SpeedParamActive,
                 $"Use explicit motion time and speed at the same time. Node type: {GetType().Name}, node guid: {Guid}.");
 
             // Motion time
