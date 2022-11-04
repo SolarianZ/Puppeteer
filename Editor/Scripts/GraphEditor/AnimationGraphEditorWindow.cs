@@ -167,7 +167,7 @@ namespace GBG.AnimationGraph.Editor.GraphEditor
             _changedDataCategories = DataCategories.None;
 
             _graphAssetSnapshot.name = _graphAsset.name;
-            EditorUtility.CopySerializedIfDifferent(_graphAssetSnapshot, _graphAsset);
+            EditorUtility.CopySerializedManagedFieldsOnly(_graphAssetSnapshot, _graphAsset);
             DestroyImmediate(_graphAssetSnapshot);
         }
 
