@@ -20,9 +20,13 @@ namespace GBG.AnimationGraph.Node
         public abstract void Dispose();
 
 
+        #region Mono Messages
+
         protected virtual void OnDestroy()
         {
             Dispose();
         }
+
+        #endregion
     }
 }

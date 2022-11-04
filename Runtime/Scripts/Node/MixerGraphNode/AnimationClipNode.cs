@@ -105,34 +105,8 @@ namespace GBG.AnimationGraph.Node
         {
         }
 
-        protected internal override IReadOnlyList<string> GetInputNodeGuids() => EmptyInputs;
 
-        public override double GetUnscaledAnimationLength()
-        {
-            if (Clip) return Clip.length;
-            return 0;
-        }
-
-        protected internal override void PrepareFrame(FrameData frameData)
-        {
-            FrameData = frameData;
-
-            if (_runtimeSpeedDirty)
-            {
-                if (SyncMethod == SyncMethod.DoNotSync)
-                {
-                    SetSpeed(BaseSpeed);
-                }
-
-                _runtimeSpeedDirty = false;
-            }
-
-            if (_runtimeMotionTimeDirty)
-            {
-                Playable.SetTime(MotionTime);
-                _runtimeMotionTimeDirty = false;
-            }
-        }
+        #region Lifecycle
 
         protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable)
         {
@@ -167,6 +141,40 @@ namespace GBG.AnimationGraph.Node
         {
             var playable = AnimationClipPlayable.Create(playableGraph, Clip);
             return playable;
+        }
+
+
+        protected internal override IReadOnlyList<string> GetInputNodeGuids() => EmptyInputs;
+
+
+        protected internal override void PrepareFrame(FrameData frameData)
+        {
+            FrameData = frameData;
+
+            if (_runtimeSpeedDirty)
+            {
+                if (SyncMethod == SyncMethod.DoNotSync)
+                {
+                    SetSpeed(BaseSpeed);
+                }
+
+                _runtimeSpeedDirty = false;
+            }
+
+            if (_runtimeMotionTimeDirty)
+            {
+                Playable.SetTime(MotionTime);
+                _runtimeMotionTimeDirty = false;
+            }
+        }
+
+        #endregion
+
+
+        public override double GetUnscaledAnimationLength()
+        {
+            if (Clip) return Clip.length;
+            return 0;
         }
 
 

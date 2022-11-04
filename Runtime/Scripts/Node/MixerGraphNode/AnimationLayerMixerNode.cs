@@ -54,50 +54,8 @@ namespace GBG.AnimationGraph.Node
         {
         }
 
-        protected internal override IReadOnlyList<string> GetInputNodeGuids()
-        {
-            if (Application.isPlaying)
-            {
-                _inputGuids ??= (from input in MixerInputs select input.InputNodeGuid).ToArray();
-            }
-            else
-            {
-                _inputGuids = (from input in MixerInputs select input.InputNodeGuid).ToArray();
-            }
 
-            return _inputGuids;
-        }
-
-        protected internal override void InitializeConnection(IReadOnlyDictionary<string, NodeBase> nodeGuidTable)
-        {
-            base.InitializeConnection(nodeGuidTable);
-
-            var layerMixerPlayable = (AnimationLayerMixerPlayable)Playable;
-            for (int i = 0; i < MixerInputs.Count; i++)
-            {
-                var layeredNodeInput = (LayeredNodeInput)MixerInputs[i];
-                layerMixerPlayable.SetLayerAdditive((uint)i, layeredNodeInput.IsAdditive);
-                if (layeredNodeInput.AvatarMask)
-                {
-                    layerMixerPlayable.SetLayerMaskFromAvatarMask((uint)i, layeredNodeInput.AvatarMask);
-                }
-            }
-        }
-
-        protected internal override void PrepareFrame(FrameData frameData)
-        {
-            for (int i = 0; i < RuntimeInputNodes.Length; i++)
-            {
-                var inputWeight = GetLogicInputWeight(i);
-                if (_isInputWeightDirty) Playable.SetInputWeight(i, inputWeight);
-
-                var inputNode = RuntimeInputNodes[i];
-                inputNode?.PrepareFrame(new FrameData(frameData, inputWeight));
-            }
-
-            _isInputWeightDirty = false;
-        }
-
+        #region Lifecycle
 
         protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable)
         {
@@ -125,6 +83,54 @@ namespace GBG.AnimationGraph.Node
             var playable = AnimationLayerMixerPlayable.Create(playableGraph, MixerInputs.Count, MixerInputs.Count > 1);
             return playable;
         }
+
+        
+        protected internal override void InitializeConnection(IReadOnlyDictionary<string, NodeBase> nodeGuidTable)
+        {
+            base.InitializeConnection(nodeGuidTable);
+
+            var layerMixerPlayable = (AnimationLayerMixerPlayable)Playable;
+            for (int i = 0; i < MixerInputs.Count; i++)
+            {
+                var layeredNodeInput = (LayeredNodeInput)MixerInputs[i];
+                layerMixerPlayable.SetLayerAdditive((uint)i, layeredNodeInput.IsAdditive);
+                if (layeredNodeInput.AvatarMask)
+                {
+                    layerMixerPlayable.SetLayerMaskFromAvatarMask((uint)i, layeredNodeInput.AvatarMask);
+                }
+            }
+        }
+
+        protected internal override IReadOnlyList<string> GetInputNodeGuids()
+        {
+            if (Application.isPlaying)
+            {
+                _inputGuids ??= (from input in MixerInputs select input.InputNodeGuid).ToArray();
+            }
+            else
+            {
+                _inputGuids = (from input in MixerInputs select input.InputNodeGuid).ToArray();
+            }
+
+            return _inputGuids;
+        }
+
+
+        protected internal override void PrepareFrame(FrameData frameData)
+        {
+            for (int i = 0; i < RuntimeInputNodes.Length; i++)
+            {
+                var inputWeight = GetLogicInputWeight(i);
+                if (_isInputWeightDirty) Playable.SetInputWeight(i, inputWeight);
+
+                var inputNode = RuntimeInputNodes[i];
+                inputNode?.PrepareFrame(new FrameData(frameData, inputWeight));
+            }
+
+            _isInputWeightDirty = false;
+        }
+
+        #endregion
 
 
         private float GetLogicInputWeight(int inputIndex)

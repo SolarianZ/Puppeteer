@@ -13,8 +13,6 @@ namespace GBG.AnimationGraph.Node
     {
         #region Serialization Data
 
-        // public string StateName;
-
         public List<Transition> Transitions => _transitions;
 
         [SerializeField]
@@ -39,25 +37,8 @@ namespace GBG.AnimationGraph.Node
         {
         }
 
-        protected internal override IReadOnlyList<string> GetInputNodeGuids()
-        {
-            _inputGuids ??= EmptyInputs; // Editor only
 
-            return _inputGuids;
-        }
-
-        protected internal override void InitializeConnection(IReadOnlyDictionary<string, NodeBase> nodeGuidTable)
-        {
-            // Linked to external graph, so here we use node guid table of linked graph
-            base.InitializeConnection(_linkedGraph.NodeGuidTable);
-
-            // State node has and only has one input
-            Playable.SetInputWeight(0, 1);
-        }
-
-        // TODO: PrepareFrame
-        protected internal override void PrepareFrame(FrameData frameData) => throw new NotImplementedException();
-
+        #region Lifecycle
 
         protected override void InitializeGraphLink(IReadOnlyDictionary<string, GraphLayer> graphGuidTable,
             IReadOnlyDictionary<string, AnimationGraphAsset> externalGraphGuidTable)
@@ -78,5 +59,28 @@ namespace GBG.AnimationGraph.Node
             var playable = AnimationMixerPlayable.Create(playableGraph, 1);
             return playable;
         }
+
+
+        protected internal override void InitializeConnection(IReadOnlyDictionary<string, NodeBase> nodeGuidTable)
+        {
+            // Linked to external graph, so here we use node guid table of linked graph
+            base.InitializeConnection(_linkedGraph.NodeGuidTable);
+
+            // State node has and only has one input
+            Playable.SetInputWeight(0, 1);
+        }
+
+        protected internal override IReadOnlyList<string> GetInputNodeGuids()
+        {
+            _inputGuids ??= EmptyInputs; // Editor only
+
+            return _inputGuids;
+        }
+
+
+        // TODO: PrepareFrame
+        protected internal override void PrepareFrame(FrameData frameData) => throw new NotImplementedException();
+
+        #endregion
     }
 }

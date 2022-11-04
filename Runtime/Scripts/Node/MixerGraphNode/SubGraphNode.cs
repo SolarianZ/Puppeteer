@@ -55,30 +55,8 @@ namespace GBG.AnimationGraph.Node
         {
         }
 
-        protected internal override IReadOnlyList<string> GetInputNodeGuids()
-        {
-            _inputGuids ??= EmptyInputs; // Editor only
 
-            return _inputGuids;
-        }
-
-        protected internal override void InitializeConnection(IReadOnlyDictionary<string, NodeBase> nodeGuidTable)
-        {
-            // Linked to external graph, so here we use node guid table of linked graph
-            base.InitializeConnection(_linkedGraphAsset.RuntimeRootGraph?.NodeGuidTable);
-
-            // Sub graph node has and only has one input
-            Playable.SetInputWeight(0, 1);
-        }
-
-        protected internal override void PrepareFrame(FrameData frameData)
-        {
-            if (_linkedGraphAsset)
-            {
-                _linkedGraphAsset.RuntimeRootGraph?.RuntimeRootNode.PrepareFrame(frameData);
-            }
-        }
-
+        #region Lifecycle
 
         protected override void InitializeGraphLink(IReadOnlyDictionary<string, GraphLayer> graphGuidTable,
             IReadOnlyDictionary<string, AnimationGraphAsset> externalGraphGuidTable)
@@ -128,6 +106,32 @@ namespace GBG.AnimationGraph.Node
             return playable;
         }
 
+        
+        protected internal override void InitializeConnection(IReadOnlyDictionary<string, NodeBase> nodeGuidTable)
+        {
+            // Linked to external graph, so here we use node guid table of linked graph
+            base.InitializeConnection(_linkedGraphAsset.RuntimeRootGraph?.NodeGuidTable);
+
+            // Sub graph node has and only has one input
+            Playable.SetInputWeight(0, 1);
+        }
+
+        protected internal override IReadOnlyList<string> GetInputNodeGuids()
+        {
+            _inputGuids ??= EmptyInputs; // Editor only
+
+            return _inputGuids;
+        }
+
+        
+        protected internal override void PrepareFrame(FrameData frameData)
+        {
+            if (_linkedGraphAsset)
+            {
+                _linkedGraphAsset.RuntimeRootGraph?.RuntimeRootNode.PrepareFrame(frameData);
+            }
+        }
+
         protected internal override void Dispose()
         {
             if (_runtimeParamBindings != null)
@@ -142,5 +146,7 @@ namespace GBG.AnimationGraph.Node
 
             base.Dispose();
         }
+
+        #endregion
     }
 }

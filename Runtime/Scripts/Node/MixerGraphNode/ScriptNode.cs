@@ -59,6 +59,51 @@ namespace GBG.AnimationGraph.Node
         {
         }
 
+
+        #region Lifecycle
+
+        protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable)
+        {
+            if (Script)
+            {
+                Script = UObject.Instantiate(Script);
+            }
+
+            // Input weights
+            var inputCount = Inputs.Count;
+            _runtimeInputWeights = new float[inputCount];
+            _runtimeInputWeightParams = new ParamInfo[inputCount];
+            for (int i = 0; i < inputCount; i++)
+            {
+                var weightParam = Inputs[i].InputWeightParam;
+                if (!weightParam.IsValue)
+                {
+                    var runtimeInputWeightParam = paramGuidTable[weightParam.Guid];
+                    _runtimeInputWeightParams[i] = runtimeInputWeightParam;
+
+                    runtimeInputWeightParam.OnValueChanged += OnInputWeightChanged;
+                }
+            }
+        }
+
+        // TODO: Need GameObject argument.
+        protected override Playable CreatePlayable(PlayableGraph playableGraph)
+        {
+            if (!Script)
+            {
+                return Playable.Null;
+            }
+
+            var playable = Script.CreateScriptPlayable(null, playableGraph, Inputs.Count);
+            Assert.AreEqual(playable.GetInputCount(), Inputs.Count,
+                $"Runtime playable input count({playable.GetInputCount()}) doesn't equal to serialized input count({Inputs.Count}).");
+
+            _scriptBehaviour = Script.GetScriptBehaviour();
+
+            return playable;
+        }
+
+
         protected internal override IReadOnlyList<string> GetInputNodeGuids()
         {
             if (Application.isPlaying)
@@ -73,6 +118,7 @@ namespace GBG.AnimationGraph.Node
             return _inputGuids;
         }
 
+        
         protected internal override void PrepareFrame(FrameData frameData)
         {
             if (_scriptBehaviour == null)
@@ -114,50 +160,9 @@ namespace GBG.AnimationGraph.Node
             base.Dispose();
         }
 
+        #endregion
 
-        protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable)
-        {
-            if (Script)
-            {
-                Script = UObject.Instantiate(Script);
-            }
-
-            // Input weights
-            var inputCount = Inputs.Count;
-            _runtimeInputWeights = new float[inputCount];
-            _runtimeInputWeightParams = new ParamInfo[inputCount];
-            for (int i = 0; i < inputCount; i++)
-            {
-                var weightParam = Inputs[i].InputWeightParam;
-                if (!weightParam.IsValue)
-                {
-                    var runtimeInputWeightParam = paramGuidTable[weightParam.Guid];
-                    _runtimeInputWeightParams[i] = runtimeInputWeightParam;
-
-                    runtimeInputWeightParam.OnValueChanged += OnInputWeightChanged;
-                }
-            }
-        }
-
-
-        // TODO: Need GameObject argument.
-        protected override Playable CreatePlayable(PlayableGraph playableGraph)
-        {
-            if (!Script)
-            {
-                return Playable.Null;
-            }
-
-            var playable = Script.CreateScriptPlayable(null, playableGraph, Inputs.Count);
-            Assert.AreEqual(playable.GetInputCount(), Inputs.Count,
-                $"Runtime playable input count({playable.GetInputCount()}) doesn't equal to serialized input count({Inputs.Count}).");
-
-            _scriptBehaviour = Script.GetScriptBehaviour();
-
-            return playable;
-        }
-
-
+        
         private float GetLogicInputWeight(int inputIndex)
         {
             if (_isInputWeightDirty)

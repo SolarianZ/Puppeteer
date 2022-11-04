@@ -104,17 +104,8 @@ namespace GBG.AnimationGraph.Node
         {
         }
 
-        protected internal override IReadOnlyList<string> GetInputNodeGuids() => EmptyInputs;
 
-        // TODO: GetUnscaledAnimationLength
-        public override double GetUnscaledAnimationLength()
-        {
-            throw new NotImplementedException();
-        }
-
-        // TODO: PrepareFrame
-        protected internal override void PrepareFrame(FrameData frameData) => throw new NotImplementedException();
-
+        #region Lifecycle
 
         // TODO: InitializeParams
         protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable) =>
@@ -122,6 +113,22 @@ namespace GBG.AnimationGraph.Node
 
         // TODO: CreatePlayable
         protected override Playable CreatePlayable(PlayableGraph playableGraph) => throw new NotImplementedException();
+
+
+        protected internal override IReadOnlyList<string> GetInputNodeGuids() => EmptyInputs;
+
+
+        // TODO: PrepareFrame
+        protected internal override void PrepareFrame(FrameData frameData) => throw new NotImplementedException();
+
+        #endregion
+
+
+        // TODO: GetUnscaledAnimationLength
+        public override double GetUnscaledAnimationLength()
+        {
+            throw new NotImplementedException();
+        }
 
 
         private void OnRuntimeSpeedParamChanged(ParamInfo paramInfo)

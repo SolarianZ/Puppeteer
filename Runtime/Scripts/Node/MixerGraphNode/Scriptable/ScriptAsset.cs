@@ -17,6 +17,16 @@ namespace GBG.AnimationGraph.Node
         public virtual void Dispose()
         {
         }
+
+
+        #region Mono Messages
+
+        protected virtual void OnDestroy()
+        {
+            Dispose();
+        }
+
+        #endregion
     }
 
     public abstract class ScriptBehaviour : PlayableBehaviour, IDisposable

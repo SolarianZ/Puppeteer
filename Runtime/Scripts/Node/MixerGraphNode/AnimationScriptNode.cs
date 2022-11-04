@@ -61,72 +61,8 @@ namespace GBG.AnimationGraph.Node
         {
         }
 
-        protected internal override IReadOnlyList<string> GetInputNodeGuids()
-        {
-            if (Application.isPlaying)
-            {
-                _inputGuids ??= (from input in MixerInputs select input.InputNodeGuid).ToArray();
-            }
-            else
-            {
-                _inputGuids = (from input in MixerInputs select input.InputNodeGuid).ToArray();
-            }
 
-            return _inputGuids;
-        }
-
-        protected internal override void InitializeConnection(IReadOnlyDictionary<string, NodeBase> nodeGuidTable)
-        {
-            base.InitializeConnection(nodeGuidTable);
-
-            // Input weight of AnimationScriptPlayable input should be always 1,
-            // process weight in AnimationJob.
-            for (int i = 0; i < MixerInputs.Count; i++)
-            {
-                Playable.SetInputWeight(i, 1);
-            }
-        }
-
-        protected internal override void PrepareFrame(FrameData frameData)
-        {
-            if (!ScriptAsset)
-            {
-                return;
-            }
-
-            if (_isInputWeightDirty)
-            {
-                for (int i = 0; i < _runtimeInputWeightParams.Length; i++)
-                {
-                    var weightParam = _runtimeInputWeightParams[i];
-                    var weight = weightParam?.GetFloat() ?? MixerInputs[i].InputWeightParam.GetFloat();
-                    _runtimeInputWeights[i] = weight;
-                }
-
-                if (ScriptAsset.NormalizeInputWeights)
-                {
-                    WeightTool.NormalizeWeights(_runtimeInputWeights, _runtimeInputWeights);
-                }
-            }
-
-            _prepareFrameArgs ??= new PrepareFrameArgs(RuntimeInputNodes, _runtimeInputWeights);
-            _prepareFrameArgs.IsInputWeightDirty = _isInputWeightDirty;
-            ScriptAsset.PrepareFrame(Playable, frameData, _prepareFrameArgs);
-
-            _isInputWeightDirty = false;
-        }
-
-        protected internal override void Dispose()
-        {
-            if (ScriptAsset)
-            {
-                ScriptAsset.Dispose();
-                UObject.Destroy(ScriptAsset);
-            }
-
-            base.Dispose();
-        }
-
+        #region Lifecycle
 
         protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable)
         {
@@ -168,6 +104,76 @@ namespace GBG.AnimationGraph.Node
 
             return playable;
         }
+
+
+        protected internal override void InitializeConnection(IReadOnlyDictionary<string, NodeBase> nodeGuidTable)
+        {
+            base.InitializeConnection(nodeGuidTable);
+
+            // Input weight of AnimationScriptPlayable input should be always 1,
+            // process weight in AnimationJob.
+            for (int i = 0; i < MixerInputs.Count; i++)
+            {
+                Playable.SetInputWeight(i, 1);
+            }
+        }
+
+        protected internal override IReadOnlyList<string> GetInputNodeGuids()
+        {
+            if (Application.isPlaying)
+            {
+                _inputGuids ??= (from input in MixerInputs select input.InputNodeGuid).ToArray();
+            }
+            else
+            {
+                _inputGuids = (from input in MixerInputs select input.InputNodeGuid).ToArray();
+            }
+
+            return _inputGuids;
+        }
+
+
+        protected internal override void PrepareFrame(FrameData frameData)
+        {
+            if (!ScriptAsset)
+            {
+                return;
+            }
+
+            if (_isInputWeightDirty)
+            {
+                for (int i = 0; i < _runtimeInputWeightParams.Length; i++)
+                {
+                    var weightParam = _runtimeInputWeightParams[i];
+                    var weight = weightParam?.GetFloat() ?? MixerInputs[i].InputWeightParam.GetFloat();
+                    _runtimeInputWeights[i] = weight;
+                }
+
+                if (ScriptAsset.NormalizeInputWeights)
+                {
+                    WeightTool.NormalizeWeights(_runtimeInputWeights, _runtimeInputWeights);
+                }
+            }
+
+            _prepareFrameArgs ??= new PrepareFrameArgs(RuntimeInputNodes, _runtimeInputWeights);
+            _prepareFrameArgs.IsInputWeightDirty = _isInputWeightDirty;
+            ScriptAsset.PrepareFrame(Playable, frameData, _prepareFrameArgs);
+
+            _isInputWeightDirty = false;
+        }
+
+        protected internal override void Dispose()
+        {
+            if (ScriptAsset)
+            {
+                ScriptAsset.Dispose();
+                UObject.Destroy(ScriptAsset);
+            }
+
+            base.Dispose();
+        }
+
+        #endregion
 
 
         private float GetLogicInputWeight(int inputIndex)

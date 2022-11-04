@@ -54,8 +54,8 @@ namespace GBG.AnimationGraph.Node
             _guid = guid;
         }
 
-
-        protected internal abstract IReadOnlyList<string> GetInputNodeGuids();
+        
+        #region Lifecycle
 
         internal void InitializeData(PlayableGraph playableGraph,
             IReadOnlyDictionary<string, ParamInfo> paramGuidTable,
@@ -67,6 +67,16 @@ namespace GBG.AnimationGraph.Node
             Playable = CreatePlayable(playableGraph);
         }
 
+        protected virtual void InitializeGraphLink(IReadOnlyDictionary<string, GraphLayer> graphGuidTable,
+            IReadOnlyDictionary<string, AnimationGraphAsset> externalGraphGuidTable)
+        {
+        }
+
+        protected abstract void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable);
+
+        protected abstract Playable CreatePlayable(PlayableGraph playableGraph);
+        
+        
         protected internal virtual void InitializeConnection(IReadOnlyDictionary<string, NodeBase> nodeGuidTable)
         {
             var inputGuids = GetInputNodeGuids();
@@ -86,11 +96,17 @@ namespace GBG.AnimationGraph.Node
             }
         }
 
+        protected internal abstract IReadOnlyList<string> GetInputNodeGuids();
+
+        
         protected internal abstract void PrepareFrame(FrameData frameData);
 
+        
         protected internal virtual void Dispose()
         {
         }
+
+        #endregion
 
 
         #region Speed & Play & Pause // See APIMask.cs
@@ -134,15 +150,5 @@ namespace GBG.AnimationGraph.Node
         }
 
         #endregion
-
-
-        protected virtual void InitializeGraphLink(IReadOnlyDictionary<string, GraphLayer> graphGuidTable,
-            IReadOnlyDictionary<string, AnimationGraphAsset> externalGraphGuidTable)
-        {
-        }
-
-        protected abstract void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable);
-
-        protected abstract Playable CreatePlayable(PlayableGraph playableGraph);
     }
 }
