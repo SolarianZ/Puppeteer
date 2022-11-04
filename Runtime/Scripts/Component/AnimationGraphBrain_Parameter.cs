@@ -1,51 +1,45 @@
-﻿using System.Collections.Generic;
-using GBG.AnimationGraph.Parameter;
-
-namespace GBG.AnimationGraph
+﻿namespace GBG.AnimationGraph
 {
     public partial class AnimationGraphBrain
     {
-        private readonly Dictionary<string, ParamInfo> _paramNameTable = new();
-
-
         public float GetFloat(string paramName)
         {
-            return _paramNameTable[paramName].GetFloat();
+            return _graphAsset.GetFloat(paramName);
         }
 
         public int GetInt(string paramName)
         {
-            return _paramNameTable[paramName].GetInt();
+            return _graphAsset.GetInt(paramName);
         }
 
         public bool GetBool(string paramName)
         {
-            return _paramNameTable[paramName].GetBool();
+            return _graphAsset.GetBool(paramName);
         }
 
         public float GetRawValue(string paramName)
         {
-            return _paramNameTable[paramName].RawValue;
+            return _graphAsset.GetRawValue(paramName);
         }
 
         public void SetFloat(string paramName, float value)
         {
-            _paramNameTable[paramName].SetFloat(value);
+            _graphAsset.SetFloat(paramName, value);
         }
 
         public void SetInt(string paramName, int value)
         {
-            _paramNameTable[paramName].SetInt(value);
+            _graphAsset.SetInt(paramName, value);
         }
 
         public void SetBool(string paramName, bool value)
         {
-            _paramNameTable[paramName].SetBool(value);
+            _graphAsset.SetBool(paramName, value);
         }
 
         public void SetRawValue(string paramName, float value)
         {
-            _paramNameTable[paramName].SetRawValue(value);
+            _graphAsset.SetRawValue(paramName, value);
         }
     }
 }

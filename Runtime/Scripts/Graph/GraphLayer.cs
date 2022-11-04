@@ -15,7 +15,7 @@ namespace GBG.AnimationGraph.Graph
     }
 
     [Serializable]
-    public class GraphLayer
+    public class GraphLayer : IDisposable
     {
         #region Serialization Data
 
@@ -75,6 +75,7 @@ namespace GBG.AnimationGraph.Graph
 
         [SerializeReference]
         private List<NodeBase> _isolatedNodes = new List<NodeBase>();
+
 #endif
 
         #endregion
@@ -82,9 +83,11 @@ namespace GBG.AnimationGraph.Graph
 
         #region Runtime Properties
 
-        internal NodeBase RootNode { get; private set; }
+        internal NodeBase RuntimeRootNode { get; private set; }
 
-        internal IReadOnlyDictionary<string, NodeBase> NodeGuidTable { get; private set; }
+        internal IReadOnlyDictionary<string, NodeBase> NodeGuidTable => _nodeGuidTable;
+
+        private Dictionary<string, NodeBase> _nodeGuidTable;
 
         #endregion
 
@@ -100,19 +103,17 @@ namespace GBG.AnimationGraph.Graph
             IReadOnlyDictionary<string, GraphLayer> graphGuidTable,
             IReadOnlyDictionary<string, ParamInfo> paramGuidTable)
         {
-            var nodeGuidTable = new Dictionary<string, NodeBase>(Nodes.Count);
+            _nodeGuidTable = new Dictionary<string, NodeBase>(Nodes.Count);
             foreach (var node in Nodes)
             {
                 node.InitializeData(playableGraph, graphGuidTable, paramGuidTable);
-                nodeGuidTable.Add(node.Guid, node);
+                _nodeGuidTable.Add(node.Guid, node);
 
-                if (node.Guid.Equals(RootNodeGuid))
+                if (RuntimeRootNode == null && node.Guid.Equals(RootNodeGuid))
                 {
-                    RootNode = node;
+                    RuntimeRootNode = node;
                 }
             }
-
-            NodeGuidTable = nodeGuidTable;
         }
 
         public void InitializeConnections()
@@ -123,12 +124,14 @@ namespace GBG.AnimationGraph.Graph
             }
         }
 
-        public void Destroy()
+        public void Dispose()
         {
-            foreach (var node in NodeGuidTable.Values)
+            foreach (var node in _nodeGuidTable.Values)
             {
                 node.Destroy();
             }
+
+            _nodeGuidTable.Clear();
         }
     }
 }

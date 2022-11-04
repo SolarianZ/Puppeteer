@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using GBG.AnimationGraph.Graph;
 using GBG.AnimationGraph.Node;
-using GBG.AnimationGraph.Parameter;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
@@ -70,17 +68,11 @@ namespace GBG.AnimationGraph
         {
             if (!_playableGraph.IsValid() && _graphAsset)
             {
-                _graphAsset = Instantiate(_graphAsset);
                 _animator = GetComponent<Animator>();
+                _graphGuidTable = new Dictionary<string, GraphLayer>(_graphAsset.GraphLayers.Count);
                 _playableGraph = PlayableGraph.Create($"{name}.{nameof(AnimationGraphBrain)}");
-
-                // Parameters
-                var paramGuidTable = new Dictionary<string, ParamInfo>(_graphAsset.Parameters.Count);
-                foreach (var paramInfo in _graphAsset.Parameters)
-                {
-                    _paramNameTable.Add(paramInfo.Name, paramInfo);
-                    paramGuidTable.Add(paramInfo.Guid, paramInfo);
-                }
+                _graphAsset = Instantiate(_graphAsset);
+                _graphAsset.Initialize(_playableGraph, _graphGuidTable);
 
                 // State driver
                 var driverPlayable = ScriptPlayable<AnimationGraphStateDriver>.Create(_playableGraph);
@@ -89,7 +81,12 @@ namespace GBG.AnimationGraph
                 scriptOutput.SetSourcePlayable(driverPlayable);
 
                 // Animation
-                BuildAnimationPlayableGraph(paramGuidTable);
+                var animOutput = AnimationPlayableOutput.Create(_playableGraph, "Animation Output", _animator);
+                _rootNode = _graphAsset.RuntimeRootNode;
+                if (_rootNode != null)
+                {
+                    animOutput.SetSourcePlayable(_rootNode.Playable);
+                }
 
                 Evaluate(0);
             }
@@ -111,7 +108,7 @@ namespace GBG.AnimationGraph
             {
                 foreach (var graph in _graphGuidTable.Values)
                 {
-                    graph.Destroy();
+                    graph.Dispose();
                 }
 
                 _playableGraph.Destroy();
@@ -120,43 +117,6 @@ namespace GBG.AnimationGraph
         }
 
         #endregion
-
-
-        private void BuildAnimationPlayableGraph(Dictionary<string, ParamInfo> paramGuidTable)
-        {
-            var animOutput = AnimationPlayableOutput.Create(_playableGraph, "Animation Output", _animator);
-            if (!_graphAsset)
-            {
-                return;
-            }
-
-            // Graph layer
-            _graphGuidTable = new Dictionary<string, GraphLayer>(_graphAsset.GraphLayers.Count);
-            foreach (var graphLayer in _graphAsset.GraphLayers)
-            {
-                _graphGuidTable.Add(graphLayer.Guid, graphLayer);
-            }
-
-            foreach (var graphLayer in _graphAsset.GraphLayers)
-            {
-                graphLayer.InitializeNodes(_playableGraph, _graphGuidTable, paramGuidTable);
-            }
-
-            foreach (var graphLayer in _graphAsset.GraphLayers)
-            {
-                graphLayer.InitializeConnections();
-            }
-
-            // Root node
-            var rootGraph = _graphAsset.GraphLayers.FirstOrDefault(g => g.Guid.Equals(_graphAsset.RootGraphGuid));
-            _rootNode = rootGraph?.RootNode;
-            if (_rootNode == null)
-            {
-                return;
-            }
-
-            animOutput.SetSourcePlayable(_rootNode.Playable);
-        }
 
 
         class AnimationGraphStateDriver : PlayableBehaviour
