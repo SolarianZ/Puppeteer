@@ -14,12 +14,14 @@ namespace GBG.AnimationGraph.Node
     {
         #region Serialization Data
 
+        [Obsolete]
         public AnimationGraphAsset SubGraph
         {
             get => _subGraph;
             internal set => _subGraph = value;
         }
 
+        [Obsolete]
         [SerializeField]
         private AnimationGraphAsset _subGraph;
 
@@ -40,9 +42,11 @@ namespace GBG.AnimationGraph.Node
         public string LinkedGraphGuid => Guid;
 
 
-        private GraphLayer _linkedGraph;
+        private AnimationGraphAsset _linkedGraphAsset;
 
         private string[] _inputGuids;
+
+        private ParamBinding[] _runtimeParamBindings;
 
         #endregion
 
@@ -53,49 +57,90 @@ namespace GBG.AnimationGraph.Node
 
         protected internal override IReadOnlyList<string> GetInputNodeGuids()
         {
-            return EmptyInputs;
+            _inputGuids ??= EmptyInputs; // Editor only
+
+            return _inputGuids;
         }
 
         protected internal override void InitializeConnection(IReadOnlyDictionary<string, NodeBase> nodeGuidTable)
         {
-            base.InitializeConnection(nodeGuidTable);
+            // Linked to external graph, so here we use node guid table of linked graph
+            base.InitializeConnection(_linkedGraphAsset.RuntimeRootGraph?.NodeGuidTable);
 
-            // SubGraphNode has and only has one input
+            // Sub graph node has and only has one input
             Playable.SetInputWeight(0, 1);
         }
 
-        // TODO: PrepareFrame
-        protected internal override void PrepareFrame(FrameData frameData) => throw new NotImplementedException();
-
-        protected internal override void Destroy()
+        protected internal override void PrepareFrame(FrameData frameData)
         {
-            if (SubGraph)
+            if (_linkedGraphAsset)
             {
-                UObject.Destroy(SubGraph);
+                _linkedGraphAsset.RuntimeRootGraph?.RuntimeRootNode.PrepareFrame(frameData);
             }
-
-            base.Destroy();
         }
 
 
-        // TODO: InitializeParams
+        protected override void InitializeGraphLink(IReadOnlyDictionary<string, GraphLayer> graphGuidTable,
+            IReadOnlyDictionary<string, AnimationGraphAsset> externalGraphGuidTable)
+        {
+            base.InitializeGraphLink(graphGuidTable, externalGraphGuidTable);
+
+            _linkedGraphAsset = externalGraphGuidTable[LinkedGraphGuid];
+            if (_linkedGraphAsset)
+            {
+                _inputGuids = _linkedGraphAsset.RuntimeRootGraph != null
+                    ? new[] { _linkedGraphAsset.RuntimeRootGraph.RootNodeGuid }
+                    : Array.Empty<string>();
+            }
+        }
+
         protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable)
         {
-            if (SubGraph)
+            if (!_linkedGraphAsset)
             {
-                SubGraph = UObject.Instantiate(SubGraph);
+                return;
             }
 
-
-            throw new NotImplementedException();
+            // Binding params
+            var paramBindingCount = ParamBindings.Count;
+            _runtimeParamBindings = new ParamBinding[paramBindingCount];
+            for (int i = 0; i < paramBindingCount; i++)
+            {
+                var bindingInfo = ParamBindings[i];
+                var destParam = _linkedGraphAsset.FindParameterByGuid(bindingInfo.DestParamGuid);
+                if (bindingInfo.IsValue())
+                {
+                    destParam.SetRawValue(bindingInfo.GetRawValue());
+                }
+                else
+                {
+                    var srcParam = paramGuidTable[bindingInfo.GetSrcParamGuid()];
+                    var paramBinding = new ParamBinding(srcParam, destParam, true);
+                    _runtimeParamBindings[i] = paramBinding;
+                }
+            }
         }
 
-        // TODO: CreatePlayable
         protected override Playable CreatePlayable(PlayableGraph playableGraph)
         {
             // SubGraphNode has and only has one input
             var playable = AnimationMixerPlayable.Create(playableGraph, 1);
             return playable;
+        }
+
+        protected internal override void Dispose()
+        {
+            if (_runtimeParamBindings != null)
+            {
+                foreach (var paramBinding in _runtimeParamBindings)
+                {
+                    paramBinding.Dispose();
+                }
+
+                _runtimeParamBindings = null;
+            }
+
+            base.Dispose();
         }
     }
 }

@@ -13,7 +13,7 @@ namespace GBG.AnimationGraph.Parameter
         public ParamInfo DestParam { get; }
 
 
-        public ParamBinding(ParamInfo srcParam, ParamInfo destParam)
+        public ParamBinding(ParamInfo srcParam, ParamInfo destParam, bool syncParamValue)
         {
             Assert.IsTrue((srcParam == null) || (srcParam.Type == destParam.Type));
 
@@ -22,6 +22,11 @@ namespace GBG.AnimationGraph.Parameter
 
             if (SrcParam != null)
             {
+                if (syncParamValue)
+                {
+                    DestParam.SetRawValue(SrcParam.RawValue);
+                }
+
                 SrcParam.OnValueChanged += OnSourceValueChanged;
             }
         }

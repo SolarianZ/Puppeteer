@@ -105,6 +105,19 @@ namespace GBG.AnimationGraph
         #endregion
 
 
+        public ParamInfo FindParameterByGuid(string paramGuid)
+        {
+            foreach (var parameter in Parameters)
+            {
+                if (parameter.Guid.Equals(paramGuid))
+                {
+                    return parameter;
+                }
+            }
+
+            return null;
+        }
+
         public void Initialize(PlayableGraph playableGraph, Dictionary<string, GraphLayer> outGraphGuidTable)
         {
             // Variables
@@ -126,6 +139,7 @@ namespace GBG.AnimationGraph
             }
 
             // External graph layers
+            var externalGraphGuidTable = new Dictionary<string, AnimationGraphAsset>(ExternalGraphs.Count);
             foreach (var externalGraph in ExternalGraphs)
             {
                 if (externalGraph.GraphAsset)
@@ -133,6 +147,8 @@ namespace GBG.AnimationGraph
                     externalGraph.GraphAsset = Instantiate(externalGraph.GraphAsset);
                     externalGraph.GraphAsset.Initialize(playableGraph, outGraphGuidTable);
                 }
+
+                externalGraphGuidTable.Add(externalGraph.Guid, externalGraph.GraphAsset);
             }
 
             // Parameters
@@ -146,7 +162,8 @@ namespace GBG.AnimationGraph
             // Nodes(Playables)
             foreach (var graphLayer in GraphLayers)
             {
-                graphLayer.InitializeNodes(playableGraph, outGraphGuidTable, paramGuidTable);
+                graphLayer.InitializeNodes(playableGraph, paramGuidTable,
+                    outGraphGuidTable, externalGraphGuidTable);
             }
 
             // Connections

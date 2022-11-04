@@ -100,13 +100,15 @@ namespace GBG.AnimationGraph.Graph
         }
 
         public void InitializeNodes(PlayableGraph playableGraph,
+            IReadOnlyDictionary<string, ParamInfo> paramGuidTable,
             IReadOnlyDictionary<string, GraphLayer> graphGuidTable,
-            IReadOnlyDictionary<string, ParamInfo> paramGuidTable)
+            IReadOnlyDictionary<string, AnimationGraphAsset> externalGraphGuidTable)
         {
             _nodeGuidTable = new Dictionary<string, NodeBase>(Nodes.Count);
             foreach (var node in Nodes)
             {
-                node.InitializeData(playableGraph, graphGuidTable, paramGuidTable);
+                node.InitializeData(playableGraph, paramGuidTable,
+                    graphGuidTable, externalGraphGuidTable);
                 _nodeGuidTable.Add(node.Guid, node);
 
                 if (RuntimeRootNode == null && node.Guid.Equals(RootNodeGuid))
@@ -128,7 +130,7 @@ namespace GBG.AnimationGraph.Graph
         {
             foreach (var node in _nodeGuidTable.Values)
             {
-                node.Destroy();
+                node.Dispose();
             }
 
             _nodeGuidTable.Clear();

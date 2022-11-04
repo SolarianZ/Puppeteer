@@ -56,15 +56,17 @@ namespace GBG.AnimationGraph.Node
         protected internal override void PrepareFrame(FrameData frameData) => throw new NotImplementedException();
 
 
-        protected override void InitializeGraphLink(IReadOnlyDictionary<string, GraphLayer> graphGuidTable)
+        protected override void InitializeGraphLink(IReadOnlyDictionary<string, GraphLayer> graphGuidTable,
+            IReadOnlyDictionary<string, AnimationGraphAsset> externalGraphGuidTable)
         {
-            base.InitializeGraphLink(graphGuidTable);
+            base.InitializeGraphLink(graphGuidTable, externalGraphGuidTable);
 
             _stateMachineGraph = graphGuidTable[StateMachineGraphGuid];
 
-            _inputGuids = new string[_stateMachineGraph.Nodes.Count];
-            _stateGuidToIndexTable = new Dictionary<string, int>(_stateMachineGraph.Nodes.Count);
-            for (int i = 0; i < _stateMachineGraph.Nodes.Count; i++)
+            var stateCount = _stateMachineGraph.Nodes.Count;
+            _inputGuids = new string[stateCount];
+            _stateGuidToIndexTable = new Dictionary<string, int>(stateCount);
+            for (int i = 0; i < stateCount; i++)
             {
                 var stateNode = (StateNode)_stateMachineGraph.Nodes[i];
                 _inputGuids[i] = stateNode.Guid;

@@ -59,9 +59,10 @@ namespace GBG.AnimationGraph.Node
         protected internal override void PrepareFrame(FrameData frameData) => throw new NotImplementedException();
 
 
-        protected override void InitializeGraphLink(IReadOnlyDictionary<string, GraphLayer> graphGuidTable)
+        protected override void InitializeGraphLink(IReadOnlyDictionary<string, GraphLayer> graphGuidTable,
+            IReadOnlyDictionary<string, AnimationGraphAsset> externalGraphGuidTable)
         {
-            base.InitializeGraphLink(graphGuidTable);
+            base.InitializeGraphLink(graphGuidTable, externalGraphGuidTable);
 
             _linkedGraph = graphGuidTable[LinkedGraphGuid];
             _inputGuids = new[] { _linkedGraph.RootNodeGuid };

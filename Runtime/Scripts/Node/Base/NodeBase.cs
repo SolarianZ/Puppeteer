@@ -58,10 +58,11 @@ namespace GBG.AnimationGraph.Node
         protected internal abstract IReadOnlyList<string> GetInputNodeGuids();
 
         internal void InitializeData(PlayableGraph playableGraph,
+            IReadOnlyDictionary<string, ParamInfo> paramGuidTable,
             IReadOnlyDictionary<string, GraphLayer> graphGuidTable,
-            IReadOnlyDictionary<string, ParamInfo> paramGuidTable)
+            IReadOnlyDictionary<string, AnimationGraphAsset> externalGraphGuidTable)
         {
-            InitializeGraphLink(graphGuidTable);
+            InitializeGraphLink(graphGuidTable, externalGraphGuidTable);
             InitializeParams(paramGuidTable);
             Playable = CreatePlayable(playableGraph);
         }
@@ -87,7 +88,7 @@ namespace GBG.AnimationGraph.Node
 
         protected internal abstract void PrepareFrame(FrameData frameData);
 
-        protected internal virtual void Destroy()
+        protected internal virtual void Dispose()
         {
         }
 
@@ -135,7 +136,8 @@ namespace GBG.AnimationGraph.Node
         #endregion
 
 
-        protected virtual void InitializeGraphLink(IReadOnlyDictionary<string, GraphLayer> graphGuidTable)
+        protected virtual void InitializeGraphLink(IReadOnlyDictionary<string, GraphLayer> graphGuidTable,
+            IReadOnlyDictionary<string, AnimationGraphAsset> externalGraphGuidTable)
         {
         }
 

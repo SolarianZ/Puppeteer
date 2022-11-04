@@ -116,7 +116,7 @@ namespace GBG.AnimationGraph.Node
             _isInputWeightDirty = false;
         }
 
-        protected internal override void Destroy()
+        protected internal override void Dispose()
         {
             if (ScriptAsset)
             {
@@ -124,7 +124,7 @@ namespace GBG.AnimationGraph.Node
                 UObject.Destroy(ScriptAsset);
             }
 
-            base.Destroy();
+            base.Dispose();
         }
 
 
