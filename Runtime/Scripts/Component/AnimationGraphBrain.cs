@@ -16,8 +16,22 @@ namespace GBG.AnimationGraph
     [RequireComponent(typeof(Animator))]
     public partial class AnimationGraphBrain : MonoBehaviour
     {
+        #region Serialization Data
+
         [SerializeField]
         private AnimationGraphAsset _graphAsset;
+
+        #endregion
+
+
+        #region Runtime Properties
+
+        public bool IsValid => _playableGraph.IsValid();
+
+        public bool IsPlaying => IsValid && _playableGraph.IsPlaying();
+
+        public bool IsDone => IsValid && _playableGraph.IsDone();
+
 
         private Animator _animator;
 
@@ -25,13 +39,36 @@ namespace GBG.AnimationGraph
 
         private NodeBase _rootNode;
 
+        #endregion
+
+
+        #region Graph Control
+
+        public void Evaluate(float deltaTime)
+        {
+            _playableGraph.Evaluate(deltaTime);
+        }
+
+        public void Play()
+        {
+            _playableGraph.Play();
+        }
+
+        public void Stop()
+        {
+            _playableGraph.Stop();
+        }
+
+        #endregion
+
 
         #region Mono Messages
 
         private void OnEnable()
         {
-            if (!_playableGraph.IsValid())
+            if (!_playableGraph.IsValid() && _graphAsset)
             {
+                _graphAsset = Instantiate(_graphAsset);
                 _animator = GetComponent<Animator>();
                 _playableGraph = PlayableGraph.Create($"{name}.{nameof(AnimationGraphBrain)}");
 
@@ -51,9 +88,11 @@ namespace GBG.AnimationGraph
 
                 // Animation
                 BuildAnimationPlayableGraph(paramGuidTable);
+
+                Evaluate(0);
             }
 
-            _playableGraph.Play();
+            Play();
         }
 
         private void OnDisable()
@@ -69,6 +108,7 @@ namespace GBG.AnimationGraph
             if (_playableGraph.IsValid())
             {
                 _playableGraph.Destroy();
+                Destroy(_graphAsset);
             }
         }
 

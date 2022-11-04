@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine.Assertions;
 
-namespace GBG.Puppeteer.Tests
+namespace GBG.Puppeteer.Tests.Editor
 {
     public class BlendWeight1DTestGizmos
     {

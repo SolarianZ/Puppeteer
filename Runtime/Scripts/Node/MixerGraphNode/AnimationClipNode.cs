@@ -101,7 +101,11 @@ namespace GBG.AnimationGraph.Node
 
             if (_runtimeSpeedDirty)
             {
-                SetSpeed(BaseSpeed);
+                if (SyncMethod == SyncMethod.DoNotSync)
+                {
+                    SetSpeed(BaseSpeed);
+                }
+
                 _runtimeSpeedDirty = false;
             }
 
@@ -171,11 +175,7 @@ namespace GBG.AnimationGraph.Node
         private void OnRuntimeSpeedParamChanged(ParamInfo paramInfo)
         {
             BaseSpeed = _runtimeSpeedParam.GetFloat();
-
-            if (SyncMethod == SyncMethod.DoNotSync)
-            {
-                _runtimeSpeedDirty = true;
-            }
+            _runtimeSpeedDirty = true;
         }
 
         private void OnRuntimeMotionTimeParamChanged(ParamInfo paramInfo)

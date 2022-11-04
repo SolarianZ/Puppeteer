@@ -73,7 +73,7 @@ namespace GBG.AnimationGraph.Node
                 if (needUpdatePlayableInputWeight) Playable.SetInputWeight(i, inputWeight);
 
                 var inputNode = RuntimeInputNodes[i];
-                inputNode?.PrepareFrame(new FrameData(frameData, inputWeight, 1));
+                inputNode?.PrepareFrame(new FrameData(frameData, inputWeight));
             }
         }
 
