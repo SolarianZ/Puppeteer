@@ -4,7 +4,9 @@ using System.Linq;
 using GBG.AnimationGraph.Parameter;
 using GBG.AnimationGraph.Utility;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.Playables;
+using UObject = UnityEngine.Object;
 
 namespace GBG.AnimationGraph.Node
 {
@@ -100,9 +102,26 @@ namespace GBG.AnimationGraph.Node
             _isInputWeightDirty = false;
         }
 
+        protected internal override void Destroy()
+        {
+            if (Script)
+            {
+                _scriptBehaviour.Dispose();
+                UObject.Destroy(Script);
+            }
+
+
+            base.Destroy();
+        }
+
 
         protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable)
         {
+            if (Script)
+            {
+                Script = UObject.Instantiate(Script);
+            }
+
             // Input weights
             var inputCount = Inputs.Count;
             _runtimeInputWeights = new float[inputCount];
@@ -121,6 +140,7 @@ namespace GBG.AnimationGraph.Node
         }
 
 
+        // TODO: Need GameObject argument.
         protected override Playable CreatePlayable(PlayableGraph playableGraph)
         {
             if (!Script)
@@ -128,14 +148,16 @@ namespace GBG.AnimationGraph.Node
                 return Playable.Null;
             }
 
-            // TODO: Need GameObject argument.
             var playable = Script.CreateScriptPlayable(null, playableGraph, Inputs.Count);
+            Assert.AreEqual(playable.GetInputCount(), Inputs.Count,
+                $"Runtime playable input count({playable.GetInputCount()}) doesn't equal to serialized input count({Inputs.Count}).");
+
             _scriptBehaviour = Script.GetScriptBehaviour();
 
             return playable;
         }
 
-        
+
         private float GetLogicInputWeight(int inputIndex)
         {
             if (_isInputWeightDirty)

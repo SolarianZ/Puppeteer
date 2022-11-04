@@ -5,7 +5,9 @@ using GBG.AnimationGraph.Parameter;
 using GBG.AnimationGraph.Utility;
 using UnityEngine;
 using UnityEngine.Animations;
+using UnityEngine.Assertions;
 using UnityEngine.Playables;
+using UObject = UnityEngine.Object;
 using UPlayable = UnityEngine.Playables.Playable;
 
 namespace GBG.AnimationGraph.Node
@@ -114,9 +116,25 @@ namespace GBG.AnimationGraph.Node
             _isInputWeightDirty = false;
         }
 
+        protected internal override void Destroy()
+        {
+            if (ScriptAsset)
+            {
+                ScriptAsset.Dispose();
+                UObject.Destroy(ScriptAsset);
+            }
+
+            base.Destroy();
+        }
+
 
         protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable)
         {
+            if (ScriptAsset)
+            {
+                ScriptAsset = UObject.Instantiate(ScriptAsset);
+            }
+
             // Input weights
             var inputCount = MixerInputs.Count;
             _runtimeInputWeights = new float[inputCount];
@@ -134,6 +152,7 @@ namespace GBG.AnimationGraph.Node
             }
         }
 
+        // TODO: Need Skeleton argument.
         protected override Playable CreatePlayable(PlayableGraph playableGraph)
         {
             if (!ScriptAsset)
@@ -141,12 +160,14 @@ namespace GBG.AnimationGraph.Node
                 return UPlayable.Null;
             }
 
-            // TODO: Need Skeleton argument.
             var playable = ScriptAsset.CreatePlayable(null, playableGraph, MixerInputs.Count);
+            Assert.AreEqual(playable.GetInputCount(), MixerInputs.Count,
+                $"Runtime playable input count({playable.GetInputCount()}) doesn't equal to serialized input count({MixerInputs.Count}).");
+
             return playable;
         }
 
-        
+
         private float GetLogicInputWeight(int inputIndex)
         {
             if (_isInputWeightDirty)

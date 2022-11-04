@@ -122,5 +122,13 @@ namespace GBG.AnimationGraph.Graph
                 node.InitializeConnection(NodeGuidTable);
             }
         }
+
+        public void Destroy()
+        {
+            foreach (var node in NodeGuidTable.Values)
+            {
+                node.Destroy();
+            }
+        }
     }
 }

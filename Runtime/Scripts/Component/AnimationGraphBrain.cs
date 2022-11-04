@@ -37,6 +37,8 @@ namespace GBG.AnimationGraph
 
         private PlayableGraph _playableGraph;
 
+        private Dictionary<string, GraphLayer> _graphGuidTable;
+
         private NodeBase _rootNode;
 
         #endregion
@@ -107,6 +109,11 @@ namespace GBG.AnimationGraph
         {
             if (_playableGraph.IsValid())
             {
+                foreach (var graph in _graphGuidTable.Values)
+                {
+                    graph.Destroy();
+                }
+
                 _playableGraph.Destroy();
                 Destroy(_graphAsset);
             }
@@ -124,15 +131,15 @@ namespace GBG.AnimationGraph
             }
 
             // Graph layer
-            var graphGuidTable = new Dictionary<string, GraphLayer>(_graphAsset.GraphLayers.Count);
+            _graphGuidTable = new Dictionary<string, GraphLayer>(_graphAsset.GraphLayers.Count);
             foreach (var graphLayer in _graphAsset.GraphLayers)
             {
-                graphGuidTable.Add(graphLayer.Guid, graphLayer);
+                _graphGuidTable.Add(graphLayer.Guid, graphLayer);
             }
 
             foreach (var graphLayer in _graphAsset.GraphLayers)
             {
-                graphLayer.InitializeNodes(_playableGraph, graphGuidTable, paramGuidTable);
+                graphLayer.InitializeNodes(_playableGraph, _graphGuidTable, paramGuidTable);
             }
 
             foreach (var graphLayer in _graphAsset.GraphLayers)

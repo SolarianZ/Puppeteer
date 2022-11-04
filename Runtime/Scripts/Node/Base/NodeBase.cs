@@ -87,6 +87,10 @@ namespace GBG.AnimationGraph.Node
 
         protected internal abstract void PrepareFrame(FrameData frameData);
 
+        protected internal virtual void Destroy()
+        {
+        }
+
 
         #region Speed & Play & Pause // See APIMask.cs
 
