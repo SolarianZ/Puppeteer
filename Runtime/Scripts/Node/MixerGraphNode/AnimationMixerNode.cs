@@ -57,13 +57,6 @@ namespace GBG.AnimationGraph.Node
             return _inputGuids;
         }
 
-        protected internal override void InitializeConnection(IReadOnlyDictionary<string, NodeBase> nodeGuidTable)
-        {
-            base.InitializeConnection(nodeGuidTable);
-
-            _isInputWeightDirty = true;
-        }
-
         protected internal override void PrepareFrame(FrameData frameData)
         {
             for (int i = 0; i < RuntimeInputNodes.Length; i++)
@@ -96,6 +89,8 @@ namespace GBG.AnimationGraph.Node
                     runtimeInputWeightParam.OnValueChanged += OnInputWeightChanged;
                 }
             }
+
+            _isInputWeightDirty = true;
         }
 
         protected override Playable CreatePlayable(PlayableGraph playableGraph)

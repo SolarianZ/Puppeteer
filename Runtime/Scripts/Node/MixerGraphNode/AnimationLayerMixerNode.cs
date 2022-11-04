@@ -116,6 +116,8 @@ namespace GBG.AnimationGraph.Node
                     runtimeInputWeightParam.OnValueChanged += OnInputWeightChanged;
                 }
             }
+
+            _isInputWeightDirty = true;
         }
 
         protected override Playable CreatePlayable(PlayableGraph playableGraph)

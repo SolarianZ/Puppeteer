@@ -150,6 +150,8 @@ namespace GBG.AnimationGraph.Node
                     runtimeInputWeightParam.OnValueChanged += OnInputWeightChanged;
                 }
             }
+
+            _isInputWeightDirty = true;
         }
 
         // TODO: Need Skeleton argument.
