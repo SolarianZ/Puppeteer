@@ -23,22 +23,23 @@ Legends:
     - ✅ Mixer Node
     - ✅ Layer Mixer Node
     - ✅ Clip Node
-        - ✅ Optional Explicit Time
-    - ▶ Blend Space 1D Node
-    - ▶ Blend Space 2D Node
+        - ✅ Optional Playback Speed
+        - ✅ Optional Motion Time
+    - ▶️ Blend Space 1D Node
+    - ▶️ Blend Space 2D Node
+    - ✅ Animation Script Node
     - ✅ Script Node
     - ✅ Sub Graph Node
-    - 📅 State Machine Node
-    - 📅 State Node(In State Machine)
+    - ▶️ State Machine Node
+    - ▶️ State Node(In State Machine)
     - 🔘 ~~Param Node~~ (Embed into PlayableNode)
-    - ❔ Pose Cache Node
-    - ❔ Light Mode
-    - ❔ Mirror Pose Node
+    - 🚫 Pose Cache Node
+    - 🚫 Mirror Pose Node
 - State Machine
-    - 📅 Transition
+    - ▶️ Transition
         - Smooth Transition
         - Frozen Transition
-- ❔ Sub Graph
+- ❔ Light Theme UI
 - ❔ Pose Preview
 - ❔ Debug Mode
 
@@ -47,22 +48,28 @@ Legends:
 
 - Nodes
     - ✅ Clip Node
-        - ✅ Optional Explicit Time
+        - ✅ Optional Playback Speed
+        - ✅ Optional Motion Time
     - ✅ Mixer Node
     - ✅ Layer Mixer Node
-    - ✅ Blend Space 1D Node
-    - ✅ Blend Space 2D Node
+    - ▶️ Blend Space 1D Node
+    - ▶️ Blend Space 2D Node
+    - ✅ Animation Script Node
     - ✅ Script Node
     - ✅ Sub Graph Node
-    - 📅 State Machine Node
-    - 📅 State Node(In State Machine)
+    - ▶️ State Machine Node
+    - ▶️ State Node(In State Machine)
     - 🔘 ~~Param Node~~ (Embed into PlayableNode)
-    - ❔ Pose Cache Node
-    - ❔ Mirror Pose Node
+    - 🚫 Pose Cache Node
+    - 🚫 Mirror Pose Node
+- Runtime PlayableGraph Modification
+    - 📅 Clip Replacement
+    - 📅 BlendSpace1D Replacement
+    - 📅 BlendSpace2D Replacement
+    - 📅 SubGraph Replacement
 - Events
     - 📅 Playable State Events
     - 📅 Custom Events
-- ❔ Mirror Pose
 
 
 ### Others
