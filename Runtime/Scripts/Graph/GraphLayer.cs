@@ -99,7 +99,7 @@ namespace GBG.AnimationGraph.Graph
             _graphType = type;
         }
 
-        public void InitializeNodes(PlayableGraph playableGraph,
+        public void InitializeNodes(Animator animator, PlayableGraph playableGraph,
             IReadOnlyDictionary<string, ParamInfo> paramGuidTable,
             IReadOnlyDictionary<string, GraphLayer> graphGuidTable,
             IReadOnlyDictionary<string, AnimationGraphAsset> externalGraphGuidTable)
@@ -107,7 +107,7 @@ namespace GBG.AnimationGraph.Graph
             _nodeGuidTable = new Dictionary<string, NodeBase>(Nodes.Count);
             foreach (var node in Nodes)
             {
-                node.InitializeData(playableGraph, paramGuidTable,
+                node.InitializeData(animator, playableGraph, paramGuidTable,
                     graphGuidTable, externalGraphGuidTable);
                 _nodeGuidTable.Add(node.Guid, node);
 

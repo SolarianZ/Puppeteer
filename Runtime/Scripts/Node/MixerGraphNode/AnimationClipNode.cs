@@ -137,7 +137,7 @@ namespace GBG.AnimationGraph.Node
             _runtimeSpeedDirty = true;
         }
 
-        protected override Playable CreatePlayable(PlayableGraph playableGraph)
+        protected override Playable CreatePlayable(Animator animator, PlayableGraph playableGraph)
         {
             var playable = AnimationClipPlayable.Create(playableGraph, Clip);
             return playable;

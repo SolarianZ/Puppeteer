@@ -72,7 +72,7 @@ namespace GBG.AnimationGraph
                 _graphGuidTable = new Dictionary<string, GraphLayer>(_graphAsset.GraphLayers.Count);
                 _playableGraph = PlayableGraph.Create($"{name}.{nameof(AnimationGraphBrain)}");
                 _graphAsset = Instantiate(_graphAsset);
-                _graphAsset.Initialize(_playableGraph, _graphGuidTable);
+                _graphAsset.Initialize(_animator, _playableGraph, _graphGuidTable);
 
                 // State driver
                 var driverPlayable = ScriptPlayable<AnimationGraphStateDriver>.Create(_playableGraph);

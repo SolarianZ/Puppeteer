@@ -78,7 +78,7 @@ namespace GBG.AnimationGraph.Node
             _isInputWeightDirty = true;
         }
 
-        protected override Playable CreatePlayable(PlayableGraph playableGraph)
+        protected override Playable CreatePlayable(Animator animator, PlayableGraph playableGraph)
         {
             var playable = AnimationLayerMixerPlayable.Create(playableGraph, MixerInputs.Count, MixerInputs.Count > 1);
             return playable;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using GBG.AnimationGraph.Graph;
 using GBG.AnimationGraph.Parameter;
+using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
 
@@ -70,7 +71,7 @@ namespace GBG.AnimationGraph.Node
         {
         }
 
-        protected override Playable CreatePlayable(PlayableGraph playableGraph)
+        protected override Playable CreatePlayable(Animator animator, PlayableGraph playableGraph)
         {
             var playable = AnimationMixerPlayable.Create(playableGraph, _stateMachineGraph.Nodes.Count);
             return playable;

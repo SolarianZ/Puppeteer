@@ -60,7 +60,7 @@ namespace GBG.AnimationGraph.Node
             }
         }
 
-        protected override Playable CreatePlayable(PlayableGraph playableGraph)
+        protected override Playable CreatePlayable(Animator animator, PlayableGraph playableGraph)
         {
             // State node has and only has one input
             var playable = AnimationMixerPlayable.Create(playableGraph, 1);

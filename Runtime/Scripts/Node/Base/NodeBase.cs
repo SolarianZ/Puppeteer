@@ -57,14 +57,14 @@ namespace GBG.AnimationGraph.Node
         
         #region Lifecycle
 
-        internal void InitializeData(PlayableGraph playableGraph,
+        internal void InitializeData(Animator animator, PlayableGraph playableGraph,
             IReadOnlyDictionary<string, ParamInfo> paramGuidTable,
             IReadOnlyDictionary<string, GraphLayer> graphGuidTable,
             IReadOnlyDictionary<string, AnimationGraphAsset> externalGraphGuidTable)
         {
             InitializeGraphLink(graphGuidTable, externalGraphGuidTable);
             InitializeParams(paramGuidTable);
-            Playable = CreatePlayable(playableGraph);
+            Playable = CreatePlayable(animator, playableGraph);
         }
 
         protected virtual void InitializeGraphLink(IReadOnlyDictionary<string, GraphLayer> graphGuidTable,
@@ -74,7 +74,7 @@ namespace GBG.AnimationGraph.Node
 
         protected abstract void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable);
 
-        protected abstract Playable CreatePlayable(PlayableGraph playableGraph);
+        protected abstract Playable CreatePlayable(Animator animator, PlayableGraph playableGraph);
         
         
         protected internal virtual void InitializeConnection(IReadOnlyDictionary<string, NodeBase> nodeGuidTable)

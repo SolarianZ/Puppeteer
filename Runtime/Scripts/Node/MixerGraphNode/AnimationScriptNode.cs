@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using GBG.AnimationGraph.Component;
 using GBG.AnimationGraph.Parameter;
 using GBG.AnimationGraph.Utility;
 using UnityEngine;
@@ -90,15 +91,15 @@ namespace GBG.AnimationGraph.Node
             _isInputWeightDirty = true;
         }
 
-        // TODO: Need Skeleton argument.
-        protected override Playable CreatePlayable(PlayableGraph playableGraph)
+        protected override Playable CreatePlayable(Animator animator, PlayableGraph playableGraph)
         {
             if (!ScriptAsset)
             {
                 return UPlayable.Null;
             }
 
-            var playable = ScriptAsset.CreatePlayable(null, playableGraph, MixerInputs.Count);
+            var skeleton = animator.GetComponent<Skeleton>();
+            var playable = ScriptAsset.CreatePlayable(skeleton, playableGraph, MixerInputs.Count);
             Assert.AreEqual(playable.GetInputCount(), MixerInputs.Count,
                 $"Runtime playable input count({playable.GetInputCount()}) doesn't equal to serialized input count({MixerInputs.Count}).");
 

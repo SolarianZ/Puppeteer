@@ -118,7 +118,8 @@ namespace GBG.AnimationGraph
             return null;
         }
 
-        public void Initialize(PlayableGraph playableGraph, Dictionary<string, GraphLayer> outGraphGuidTable)
+        public void Initialize(Animator animator, PlayableGraph playableGraph,
+            Dictionary<string, GraphLayer> outGraphGuidTable)
         {
             // Variables
             _paramNameTable = new Dictionary<string, ParamInfo>(Parameters.Count);
@@ -145,7 +146,7 @@ namespace GBG.AnimationGraph
                 if (externalGraph.GraphAsset)
                 {
                     externalGraph.GraphAsset = Instantiate(externalGraph.GraphAsset);
-                    externalGraph.GraphAsset.Initialize(playableGraph, outGraphGuidTable);
+                    externalGraph.GraphAsset.Initialize(animator, playableGraph, outGraphGuidTable);
                 }
 
                 externalGraphGuidTable.Add(externalGraph.Guid, externalGraph.GraphAsset);
@@ -162,7 +163,7 @@ namespace GBG.AnimationGraph
             // Nodes(Playables)
             foreach (var graphLayer in GraphLayers)
             {
-                graphLayer.InitializeNodes(playableGraph, paramGuidTable,
+                graphLayer.InitializeNodes(animator, playableGraph, paramGuidTable,
                     outGraphGuidTable, externalGraphGuidTable);
             }
 

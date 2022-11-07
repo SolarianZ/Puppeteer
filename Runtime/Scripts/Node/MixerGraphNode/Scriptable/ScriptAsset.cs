@@ -9,7 +9,7 @@ namespace GBG.AnimationGraph.Node
         public abstract bool NormalizeInputWeights { get; }
 
 
-        public abstract Playable CreateScriptPlayable(GameObject gameObject,
+        public abstract Playable CreateScriptPlayable(Animator animator,
             PlayableGraph playableGraph, int inputCount);
 
         public abstract ScriptBehaviour GetScriptBehaviour();

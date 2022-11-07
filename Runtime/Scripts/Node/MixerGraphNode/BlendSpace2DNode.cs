@@ -133,7 +133,7 @@ namespace GBG.AnimationGraph.Node
             throw new NotImplementedException();
 
         // TODO: CreatePlayable
-        protected override Playable CreatePlayable(PlayableGraph playableGraph) => throw new NotImplementedException();
+        protected override Playable CreatePlayable(Animator animator, PlayableGraph playableGraph) => throw new NotImplementedException();
 
         
         protected internal override IReadOnlyList<string> GetInputNodeGuids() => EmptyInputs;
