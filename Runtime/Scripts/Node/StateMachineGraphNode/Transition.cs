@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using GBG.AnimationGraph.Parameter;
+using GBG.AnimationGraph.Utility;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace GBG.AnimationGraph.Node
 {
     public enum TransitionMode
     {
-        Smooth,
+        Smooth = 0,
 
         Frozen
     }
@@ -16,10 +19,10 @@ namespace GBG.AnimationGraph.Node
     {
         #region Serialization Data
 
-        // public string Guid => _guid;
-        //
-        // [SerializeField]
-        // private string _guid;
+        public string SrcStateGuid => _srcStateGuid;
+
+        [SerializeField]
+        private string _srcStateGuid;
 
         public string DestStateGuid => _destStateGuid;
 
@@ -64,21 +67,69 @@ namespace GBG.AnimationGraph.Node
         }
 
         [SerializeField]
-        private AnimationCurve _blendCurve = AnimationCurve.Linear(0, 1, 1, 0);
+        private AnimationCurve _blendCurve = AnimationCurve.Linear(0, 0, 1, 1);
 
         public List<TransitionCondition> Conditions => _conditions;
 
         [SerializeField]
-        private List<TransitionCondition> _conditions = new List<TransitionCondition>();
+        private List<TransitionCondition> _conditions = new();
 
         // TODO: Interrupt?
 
         #endregion
 
 
+        #region Runtime Properties
+
+        public Action OnMeetConditions;
+
+        #endregion
+
+
+        [Obsolete]
         public Transition(string destStateGuid)
         {
             _destStateGuid = destStateGuid;
+        }
+
+        public Transition(string srcStateGuid, string destStateGuid)
+        {
+            _srcStateGuid = srcStateGuid;
+            _destStateGuid = destStateGuid;
+        }
+
+        public void Initialize(IReadOnlyDictionary<string, ParamInfo> paramGuidTable)
+        {
+            Assert.IsTrue(CurveTool.IsNormalized(BlendCurve), "Blend curve in animation transition is not normalized.");
+            // $"Blend curve of animation transition '{FromNodeGuid} -> {DestNodeGuid}' is not normalized."
+
+            foreach (var condition in Conditions)
+            {
+                condition.Initialize(paramGuidTable);
+                condition.OnConditionStateChanged += OnConditionStateChanged;
+            }
+        }
+
+        public bool CheckTransitions()
+        {
+            foreach (var condition in Conditions)
+            {
+                if (condition.Result)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+
+        private void OnConditionStateChanged(bool isMeetCondition)
+        {
+            if (isMeetCondition)
+            {
+                OnMeetConditions?.Invoke();
+            }
         }
     }
 }

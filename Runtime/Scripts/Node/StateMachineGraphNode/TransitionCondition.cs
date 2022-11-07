@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using GBG.AnimationGraph.Parameter;
 using UnityEngine;
@@ -18,7 +19,7 @@ namespace GBG.AnimationGraph.Node
     }
 
     [Serializable]
-    public class TransitionCondition
+    public class TransitionCondition : IDisposable
     {
         #region Serialization Data
 
@@ -28,6 +29,7 @@ namespace GBG.AnimationGraph.Node
             internal set => _paramType = value;
         }
 
+        [SerializeField]
         private ParamType _paramType;
 
         public ParamGuidOrValue LeftParam
@@ -60,6 +62,49 @@ namespace GBG.AnimationGraph.Node
         #endregion
 
 
+        #region Runtime Properties
+
+        public bool Result { get; set; }
+
+        public Action<bool> OnConditionStateChanged;
+
+
+        private ParamInfo _runtimeLeftParam;
+
+        private ParamInfo _runtimeRightParam;
+
+        #endregion
+
+
+        public void Initialize(IReadOnlyDictionary<string, ParamInfo> paramGuidTable)
+        {
+            AssertCheck();
+
+            if (!LeftParam.IsLiteral)
+            {
+                _runtimeLeftParam = paramGuidTable[LeftParam.Guid];
+                _runtimeLeftParam.OnValueChanged += OnConditionParamChanged;
+            }
+
+            if (!RightParam.IsLiteral)
+            {
+                _runtimeRightParam = paramGuidTable[RightParam.Guid];
+                _runtimeLeftParam.OnValueChanged += OnConditionParamChanged;
+            }
+
+            Result = Evaluate();
+        }
+
+        private void OnConditionParamChanged(ParamInfo animParam)
+        {
+            if (Result != Evaluate())
+            {
+                Result = !Result;
+                OnConditionStateChanged?.Invoke(Result);
+            }
+        }
+
+
         [Conditional("UNITY_ASSERTIONS")]
         public void AssertCheck()
         {
@@ -74,6 +119,26 @@ namespace GBG.AnimationGraph.Node
             {
                 Assert.AreNotEqual(ParamType.Bool, ParamType,
                     $"Use {ConditionOperator.Greater} or {ConditionOperator.Less} on {ParamType.Bool} operands.");
+            }
+        }
+
+        public bool Evaluate()
+        {
+            var leftParamValue = _runtimeLeftParam?.RawValue ?? LeftParam.RawValue;
+            var rightParamValue = _runtimeRightParam?.RawValue ?? RightParam.RawValue;
+            return CheckCondition(Operator, leftParamValue, rightParamValue);
+        }
+
+        public void Dispose()
+        {
+            if (_runtimeLeftParam != null)
+            {
+                _runtimeLeftParam.OnValueChanged -= OnConditionParamChanged;
+            }
+
+            if (_runtimeRightParam != null)
+            {
+                _runtimeRightParam.OnValueChanged -= OnConditionParamChanged;
             }
         }
 

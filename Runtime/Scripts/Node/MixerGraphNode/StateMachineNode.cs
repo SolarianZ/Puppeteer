@@ -26,6 +26,18 @@ namespace GBG.AnimationGraph.Node
 
         private Dictionary<string, int> _stateGuidToIndexTable;
 
+        private readonly Dictionary<string, List<Transition>> _stateGuidToTransitionTable = new();
+
+        private readonly List<StateIndexAndInitialWeight> _transitionSources = new List<StateIndexAndInitialWeight>();
+
+        private string _activeStateGuid;
+
+        private Transition _activeTransition;
+
+        private float _transitionTimer;
+
+        private bool _isStateDirty;
+
         #endregion
 
 
@@ -67,6 +79,22 @@ namespace GBG.AnimationGraph.Node
 
         protected internal override void InitializeConnection(IReadOnlyDictionary<string, NodeBase> nodeGuidTable)
         {
+            // Record transitions of each state
+            foreach (var inputGuid in _inputGuids)
+            {
+                var inputNode = (StateNode)nodeGuidTable[inputGuid];
+                foreach (var transition in inputNode.Transitions)
+                {
+                    if (!_stateGuidToTransitionTable.TryGetValue(inputGuid, out var transitionList))
+                    {
+                        transitionList = new();
+                        _stateGuidToTransitionTable[inputGuid] = transitionList;
+                    }
+
+                    transitionList.Add(transition);
+                }
+            }
+
             // Linked to external graph, so here we use node guid table of linked graph
             base.InitializeConnection(_stateMachineGraph?.NodeGuidTable);
 
@@ -86,8 +114,113 @@ namespace GBG.AnimationGraph.Node
 
 
         // TODO: PrepareFrame
-        protected internal override void PrepareFrame(FrameData frameData) => throw new NotImplementedException();
+        protected internal override void PrepareFrame(FrameData frameData)
+        {
+            while (_isStateDirty)
+            {
+                var newActiveTransition = FindTargetTransition();
+                if (newActiveTransition != null)
+                {
+                    RecordStatesBeforeTransitioning();
+                    _activeStateGuid = newActiveTransition.DestStateGuid;
+                    _transitionTimer = 0;
+                    _activeTransition = newActiveTransition;
+                }
+                else
+                {
+                    _isStateDirty = false;
+                }
+            }
+
+            if (_activeTransition != null)
+            {
+                _transitionTimer += frameData.DeltaTime;
+                DoTransition();
+            }
+        }
 
         #endregion
+
+
+        #region Transition
+
+        private Transition FindTargetTransition()
+        {
+            var candidateTransitions = _stateGuidToTransitionTable[_activeStateGuid];
+            Transition targetTransition = null;
+            for (int i = 0; i < candidateTransitions.Count; i++)
+            {
+                var currTransition = candidateTransitions[i];
+                if (!currTransition.CheckTransitions())
+                {
+                    continue;
+                }
+
+                targetTransition = currTransition;
+                break;
+
+                // if (targetTransition == null)
+                // {
+                //     targetTransition = currTransition;
+                //     continue;
+                // }
+
+                // if (currTransition.PriorityOrder < targetTransition.PriorityOrder)
+                // {
+                //     targetTransition = currTransition;
+                // }
+            }
+
+            return targetTransition;
+        }
+
+        private void RecordStatesBeforeTransitioning()
+        {
+            for (int i = 0; i < _transitionSources.Count; i++)
+            {
+                var oldSrcIndex = _transitionSources[i].Index;
+                _transitionSources[i] =
+                    new StateIndexAndInitialWeight(oldSrcIndex, Playable.GetInputWeight(oldSrcIndex));
+            }
+
+            var newSrcIndex = _stateGuidToIndexTable[_activeStateGuid];
+            _transitionSources.Add(new StateIndexAndInitialWeight(newSrcIndex, Playable.GetInputWeight(newSrcIndex)));
+        }
+
+        private void DoTransition()
+        {
+            // Calculate weight
+            var alpha = _activeTransition.BlendCurve.Evaluate(_transitionTimer / _activeTransition.FadeTime);
+            var destInputIndex = _stateGuidToIndexTable[_activeTransition.DestStateGuid];
+            Playable.SetInputWeight(destInputIndex, alpha);
+            for (int i = 0; i < _transitionSources.Count; i++)
+            {
+                var srcState = _transitionSources[i];
+                Playable.SetInputWeight(srcState.Index, srcState.InitialWeight * (1 - alpha));
+            }
+
+            // Transition completed
+            if (_transitionTimer >= _activeTransition.FadeTime)
+            {
+                _transitionSources.Clear();
+                _activeTransition = null;
+            }
+        }
+
+        #endregion
+
+
+        readonly struct StateIndexAndInitialWeight
+        {
+            public readonly int Index;
+
+            public readonly float InitialWeight;
+
+            public StateIndexAndInitialWeight(int index, float initialWeight)
+            {
+                Index = index;
+                InitialWeight = initialWeight;
+            }
+        }
     }
 }

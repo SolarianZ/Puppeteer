@@ -8,6 +8,7 @@ using UnityEngine.Playables;
 
 namespace GBG.AnimationGraph.Node
 {
+    // TODO: There should not be a playable node. Move Transitions to StateMachineNode.
     [Serializable]
     public class StateNode : NodeBase
     {
@@ -50,8 +51,14 @@ namespace GBG.AnimationGraph.Node
         }
 
         // TODO: InitializeParams(Transitions)
-        protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable) =>
-            throw new NotImplementedException();
+        protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable)
+        {
+            foreach (var transition in Transitions)
+            {
+                transition.Initialize(paramGuidTable);
+                transition.OnMeetConditions += OnMeetConditions;
+            }
+        }
 
         protected override Playable CreatePlayable(PlayableGraph playableGraph)
         {
@@ -78,9 +85,15 @@ namespace GBG.AnimationGraph.Node
         }
 
 
-        // TODO: PrepareFrame
+        // TODO: PrepareFrame(Exit Time)
         protected internal override void PrepareFrame(FrameData frameData) => throw new NotImplementedException();
 
         #endregion
+
+
+        private void OnMeetConditions()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

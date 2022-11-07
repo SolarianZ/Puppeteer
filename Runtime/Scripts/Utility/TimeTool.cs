@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace GBG.AnimationGraph
+namespace GBG.AnimationGraph.Utility
 {
     public static class TimeTool
     {

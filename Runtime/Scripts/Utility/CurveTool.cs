@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace GBG.AnimationGraph.Editor.Utility
+namespace GBG.AnimationGraph.Utility
 {
     public static class CurveTool
     {

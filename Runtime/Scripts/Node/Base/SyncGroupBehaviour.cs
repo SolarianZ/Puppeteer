@@ -8,31 +8,49 @@ namespace GBG.AnimationGraph.Node
 {
     public enum SyncGroupRole
     {
-        /** This node can be the leader, as long as it has a higher blend weight than the previous best leader. */
-        CanBeLeader,
+        /// <summary>
+        /// This node can be the leader, as long as it has a higher blend weight than the previous best leader.
+        /// </summary>
+        CanBeLeader = 0,
 
-        /** This node will always be a follower (unless there are only followers, in which case the first one ticked wins). */
+        /// <summary>
+        /// This node will always be a follower (unless there are only followers, in which case the first one ticked wins).
+        /// </summary>
         AlwaysFollower,
 
-        /** This node will always be a leader (if more than one node is AlwaysLeader, the last one ticked wins). */
+        /// <summary>
+        /// This node will always be a leader (if more than one node is AlwaysLeader, the last one ticked wins).
+        /// </summary>
         AlwaysLeader,
 
-        /** This node will be excluded from the sync group while blending in. Once blended in it will be the sync group leader until blended out*/
+        /// <summary>
+        /// This node will be excluded from the sync group while blending in.
+        /// Once blended in it will be the sync group leader until blended out.
+        /// </summary>
         TransitionLeader,
 
-        /** This node will be excluded from the sync group while blending in. Once blended in it will be a follower until blended out*/
+        /// <summary>
+        /// This node will be excluded from the sync group while blending in.
+        /// Once blended in it will be a follower until blended out.
+        /// </summary>
         TransitionFollower,
     }
 
     public enum SyncMethod
     {
-        // Don't sync ever
-        DoNotSync,
+        /// <summary>
+        /// Don't sync ever.
+        /// </summary>
+        DoNotSync = 0,
 
-        // Use a named sync group
+        /// <summary>
+        /// Use a named sync group.
+        /// </summary>
         SyncGroup,
 
-        // Use the graph structure to provide a sync group to apply
+        /// <summary>
+        /// Use the graph structure to provide a sync group to apply.
+        /// </summary>
         Graph
     }
 
