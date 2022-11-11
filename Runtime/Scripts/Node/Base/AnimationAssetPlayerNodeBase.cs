@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using GBG.AnimationGraph.Parameter;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace GBG.AnimationGraph.Node
 {
@@ -80,12 +82,30 @@ namespace GBG.AnimationGraph.Node
 
         #region Runtime Properties
 
-        public abstract float BaseSpeed { get; }
-
         public abstract FrameData FrameData { get; protected set; }
 
+        public float BaseSpeed
+        {
+            get
+            {
+                if (!SpeedParamActive) return 1;
+                return RuntimeSpeedParam?.GetFloat() ?? SpeedParam.GetFloat();
+            }
+        }
 
-        protected abstract float MotionTime { get; }
+
+        protected float MotionTime
+        {
+            get
+            {
+                if (!MotionTimeParamActive) return 0;
+                return RuntimeMotionTimeParam?.GetFloat() ?? MotionTimeParam.GetFloat();
+            }
+        }
+
+        protected ParamInfo RuntimeSpeedParam { get; private set; }
+
+        protected ParamInfo RuntimeMotionTimeParam { get; private set; }
 
         #endregion
 
@@ -93,6 +113,40 @@ namespace GBG.AnimationGraph.Node
         protected AnimationAssetPlayerNodeBase(string guid) : base(guid)
         {
         }
+
+        protected sealed override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable)
+        {
+            Assert.IsFalse(MotionTimeParamActive && SpeedParamActive,
+                $"Use explicit motion time and speed at the same time. Node type: {GetType().Name}, node guid: {Guid}.");
+
+            // Motion time
+            if (MotionTimeParamActive)
+            {
+                if (!MotionTimeParam.IsLiteral)
+                {
+                    RuntimeMotionTimeParam = paramGuidTable[MotionTimeParam.Guid];
+                    RuntimeMotionTimeParam.OnValueChanged += OnRuntimeMotionTimeParamChanged;
+                }
+            }
+
+            // Speed
+            if (SpeedParamActive)
+            {
+                if (!SpeedParam.IsLiteral)
+                {
+                    RuntimeSpeedParam = paramGuidTable[SpeedParam.Guid];
+                    RuntimeSpeedParam.OnValueChanged += OnRuntimeSpeedParamChanged;
+                }
+            }
+
+            InitializeAssetPlayerParams(paramGuidTable);
+        }
+
+        protected abstract void InitializeAssetPlayerParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable);
+
+        protected abstract void OnRuntimeSpeedParamChanged(ParamInfo paramInfo);
+
+        protected abstract void OnRuntimeMotionTimeParamChanged(ParamInfo paramInfo);
 
 
         public double GetScaledAnimationLength()

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using GBG.AnimationGraph.Parameter;
 using UnityEngine;
+using UnityEngine.Animations;
 using UnityEngine.Playables;
 
 namespace GBG.AnimationGraph.Node
@@ -88,33 +89,10 @@ namespace GBG.AnimationGraph.Node
 
         #region Runtime Properties
 
-        public override float BaseSpeed
-        {
-            get
-            {
-                if (!SpeedParamActive) return 1;
-                return _runtimeSpeedParam?.GetFloat() ?? SpeedParam.GetFloat();
-            }
-        }
-
         public override FrameData FrameData { get; protected set; }
 
 
-        protected override float MotionTime
-        {
-            get
-            {
-                if (!MotionTimeParamActive) return 0;
-                return _runtimeMotionTimeParam?.GetFloat() ?? MotionTimeParam.GetFloat();
-            }
-        }
-
-
-        private ParamInfo _runtimeSpeedParam;
-
         private bool _runtimeSpeedDirty;
-
-        private ParamInfo _runtimeMotionTimeParam;
 
         private bool _runtimeMotionTimeDirty;
 
@@ -129,34 +107,37 @@ namespace GBG.AnimationGraph.Node
         #region Lifecycle
 
         // TODO: InitializeParams
-        protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable) =>
+        protected override void InitializeAssetPlayerParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable) =>
             throw new NotImplementedException();
 
-        // TODO: CreatePlayable
-        protected override Playable CreatePlayable(Animator animator, PlayableGraph playableGraph) => throw new NotImplementedException();
+        protected override Playable CreatePlayable(Animator animator, PlayableGraph playableGraph)
+        {
+            var playable = AnimationMixerPlayable.Create(playableGraph, Samples.Count);
+            return playable;
+        }
 
-        
+
         protected internal override IReadOnlyList<string> GetInputNodeGuids() => EmptyInputs;
 
         // TODO: PrepareFrame
         protected internal override void PrepareFrame(FrameData frameData) => throw new NotImplementedException();
 
         #endregion
-        
-        
+
+
         // TODO: GetUnscaledAnimationLength
         public override double GetUnscaledAnimationLength()
         {
             throw new NotImplementedException();
         }
 
-        
-        private void OnRuntimeSpeedParamChanged(ParamInfo paramInfo)
+
+        protected override void OnRuntimeSpeedParamChanged(ParamInfo paramInfo)
         {
             _runtimeSpeedDirty = true;
         }
 
-        private void OnRuntimeMotionTimeParamChanged(ParamInfo paramInfo)
+        protected override void OnRuntimeMotionTimeParamChanged(ParamInfo paramInfo)
         {
             _runtimeMotionTimeDirty = true;
         }

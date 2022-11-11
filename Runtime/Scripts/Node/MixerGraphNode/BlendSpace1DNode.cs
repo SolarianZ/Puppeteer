@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using GBG.AnimationGraph.Parameter;
 using UnityEngine;
+using UnityEngine.Animations;
 using UnityEngine.Playables;
 
 namespace GBG.AnimationGraph.Node
@@ -67,33 +68,14 @@ namespace GBG.AnimationGraph.Node
 
         #region Runtime Properties
 
-        public override float BaseSpeed
-        {
-            get
-            {
-                if (!SpeedParamActive) return 1;
-                return _runtimeSpeedParam?.GetFloat() ?? SpeedParam.GetFloat();
-            }
-        }
-
         public override FrameData FrameData { get; protected set; }
 
 
-        protected override float MotionTime
-        {
-            get
-            {
-                if (!MotionTimeParamActive) return 0;
-                return _runtimeMotionTimeParam?.GetFloat() ?? MotionTimeParam.GetFloat();
-            }
-        }
+        private ParamInfo _runtimePositionParam;
 
-
-        private ParamInfo _runtimeSpeedParam;
+        private bool _runtimePositionDirty;
 
         private bool _runtimeSpeedDirty;
-
-        private ParamInfo _runtimeMotionTimeParam;
 
         private bool _runtimeMotionTimeDirty;
 
@@ -107,12 +89,22 @@ namespace GBG.AnimationGraph.Node
 
         #region Lifecycle
 
-        // TODO: InitializeParams
-        protected override void InitializeParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable) =>
-            throw new NotImplementedException();
+        protected override void InitializeAssetPlayerParams(IReadOnlyDictionary<string, ParamInfo> paramGuidTable)
+        {
+            if (!PositionParam.IsLiteral)
+            {
+                _runtimePositionParam = paramGuidTable[PositionParam.Guid];
+                _runtimePositionParam.OnValueChanged += OnRuntimePositionParamChanged;
+            }
 
-        // TODO: CreatePlayable
-        protected override Playable CreatePlayable(Animator animator, PlayableGraph playableGraph) => throw new NotImplementedException();
+            _runtimePositionDirty = true;
+        }
+
+        protected override Playable CreatePlayable(Animator animator, PlayableGraph playableGraph)
+        {
+            var playable = AnimationMixerPlayable.Create(playableGraph, Samples.Count);
+            return playable;
+        }
 
 
         protected internal override IReadOnlyList<string> GetInputNodeGuids() => EmptyInputs;
@@ -131,14 +123,25 @@ namespace GBG.AnimationGraph.Node
         }
 
 
-        private void OnRuntimeSpeedParamChanged(ParamInfo paramInfo)
+        protected override void OnRuntimeSpeedParamChanged(ParamInfo paramInfo)
         {
             _runtimeSpeedDirty = true;
         }
 
-        private void OnRuntimeMotionTimeParamChanged(ParamInfo paramInfo)
+        protected override void OnRuntimeMotionTimeParamChanged(ParamInfo paramInfo)
         {
             _runtimeMotionTimeDirty = true;
+        }
+
+
+        private void OnRuntimePositionParamChanged(ParamInfo paramInfo)
+        {
+            _runtimePositionDirty = true;
+        }
+
+        private float GetPosition()
+        {
+            return _runtimePositionParam?.GetFloat() ?? PositionParam.GetFloat();
         }
     }
 }
