@@ -31,10 +31,9 @@ namespace GBG.AnimationGraph.Editor.Node
         public StateEditorNode(AnimationGraphAsset graphAsset, StateNode node,
             Graph.GraphLayer graphLayer) : base(graphAsset, graphLayer)
         {
+            Node = node;
             Assert.AreEqual(node.LinkedGraphGuid, graphLayer.Guid,
                 $"Node guid not match with linked graph guid. Node type: {GetType().Name}, node guid: {Guid}.");
-
-            Node = node;
 
             SetPosition(new Rect(Node.EditorPosition, Vector2.zero));
 

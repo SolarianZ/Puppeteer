@@ -37,8 +37,8 @@ namespace GBG.AnimationGraph
         }
     }
 
-    // [CreateAssetMenu(fileName = nameof(AnimationGraphAsset),
-    //     menuName = "Puppeteer/[TEST] Animation Graph")]
+    [CreateAssetMenu(fileName = nameof(AnimationGraphAsset),
+        menuName = "Puppeteer/[TEST] Animation Graph")]
     public class AnimationGraphAsset : ScriptableObject, IDisposable
     {
         #region Serialization Data
