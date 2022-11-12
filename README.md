@@ -2,15 +2,17 @@
 
 A graph based animation controller for Unity.
 
-Still under development.
+**This package is not finished and has not been carefully tested. It may be good for reference but not good for production!**
 
+![Animation Mixer Graph Example](./Documents~/imgs/img_sample_animation_mixer_graph.png) 
 
-## Roadmap
+![Animation State Machine Graph Example](./Documents~/imgs/img_sample_animation_state_machine_graph.png) 
+
+## Status
 
 Legends:
 - 󠀥✅ Completed
 - ▶️ In Progress
-- 📅 Planned
 - ❔ Undetermined
 - 🔘 Canceled
 - 🚫 Won't Support
@@ -63,13 +65,13 @@ Legends:
     - 🚫 Pose Cache Node
     - 🚫 Mirror Pose Node
 - Runtime PlayableGraph Modification
-    - 📅 Clip Replacement
-    - 📅 BlendSpace1D Replacement
-    - 📅 BlendSpace2D Replacement
-    - 📅 SubGraph Replacement
+    - ❔ Clip Replacement
+    - ❔ BlendSpace1D Replacement
+    - ❔ BlendSpace2D Replacement
+    - ❔ SubGraph Replacement
 - Events
-    - 📅 Playable State Events
-    - 📅 Custom Events
+    - ❔ Playable State Events
+    - ❔ Custom Events
 
 
 ### Others

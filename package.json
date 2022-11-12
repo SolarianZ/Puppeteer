@@ -2,7 +2,7 @@
   "name": "com.greenbamboogames.puppeteer",
   "version": "0.0.2",
   "displayName": "Puppeteer!",
-  "description": "Puppeteer!",
+  "description": "A graph based animation controller for Unity.",
   "unity": "2021.3",
   "documentationUrl": "",
   "changelogUrl": "",
@@ -11,7 +11,7 @@
   "author": {
     "name": "GBG",
     "email": "vdergow@hotmail.com",
-    "url": ""
+    "url": "https://github.com/SolarianZ"
   },
   "type": "library",
   "hideInEditor": false
