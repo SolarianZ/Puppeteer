@@ -2,7 +2,12 @@
 
 A graph based animation controller for Unity.
 
-**This package is not finished and has not been carefully tested. It may be good for reference but not good for production!**
+**IMPORTANT NOTICE:** The code design in this repository has some flaws, which prevent it from fully implementing certain functionalities (such as multi-layer state machines). You can reference the design ideas in this repository, but do not use this repository directly in a development environment.
+
+**ADDENDUM:** Although the code design in this repository failed, in my subsequent development, I have proven that using Playable to implement a graph-based animation system is feasible, but I am unable to open-source it. Additionally, I **do not recommend** using Playable to build a large-scale, graph-based animation system, as Playable was not designed for complex topological structures, and it has quite a few limitations, reference(written in Chinese):
+- [Animation Playable Bug、限制及解决方案汇总](https://zhuanlan.zhihu.com/p/631392835)
+- [Playable使用细则](https://zhuanlan.zhihu.com/p/632890306)
+- [动画图插件的开发总结](https://zhuanlan.zhihu.com/p/601926796)
 
 ![Animation Mixer Graph Example](./Documents~/imgs/img_sample_animation_mixer_graph.png) 
 
